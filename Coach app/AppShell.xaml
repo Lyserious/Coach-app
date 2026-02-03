@@ -3,12 +3,12 @@
     x:Class="Coach_app.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Coach_app"
-    Title="Coach_app">
+    xmlns:auth="clr-namespace:Coach_app.Views.Auth"
+    Title="Coach app">
 
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Title="Connexion"
+        ContentTemplate="{DataTemplate auth:LoginPage}"
+        Route="LoginPage" />
 
 </Shell>

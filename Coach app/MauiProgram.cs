@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Coach_app.Data.Repositories;
+using Microsoft.Extensions.Logging;
+using Coach_app.Services.Auth;
+using Coach_app.ViewModels.Auth;
+using Coach_app.Views.Auth;
+
+
 
 namespace Coach_app
 {
@@ -16,9 +22,17 @@ namespace Coach_app
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
+
+
+            // Services Data
+            builder.Services.AddSingleton<ICoachRepository, CoachRepository>();
+            builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+            builder.Services.AddSingleton<IAuthService, AuthService>();
+            builder.Services.AddTransient<LoginViewModel>(); 
+            builder.Services.AddTransient<LoginPage>();
             return builder.Build();
         }
     }

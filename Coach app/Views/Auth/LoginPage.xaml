@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Auth"
+             x:Class="Coach_app.Views.Auth.LoginPage"
+             Shell.NavBarIsVisible="False"
+             Shell.FlyoutBehavior="Disabled"
+             Title="Connexion">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+
+            <Image Source="dotnet_bot.png" 
+                   HeightRequest="150" 
+                   HorizontalOptions="Center" />
+
+            <Label Text="{Binding Title}"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <VerticalStackLayout Spacing="15">
+                <Entry Placeholder="Nom du Coach"
+                       Text="{Binding Username}"
+                       Keyboard="Text" />
+
+                <Entry Placeholder="Mot de passe"
+                       Text="{Binding Password}"
+                       IsPassword="True" />
+
+                <Entry Placeholder="Confirmer le mot de passe"
+                       Text="{Binding ConfirmPassword}"
+                       IsPassword="True"
+                       IsVisible="{Binding IsRegistering}" />
+            </VerticalStackLayout>
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" />
+            <Button Text="{Binding ButtonText}"
+                    Command="{Binding SubmitCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    HeightRequest="50"
+                    CornerRadius="25" />
+
+            <Button Text="{Binding SwitchModeText}"
+                    Command="{Binding ToggleModeCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource Primary}"
+                    FontSize="Small" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource Primary}"
+                               HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
