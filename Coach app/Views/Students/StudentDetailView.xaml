@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Students"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="Coach_app.Views.Students.StudentDetailView"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="*, Auto">
+        <ScrollView Grid.Row="0" Padding="20">
+            <VerticalStackLayout Spacing="20">
+
+                <Frame HeightRequest="120" WidthRequest="120" CornerRadius="60" HorizontalOptions="Center" Padding="0" IsClippedToBounds="True" BorderColor="{StaticResource Primary}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding PickPhotoCommand}"/>
+                    </Frame.GestureRecognizers>
+
+                    <Grid>
+                        <Image Source="{Binding ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill"/>
+
+                        <Label Text="📷" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White" Opacity="0.8"/>
+                    </Grid>
+                </Frame>
+                <Label Text="Appuyez sur le cercle pour choisir une photo" HorizontalOptions="Center" FontSize="10" TextColor="Gray"/>
+
+                <Frame Padding="15" CornerRadius="10">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Identité" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Grid ColumnDefinitions="*, *">
+                            <Entry Grid.Column="0" Placeholder="Prénom" Text="{Binding FirstName}" Margin="0,0,5,0"/>
+                            <Entry Grid.Column="1" Placeholder="Nom" Text="{Binding LastName}" Margin="5,0,0,0"/>
+                        </Grid>
+                        <Entry Placeholder="Surnom (ex: La Machine)" Text="{Binding Nickname}"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Padding="15" CornerRadius="10">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Niveau Max" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Picker Title="Sélectionner un niveau"
+                                ItemsSource="{Binding Levels}"
+                                SelectedItem="{Binding SelectedLevel}"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Padding="15" CornerRadius="10" IsVisible="{Binding IsEditMode, Converter={toolkit:InvertedBoolConverter}}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Contact Rapide" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Entry Placeholder="Téléphone" Keyboard="Telephone" Text="{Binding QuickContactPhone}"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*, *, *" ColumnSpacing="10" Padding="20" BackgroundColor="{AppThemeBinding Light=White, Dark=Black}">
+
+            <Button Grid.Column="0" Text="Retirer" Command="{Binding DeleteCommand}" 
+                    BackgroundColor="DarkRed" TextColor="White" IsVisible="{Binding IsEditMode}"/>
+
+            <Button Grid.Column="1" Text="Annuler" Command="{Binding CancelCommand}" 
+                    BackgroundColor="Transparent" TextColor="Gray" BorderColor="Gray" BorderWidth="1"/>
+
+            <Button Grid.Column="2" Text="Enregistrer" Command="{Binding SaveCommand}" 
+                    BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+        </Grid>
+    </Grid>
+</ContentPage>

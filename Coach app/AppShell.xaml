@@ -3,12 +3,46 @@
     x:Class="Coach_app.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Coach_app"
-    Title="Coach_app">
+    xmlns:auth="clr-namespace:Coach_app.Views.Auth"
+    xmlns:home="clr-namespace:Coach_app.Views.Home"
+    xmlns:groups="clr-namespace:Coach_app.Views.Groups"
+    xmlns:exercises="clr-namespace:Coach_app.Views.Exercises"
+    Title="Coach Tracker"
+    FlyoutBackgroundColor="{StaticResource Primary}">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <Shell.FlyoutBehavior>
+        <OnPlatform x:TypeArguments="FlyoutBehavior">
+            <On Platform="Android,iOS" Value="Flyout" />
+            <On Platform="MacCatalyst,WinUI" Value="Disabled" />
+        </OnPlatform>
+    </Shell.FlyoutBehavior>
+
+    <Shell.FlyoutHeader>
+        <Grid HeightRequest="150" BackgroundColor="{StaticResource Primary}">
+            <Image Source="dotnet_bot.png" 
+                   HeightRequest="80" 
+                   VerticalOptions="Center" />
+            <Label Text="Coach Tracker"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="End"
+                   Margin="0,0,0,10"/>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <ShellContent Route="LoginPage"
+                  ContentTemplate="{DataTemplate auth:LoginPage}"
+                  FlyoutItemIsVisible="False" />
+
+    <FlyoutItem Title="Accueil" Icon="dotnet_bot.png">
+        <ShellContent ContentTemplate="{DataTemplate home:DashboardView}" Route="Dashboard" />
+    </FlyoutItem>
+    <FlyoutItem Title="Mes Groupes" Icon="dotnet_bot.png">
+        <ShellContent ContentTemplate="{DataTemplate groups:GroupsView}" Route="Groups" />
+    </FlyoutItem>
+    <FlyoutItem Title="Bibliothèque d'exercices" Icon="dotnet_bot.png">
+        <ShellContent ContentTemplate="{DataTemplate exercises:ExerciseLibraryView}" Route="Exercises" />
+    </FlyoutItem>
 
 </Shell>

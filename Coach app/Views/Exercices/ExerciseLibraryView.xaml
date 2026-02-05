@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Exercises"
+             xmlns:models="clr-namespace:Coach_app.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:shared="clr-namespace:Coach_app.Views.Shared" 
+             x:Class="Coach_app.Views.Exercises.ExerciseLibraryView"
+             Title="{Binding Title}">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadExercisesCommand}" />
+    </ContentPage.Behaviors>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{OnPlatform WinUI='250', MacCatalyst='250', Default='0'}" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <shared:SidebarView Grid.Column="0" 
+                            IsVisible="{OnPlatform WinUI='True', MacCatalyst='True', Default='False'}" />
+
+        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" Padding="15">
+            
+            <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,15">
+                <Label Text="Catalogue" FontSize="24" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Button Grid.Column="1" Text="+ Nouvel Exo" Command="{Binding AddExerciseCommand}" 
+                        BackgroundColor="{StaticResource Primary}" TextColor="White" HeightRequest="40"/>
+            </Grid>
+
+            <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never" Margin="0,0,0,15">
+                <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Categories}" Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Button Text="{Binding .}" 
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ExerciseLibraryViewModel}}, Path=FilterByCategoryCommand}"
+                                    CommandParameter="{Binding .}"
+                                    BackgroundColor="LightGray" TextColor="Black" 
+                                    CornerRadius="20" HeightRequest="35" FontSize="12"/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+            </ScrollView>
+
+            <CollectionView Grid.Row="2" ItemsSource="{Binding Exercises}" SelectionMode="Single">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="{OnIdiom Phone=1, Tablet=2, Desktop=3}" VerticalItemSpacing="10" HorizontalItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+                
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Exercise">
+                        <Frame Padding="15" CornerRadius="10" HasShadow="True" BorderColor="Transparent">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ExerciseLibraryViewModel}}, Path=EditExerciseCommand}"
+                                                      CommandParameter="{Binding .}"/>
+                            </Frame.GestureRecognizers>
+                            
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16"/>
+                                <Label Text="{Binding CategoryDisplay}" TextColor="{StaticResource Primary}" FontSize="12"/>
+                                <Label Text="{Binding Description}" TextColor="Gray" FontSize="12" LineBreakMode="TailTruncation"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
+</ContentPage>
