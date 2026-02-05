@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Coach_app.Views.Shared.SidebarView"
+             BackgroundColor="{StaticResource Gray100}">
+    <Grid RowDefinitions="Auto, *" Padding="10,20">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,30">
+            <Image Source="dotnet_bot.png" HeightRequest="60" HorizontalOptions="Center"/>
+            <Label Text="COACH TRACKER" 
+                   FontSize="12" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Gray900}"/>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="15" Margin="0,20,0,0">
+
+            <Button Text="Accueil" 
+                    ImageSource="dotnet_bot.png" 
+                    ContentLayout="Left,15"
+                    HeightRequest="45"
+                    CornerRadius="10"
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    HorizontalOptions="Start"
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="//Dashboard"/>
+
+            <Button Text="Mes Groupes" 
+                    ImageSource="dotnet_bot.png"
+                    ContentLayout="Left,15"
+                    HeightRequest="45"
+                    CornerRadius="10"
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    HorizontalOptions="Start"            
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="//Groups"/>
+
+            <Button Text="Exercices" 
+                    ImageSource="dotnet_bot.png"
+                    ContentLayout="Left,15"
+                    HeightRequest="45"
+                    CornerRadius="10"
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    HorizontalOptions="Start"                   
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="//Exercises"/>
+
+        </VerticalStackLayout>
+
+        <Button Grid.Row="1" 
+                Text="Se déconnecter" 
+                VerticalOptions="End"
+                BackgroundColor="{StaticResource Primary}" 
+                TextColor="White"
+                Command="{Binding LogoutCommand}"
+                HeightRequest="40"/>
+    </Grid>
+</ContentView>

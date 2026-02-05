@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Groups"
+             xmlns:models="clr-namespace:Coach_app.Models"
+             xmlns:shared="clr-namespace:Coach_app.Views.Shared"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit" 
+             x:Class="Coach_app.Views.Groups.GroupsView"
+             Title="{Binding Title}">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadGroupsCommand}" />
+    </ContentPage.Behaviors>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{OnPlatform WinUI='250', MacCatalyst='250', Default='0'}" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <shared:SidebarView Grid.Column="0" IsVisible="{OnPlatform WinUI='True', MacCatalyst='True', Default='False'}" />
+
+        <Grid Grid.Column="1" RowDefinitions="Auto, *" Padding="20">
+
+            <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,20">
+                <Label Text="Groupes récurrents &amp; Stages" FontSize="20" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Button Grid.Column="1" Text="+ Créer" Command="{Binding AddGroupCommand}"
+                        BackgroundColor="{StaticResource Primary}" TextColor="White" HeightRequest="40"/>
+            </Grid>
+
+            <CollectionView Grid.Row="1" 
+                            ItemsSource="{Binding Groups}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedGroup}">
+
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="{OnIdiom Phone=1, Tablet=2, Desktop=3}" VerticalItemSpacing="15" HorizontalItemSpacing="15"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Group">
+                        <Frame Padding="0" CornerRadius="15" HasShadow="True" BorderColor="Transparent" HeightRequest="200">
+                            <Grid RowDefinitions="2*, 1*">
+                                <Image Source="{Binding CoverImagePath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill" Grid.RowSpan="2"/>
+                                <BoxView Color="Black" Opacity="0.3" Grid.RowSpan="2"/>
+
+                                <Border BackgroundColor="White" HorizontalOptions="End" VerticalOptions="Start" Margin="10" Padding="8,4" StrokeShape="RoundRectangle 10">
+                                    <Label Text="{Binding Type}" FontSize="10" FontAttributes="Bold" TextColor="Black"/>
+                                </Border>
+
+                                <VerticalStackLayout Grid.Row="1" BackgroundColor="White" Padding="15,10">
+                                    <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="Black"/>
+                                    <Label Text="{Binding ScheduleDisplay}" FontSize="12" TextColor="Gray" Margin="0,5,0,0"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
+</ContentPage>

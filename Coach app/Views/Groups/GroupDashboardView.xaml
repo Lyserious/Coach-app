@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Groups"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit" 
+             x:Class="Coach_app.Views.Groups.GroupDashboardView"
+             Title="{Binding GroupName}"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadDataCommand}" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto, *">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="15,40,15,20" BackgroundColor="{StaticResource Primary}">
+            <Button Grid.Column="0" Text="←" Command="{Binding GoBackCommand}"
+                    BackgroundColor="Transparent" TextColor="White" FontSize="24"
+                    VerticalOptions="Start" Margin="0,-10,0,0"/>
+
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="10,0">
+                <Label Text="{Binding GroupName}" TextColor="White" FontSize="22" FontAttributes="Bold"/>
+                <Label Text="Tableau de bord" TextColor="White" Opacity="0.8" FontSize="12"/>
+            </VerticalStackLayout>
+
+            <Button Grid.Column="2" Text="⚙ Paramètres" Command="{Binding EditGroupCommand}"
+                    BackgroundColor="White" TextColor="{StaticResource Primary}"
+                    FontSize="12" HeightRequest="35" CornerRadius="15" VerticalOptions="Center"/>
+        </Grid>
+
+        <ScrollView Grid.Row="1" Padding="20">
+            <VerticalStackLayout Spacing="25">
+
+                <Frame CornerRadius="15" HasShadow="True" BorderColor="Transparent" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="📅  Calendrier / Séances" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}"/>
+
+                        <Grid ColumnDefinitions="Auto, *" BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#333}" Padding="10" 
+                              RowDefinitions="Auto, Auto">
+                            <Label Grid.Column="0" Text="PROCHAINE" FontSize="10" FontAttributes="Bold" TextColor="Gray" Margin="0,0,10,0"/>
+                            <Label Grid.Column="1" Text="Lundi 14 Octobre" FontAttributes="Bold"/>
+
+                            <Label Grid.Row="1" Grid.Column="1" Text="18:00 - 20:00 (Endurance)" TextColor="Gray" FontSize="12"/>
+                        </Grid>
+
+                        <Button Text="Voir tout le calendrier" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" FontSize="12" HorizontalOptions="End"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame CornerRadius="15" HasShadow="True" BorderColor="Transparent" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <Label Text="👥  Élèves" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
+                            <Button Grid.Column="1" Text="+ Ajouter" Command="{Binding AddStudentCommand}" 
+                                    FontSize="11" HeightRequest="30" Padding="10,0" CornerRadius="15"
+                                    BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding Students}" HeightRequest="250">
+                            <CollectionView.EmptyView>
+                                <Label Text="Aucun élève. Ajoutez-en un !" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Gray" Margin="0,30,0,0"/>
+                            </CollectionView.EmptyView>
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="40, *, Auto" Padding="0,5">
+                                        <Image Grid.Column="0" Source="{Binding ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
+                                               Aspect="AspectFill" HeightRequest="35" WidthRequest="35">
+                                            <Image.Clip>
+                                                <EllipseGeometry Center="17.5,17.5" RadiusX="17.5" RadiusY="17.5"/>
+                                            </Image.Clip>
+                                        </Image>
+
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="10,0,0,0">
+                                            <Label Text="{Binding DisplayName}" FontAttributes="Bold" FontSize="14"/>
+                                            <Label Text="{Binding MaxLevel, StringFormat='Niveau : {0}'}" TextColor="Gray" FontSize="10"/>
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="2" Text="🛈" FontSize="18" TextColor="LightGray" VerticalOptions="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame CornerRadius="15" HasShadow="True" BorderColor="Transparent" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="📷  Photos &amp; Vidéos" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}"/>
+                        <Label Text="Aucun média partagé pour ce groupe." TextColor="Gray" FontSize="12" FontAttributes="Italic"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

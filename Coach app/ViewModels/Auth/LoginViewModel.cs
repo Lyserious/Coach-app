@@ -9,6 +9,7 @@ namespace Coach_app.ViewModels.Auth
     public partial class LoginViewModel : ViewModelBase
     {
         private readonly IAuthService _authService;
+        private readonly ISessionService _sessionService;
 
         [ObservableProperty]
         private string _username;
@@ -31,9 +32,10 @@ namespace Coach_app.ViewModels.Auth
         public string ButtonText => IsRegistering ? "Créer mon profil" : "Se connecter";
         public string SwitchModeText => IsRegistering ? "J'ai déjà un compte" : "Créer un nouveau profil coach";
 
-        public LoginViewModel(IAuthService authService)
+        public LoginViewModel(IAuthService authService, ISessionService sessionService) // <--- MAJ CONSTRUCTEUR
         {
             _authService = authService;
+            _sessionService = sessionService;
             Title = "Coach Tracker - Connexion";
             CheckInitialStateAsync();
         }
@@ -65,7 +67,7 @@ namespace Coach_app.ViewModels.Auth
             try
             {
                 
-                // On retire les espaces avant/après le nom (ex: "Alex " devient "Alex")
+                // On retire les espaces avant/après le nom (ex: "Alice " devient "Alice")
                 if (!string.IsNullOrWhiteSpace(Username))
                 {
                     Username = Username.Trim();
@@ -114,8 +116,12 @@ namespace Coach_app.ViewModels.Auth
             var coach = await _authService.LoginAsync(Username, Password);
             if (coach != null)
             {
-                await Shell.Current.DisplayAlert("Succès", $"Bienvenue Coach {coach.Name} !", "Go");
-                // Navigation vers le dashboard à venir...
+                // 1. On stocke la session
+                _sessionService.SetSession(coach);
+
+                // 2. Navigation vers le Dashboard (Route absolue "//Dashboard")
+                // Cela efface la stack de navigation précédente (on ne peut pas faire "Retour" vers le login)
+                await Shell.Current.GoToAsync("//Dashboard");
             }
             else
             {

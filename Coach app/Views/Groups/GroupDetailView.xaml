@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Groups"
+             x:Class="Coach_app.Views.Groups.GroupDetailView"
+             Title="{Binding TitleText}">
+
+    <Grid RowDefinitions="*, Auto">
+
+        <ScrollView Grid.Row="0" Padding="20">
+            <VerticalStackLayout Spacing="20">
+
+                <Frame Padding="15" CornerRadius="10">
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="Général" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+
+                        <Entry Placeholder="Nom (ex: Grpe Compétition)" 
+                               Text="{Binding Name}" 
+                               FontSize="18"/>
+
+                        <Picker ItemsSource="{Binding GroupTypeNames}" 
+                                SelectedIndex="{Binding SelectedTypeIndex}"
+                                Title="Type d'activité" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame IsVisible="{Binding IsWeekly}" Padding="15" CornerRadius="10">
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="Configuration de la Saison" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+
+                        <Label Text="Quel jour de la semaine ?" FontSize="12" TextColor="Gray"/>
+                        <Picker ItemsSource="{Binding DayNames}" SelectedIndex="{Binding SelectedDayIndex}"/>
+
+                        <Label Text="Horaires" FontSize="12" TextColor="Gray"/>
+                        <Grid ColumnDefinitions="*, Auto, *">
+                            <TimePicker Time="{Binding StartTime}" Format="HH:mm"/>
+                            <Label Grid.Column="1" Text="à" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <TimePicker Grid.Column="2" Time="{Binding EndTime}" Format="HH:mm"/>
+                        </Grid>
+
+                        <Label Text="Durée de la saison" FontSize="12" TextColor="Gray"/>
+                        <Grid ColumnDefinitions="*, Auto, *">
+                            <DatePicker Date="{Binding StartDate}" Format="dd/MM/yyyy"/>
+                            <Label Grid.Column="1" Text="au" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <DatePicker Grid.Column="2" Date="{Binding EndDate}" Format="dd/MM/yyyy"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame IsVisible="{Binding IsEvent}" Padding="15" CornerRadius="10">
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="Dates du Stage" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Grid ColumnDefinitions="*, Auto, *">
+                            <DatePicker Date="{Binding StartDate}" Format="dd MMM"/>
+                            <Label Grid.Column="1" Text="au" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <DatePicker Grid.Column="2" Date="{Binding EndDate}" Format="dd MMM"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame IsVisible="{Binding IsPrivate}" Padding="15" CornerRadius="10" BackgroundColor="#E3F2FD">
+                    <Label Text="Pour les cours particuliers, créez le groupe ici. Vous gérerez les séances dans le calendrier ensuite." 
+                           TextColor="Black" FontSize="12"/>
+                </Frame>
+
+                <BoxView HeightRequest="20" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*, *, *" ColumnSpacing="10" Padding="20" BackgroundColor="{AppThemeBinding Light=White, Dark=Black}">
+
+            <Button Grid.Column="0" Text="Archiver" Command="{Binding DeleteCommand}"
+                    BackgroundColor="DarkRed" TextColor="White"
+                    IsVisible="{Binding IsEditMode}"/>
+
+            <Button Grid.Column="1" Text="Annuler" Command="{Binding CancelCommand}"
+                    BackgroundColor="Transparent" TextColor="Gray" BorderColor="Gray" BorderWidth="1"/>
+
+            <Button Grid.Column="2" Text="{Binding SubmitButtonText}" Command="{Binding SaveCommand}"
+                    BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>
