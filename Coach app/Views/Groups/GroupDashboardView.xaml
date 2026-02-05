@@ -49,9 +49,14 @@
 
                 <Frame CornerRadius="15" HasShadow="True" BorderColor="Transparent" Padding="15">
                     <VerticalStackLayout Spacing="10">
-                        <Grid ColumnDefinitions="*, Auto">
+                        <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="10">
                             <Label Text="👥  Élèves" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
-                            <Button Grid.Column="1" Text="+ Ajouter" Command="{Binding AddStudentCommand}" 
+
+                            <Button Grid.Column="1" Text="🔍 Importer" Command="{Binding ImportStudentCommand}" 
+                                    FontSize="11" HeightRequest="30" Padding="10,0" CornerRadius="15"
+                                    BackgroundColor="LightGray" TextColor="Black"/>
+
+                            <Button Grid.Column="2" Text="+ Nouveau" Command="{Binding AddStudentCommand}" 
                                     FontSize="11" HeightRequest="30" Padding="10,0" CornerRadius="15"
                                     BackgroundColor="{StaticResource Primary}" TextColor="White"/>
                         </Grid>

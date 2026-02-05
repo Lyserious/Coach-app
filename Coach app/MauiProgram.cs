@@ -61,7 +61,7 @@ namespace Coach_app
             builder.Services.AddTransient<ExerciseLibraryView>();
             builder.Services.AddTransient<ExerciseDetailView>();
             builder.Services.AddTransient<StudentDetailView>();
-
+            builder.Services.AddTransient<AddExistingStudentView>();
 
             // ViewModels
 
@@ -71,7 +71,7 @@ namespace Coach_app
             builder.Services.AddTransient<ExerciseLibraryViewModel>();
             builder.Services.AddTransient<ExerciseDetailViewModel>();
             builder.Services.AddTransient<StudentDetailViewModel>();
-
+            builder.Services.AddTransient<AddExistingStudentViewModel>();
 
 
 

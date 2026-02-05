@@ -92,5 +92,11 @@ namespace Coach_app.ViewModels.Groups
         {
             await Shell.Current.GoToAsync("..");
         }
+        [RelayCommand]
+        private async Task ImportStudent()
+        {
+            // Navigation vers la page d'import
+            await Shell.Current.GoToAsync($"{nameof(AddExistingStudentView)}?GroupId={GroupId}");
+        }
     }
 }
