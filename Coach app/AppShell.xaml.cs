@@ -18,7 +18,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(GroupDashboardView), typeof(GroupDashboardView));
         Routing.RegisterRoute(nameof(ExerciseDetailView), typeof(ExerciseDetailView));
         Routing.RegisterRoute(nameof(StudentDetailView), typeof(StudentDetailView));
-
+        Routing.RegisterRoute(nameof(AddExistingStudentView), typeof(AddExistingStudentView));
 
 
     }
