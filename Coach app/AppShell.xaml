@@ -7,8 +7,13 @@
     xmlns:home="clr-namespace:Coach_app.Views.Home"
     xmlns:groups="clr-namespace:Coach_app.Views.Groups"
     xmlns:exercises="clr-namespace:Coach_app.Views.Exercises"
+    xmlns:settings="clr-namespace:Coach_app.Views.Settings"
+    xmlns:students="clr-namespace:Coach_app.Views.Students"
     Title="Coach Tracker"
-    FlyoutBackgroundColor="{StaticResource Primary}">
+    FlyoutBackgroundColor="{StaticResource Primary}"
+    >
+
+    
 
     <Shell.FlyoutBehavior>
         <OnPlatform x:TypeArguments="FlyoutBehavior">
@@ -31,7 +36,7 @@
         </Grid>
     </Shell.FlyoutHeader>
 
-    <ShellContent Route="LoginPage"
+    <ShellContent Route="Login"
                   ContentTemplate="{DataTemplate auth:LoginPage}"
                   FlyoutItemIsVisible="False" />
 
@@ -43,6 +48,9 @@
     </FlyoutItem>
     <FlyoutItem Title="Bibliothèque d'exercices" Icon="dotnet_bot.png">
         <ShellContent ContentTemplate="{DataTemplate exercises:ExerciseLibraryView}" Route="Exercises" />
+    </FlyoutItem>
+    <FlyoutItem Title="Annuaire Élèves" Icon="dotnet_bot.png">
+        <ShellContent ContentTemplate="{DataTemplate students:StudentLibraryView}" Route="StudentLibraryView" />
     </FlyoutItem>
 
 </Shell>

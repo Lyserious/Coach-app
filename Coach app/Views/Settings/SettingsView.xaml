@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Settings"
+             x:Class="Coach_app.Views.Settings.SettingsView"
+             Title="{Binding Title}">
+
+    <VerticalStackLayout Spacing="20" Padding="20">
+        <Label Text="Préférences de l'application" FontSize="18" FontAttributes="Bold" TextColor="Gray"/>
+
+        <Frame BorderColor="LightGray" Padding="15">
+            <Label Text="Version de l'application : 1.0.0" TextColor="Gray"/>
+        </Frame>
+
+        <Button Text="Se déconnecter" 
+                Command="{Binding LogoutCommand}" 
+                BackgroundColor="#FFEEEE" 
+                TextColor="Red"
+                Margin="0,50,0,0"/>
+    </VerticalStackLayout>
+</ContentPage>

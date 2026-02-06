@@ -1,8 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Coach_app.Services.Auth;
+﻿using Coach_app.Services.Auth;
 using Coach_app.ViewModels.Base;
-using Coach_app.Views.Auth;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Coach_app.ViewModels.Home
 {
@@ -16,28 +15,33 @@ namespace Coach_app.ViewModels.Home
         public DashboardViewModel(ISessionService sessionService)
         {
             _sessionService = sessionService;
-            Title = "Accueil";
-            LoadData();
+            Title = "Tableau de bord";
+            UpdateWelcomeMessage();
         }
 
-        private void LoadData()
+        private void UpdateWelcomeMessage()
         {
-            if (_sessionService.CurrentCoach != null)
+            var coachName = _sessionService.CurrentCoach?.Name ?? "Coach";
+            WelcomeMessage = $"Bonjour, {coachName} !";
+        }
+
+        [RelayCommand]
+        private async Task GoToPage(string route)
+        {
+            if (!string.IsNullOrEmpty(route))
             {
-                WelcomeMessage = $"Bonjour, {_sessionService.CurrentCoach.Name} !";
+                await Shell.Current.GoToAsync(route);
             }
         }
 
         [RelayCommand]
         private async Task Logout()
         {
-            bool confirm = await Shell.Current.DisplayAlert("Déconnexion", "Voulez-vous vraiment vous déconnecter ?", "Oui", "Non");
-            if (confirm)
-            {
-                _sessionService.ClearSession();
-                // Retour au Login via la route absolue
-                await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
-            }
+            // CORRECTION ICI : Utilisation de TA méthode 'ClearSession'
+            _sessionService.ClearSession();
+
+            // Redirection vers la page de login
+            await Shell.Current.GoToAsync("//Login");
         }
     }
 }

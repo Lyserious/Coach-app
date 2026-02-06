@@ -44,13 +44,19 @@ namespace Coach_app
             builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
             builder.Services.AddSingleton<IAuthService, AuthService>();
             builder.Services.AddSingleton<ISessionService, SessionService>();
+            builder.Services.AddTransient<Views.Settings.SettingsView>();
+
+
 
             // Repositories
             builder.Services.AddTransient<IGroupRepository, GroupRepository>();
-            builder.Services.AddTransient<LoginViewModel>(); 
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<IExerciseRepository, ExerciseRepository>();
             builder.Services.AddTransient<IStudentRepository, StudentRepository>();
+
+
+
+
 
             // Views
             builder.Services.AddTransient<Coach_app.Views.Groups.GroupsView>();
@@ -62,6 +68,9 @@ namespace Coach_app
             builder.Services.AddTransient<ExerciseDetailView>();
             builder.Services.AddTransient<StudentDetailView>();
             builder.Services.AddTransient<AddExistingStudentView>();
+            builder.Services.AddTransient<StudentLibraryView>();
+
+
 
             // ViewModels
 
@@ -72,7 +81,9 @@ namespace Coach_app
             builder.Services.AddTransient<ExerciseDetailViewModel>();
             builder.Services.AddTransient<StudentDetailViewModel>();
             builder.Services.AddTransient<AddExistingStudentViewModel>();
-
+            builder.Services.AddTransient<StudentLibraryViewModel>();
+            builder.Services.AddTransient<ViewModels.Settings.SettingsViewModel>();
+            builder.Services.AddTransient<LoginViewModel>();
 
 
             return builder.Build();

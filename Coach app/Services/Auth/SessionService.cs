@@ -7,6 +7,7 @@ namespace Coach_app.Services.Auth
         Coach CurrentCoach { get; }
         void SetSession(Coach coach);
         void ClearSession();
+
     }
 
     public class SessionService : ISessionService

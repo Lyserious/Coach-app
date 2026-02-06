@@ -2,35 +2,63 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Home"
-             xmlns:shared="clr-namespace:Coach_app.Views.Shared"
              x:Class="Coach_app.Views.Home.DashboardView"
              Title="{Binding Title}">
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{OnPlatform WinUI='250', MacCatalyst='250', Default='0'}" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+    <Grid RowDefinitions="Auto, *" Padding="20" RowSpacing="20">
 
-        <shared:SidebarView Grid.Column="0" 
-                            IsVisible="{OnPlatform WinUI='True', MacCatalyst='True', Default='False'}" />
+        <VerticalStackLayout Grid.Row="0" Spacing="5">
+            <Label Text="{Binding WelcomeMessage}" 
+                   FontSize="24" 
+                   FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+            <Label Text="Prêt pour une nouvelle séance ?" 
+                   TextColor="Gray" />
+        </VerticalStackLayout>
 
-        <Grid Grid.Column="1" RowDefinitions="Auto, *" Padding="20">
-            <VerticalStackLayout Grid.Row="0" Spacing="5">
-                <Label Text="{Binding WelcomeMessage}" 
-                       FontSize="24" 
-                       FontAttributes="Bold" />
-                <Label Text="Prêt pour une nouvelle séance ?" 
-                       TextColor="Gray" />
-            </VerticalStackLayout>
+        <ScrollView Grid.Row="1">
+            <Grid ColumnDefinitions="*,*" RowDefinitions="160, 160" ColumnSpacing="15" RowSpacing="15">
 
-            <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center">
-                <Label Text="Les groupes s'afficheront ici..." FontAttributes="Italic"/>
-                <Button Text="Se déconnecter" 
-                        Command="{Binding LogoutCommand}" 
-                        Margin="0,20,0,0"/>
-            </VerticalStackLayout>
-        </Grid>
+                <Frame Grid.Row="0" Grid.Column="0" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="ExerciseLibraryView"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <Label Text="📚" FontSize="40" HorizontalOptions="Center"/>
+                        <Label Text="Catalogue" FontAttributes="Bold" TextColor="Black"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="0" Grid.Column="1" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//Groups"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <Label Text="👥" FontSize="40" HorizontalOptions="Center" TextColor="White"/>
+                        <Label Text="Mes Groupes" FontAttributes="Bold" TextColor="Black"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1" Grid.Column="0" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="StudentLibraryView"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <Label Text="🎓" FontSize="40" HorizontalOptions="Center"/>
+                        <Label Text="Annuaire" FontAttributes="Bold" TextColor="Black"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1" Grid.Column="1" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="SettingsView"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <Label Text="⚙️" FontSize="40" HorizontalOptions="Center"/>
+                        <Label Text="Paramètres" FontAttributes="Bold" TextColor="Black"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </Grid>
+        </ScrollView>
     </Grid>
-
 </ContentPage>

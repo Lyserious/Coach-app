@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Students"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="Coach_app.Views.Students.StudentLibraryView"
+             Title="{Binding Title}">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadDataCommand}" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20" RowSpacing="15">
+
+        <SearchBar Grid.Row="0"
+                   Placeholder="Rechercher un élève..."
+                   Text="{Binding SearchText}"
+                   BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#333}"
+                   CancelButtonColor="{StaticResource Primary}"/>
+
+        <CollectionView Grid.Row="1" 
+                        ItemsSource="{Binding Students}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedStudent}">
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label Text="Aucun élève trouvé." TextColor="Gray"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="10" Margin="0,0,0,10" CornerRadius="10" BorderColor="LightGray" HasShadow="False">
+                        <Grid ColumnDefinitions="50, *, Auto">
+                            <Image Grid.Column="0" Source="{Binding ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
+                                   Aspect="AspectFill" HeightRequest="50" WidthRequest="50">
+                                <Image.Clip>
+                                    <EllipseGeometry Center="25,25" RadiusX="25" RadiusY="25"/>
+                                </Image.Clip>
+                            </Image>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="15,0,0,0">
+                                <Label Text="{Binding DisplayName}" FontAttributes="Bold" FontSize="16"/>
+                                <Label Text="{Binding MaxLevel, StringFormat='Niveau : {0}'}" FontSize="12" TextColor="Gray"/>
+                            </VerticalStackLayout>
+
+                            <Label Grid.Column="2" Text="›" FontSize="24" TextColor="LightGray" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2" Text="+ Nouvel Élève" 
+                Command="{Binding AddStudentCommand}"
+                BackgroundColor="{StaticResource Primary}" 
+                TextColor="White" CornerRadius="25" HeightRequest="50"/>
+    </Grid>
+</ContentPage>

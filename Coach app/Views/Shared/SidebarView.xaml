@@ -49,14 +49,27 @@
                     Command="{Binding NavigateCommand}"
                     CommandParameter="//Exercises"/>
 
+            <Button Text="Elèves" 
+                    ImageSource="dotnet_bot.png"
+                    ContentLayout="Left,15"
+                    HeightRequest="45"
+                    CornerRadius="10"
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    HorizontalOptions="Start"                   
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="StudentLibraryView"/>
+            
+
         </VerticalStackLayout>
 
         <Button Grid.Row="1" 
-                Text="Se déconnecter" 
+                Text="Paramètres" 
                 VerticalOptions="End"
                 BackgroundColor="{StaticResource Primary}" 
                 TextColor="White"
-                Command="{Binding LogoutCommand}"
-                HeightRequest="40"/>
+                HeightRequest="40"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="SettingsView"/>
     </Grid>
 </ContentView>
