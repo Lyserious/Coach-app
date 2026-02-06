@@ -4,10 +4,14 @@
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Students"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Coach_app.Views.Students.StudentProfileView"
-             Title="Profil Élève">
+             Title="{Binding Title}">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadDataCommand}" />
+    </ContentPage.Behaviors>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Modifier" Command="{Binding EditStudentCommand}" IconImageSource="dotnet_bot.png"/>
+        <ToolbarItem Text="Modifier" Command="{Binding EditStudentCommand}" />
     </ContentPage.ToolbarItems>
 
     <Grid RowDefinitions="Auto, Auto, Auto, *" Padding="0" BackgroundColor="White">
@@ -20,8 +24,19 @@
                        Aspect="AspectFill"/>
             </Frame>
 
-            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="8">
-                <Label Text="{Binding Student.DisplayName}" FontSize="20" FontAttributes="Bold" TextColor="Black"/>
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
+
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Grid.Column="0" Text="{Binding Student.DisplayName}" FontSize="20" FontAttributes="Bold" TextColor="Black" VerticalOptions="Center"/>
+
+                    <Button Grid.Column="1" Text="✎" 
+                            Command="{Binding EditStudentCommand}"
+                            FontSize="22"
+                            TextColor="{StaticResource Primary}"
+                            BackgroundColor="Transparent"
+                            HeightRequest="40" WidthRequest="40"
+                            Padding="0" Margin="0,-5,0,0"/>
+                </Grid>
 
                 <Label Text="{Binding Student.MaxLevel, StringFormat='Niveau Max : {0}'}" 
                        FontSize="14" TextColor="{StaticResource Primary}" FontAttributes="Bold"/>
@@ -31,6 +46,11 @@
                 <HorizontalStackLayout Spacing="5">
                     <Label Text="📞" FontSize="14"/>
                     <Label Text="{Binding Student.PhoneNumber, TargetNullValue='Non renseigné'}" FontSize="13" TextColor="Gray"/>
+                </HorizontalStackLayout>
+
+                <HorizontalStackLayout Spacing="5">
+                    <Label Text="📧" FontSize="14"/>
+                    <Label Text="{Binding Student.Email, TargetNullValue='Non renseigné'}" FontSize="13" TextColor="Gray"/>
                 </HorizontalStackLayout>
 
                 <HorizontalStackLayout Spacing="5">

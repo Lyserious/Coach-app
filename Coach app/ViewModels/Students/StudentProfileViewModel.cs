@@ -21,41 +21,34 @@ namespace Coach_app.ViewModels.Students
 
         [ObservableProperty] private int _id;
         [ObservableProperty] private Student _student;
-        [ObservableProperty] private string _emergencyContactInfo; // Ex: "Maman (06...)"
+        [ObservableProperty] private string _emergencyContactInfo;
 
         // --- GESTION DES ONGLETS ---
-        // 0 = Inscriptions, 1 = Photos, 2 = Notes, 3 = Stats
         [ObservableProperty] private int _selectedTabIndex = 0;
 
         // --- FILTRES INSCRIPTIONS ---
-        // 0 = Tout, 1 = Actuelles, 2 = Futures 3= passées
         [ObservableProperty] private int _inscriptionFilterIndex = 0;
 
         public ObservableCollection<Group> FilteredGroups { get; } = new();
         public ObservableCollection<StudentNote> Notes { get; } = new();
 
-        // Propriétés pour gérer la visibilité des onglets dans la vue
+        // Propriétés visuelles
         public bool IsInscriptionsVisible => SelectedTabIndex == 0;
         public bool IsPhotosVisible => SelectedTabIndex == 1;
         public bool IsNotesVisible => SelectedTabIndex == 2;
         public bool IsStatsVisible => SelectedTabIndex == 3;
 
-        // Couleurs des boutons onglets (Visuel)
         public Color Tab0Color => SelectedTabIndex == 0 ? Colors.Black : Colors.Gray;
         public Color Tab1Color => SelectedTabIndex == 1 ? Colors.Black : Colors.Gray;
         public Color Tab2Color => SelectedTabIndex == 2 ? Colors.Black : Colors.Gray;
         public Color Tab3Color => SelectedTabIndex == 3 ? Colors.Black : Colors.Gray;
 
-        // Couleurs des filtres inscriptions
-        public Color Filter0Color => InscriptionFilterIndex == 0 ? Color.Parse("#512BD4") : Colors.LightGray; // #512BD4 = Primary
+        public Color Filter0Color => InscriptionFilterIndex == 0 ? Color.Parse("#512BD4") : Colors.LightGray;
         public Color Filter0Text => InscriptionFilterIndex == 0 ? Colors.White : Colors.Black;
-
         public Color Filter1Color => InscriptionFilterIndex == 1 ? Color.Parse("#512BD4") : Colors.LightGray;
         public Color Filter1Text => InscriptionFilterIndex == 1 ? Colors.White : Colors.Black;
-
         public Color Filter2Color => InscriptionFilterIndex == 2 ? Color.Parse("#512BD4") : Colors.LightGray;
         public Color Filter2Text => InscriptionFilterIndex == 2 ? Colors.White : Colors.Black;
-
         public Color Filter3Color => InscriptionFilterIndex == 3 ? Color.Parse("#512BD4") : Colors.LightGray;
         public Color Filter3Text => InscriptionFilterIndex == 3 ? Colors.White : Colors.Black;
 
@@ -65,37 +58,45 @@ namespace Coach_app.ViewModels.Students
             _groupRepository = groupRepository;
         }
 
+        // Quand l'ID change (premier chargement)
         async partial void OnIdChanged(int value)
         {
-            if (value > 0) await LoadData(value);
+            if (value > 0)
+            {
+                _id = value;
+                await LoadData();
+            }
         }
 
-        private async Task LoadData(int studentId)
+        // Cette méthode est maintenant une commande publique pour le rafraichissement
+        [RelayCommand]
+        public async Task LoadData()
         {
+            if (_id == 0) return;
+
             IsBusy = true;
             try
             {
                 // 1. Infos Élève
-                Student = await _repository.GetStudentByIdAsync(studentId);
+                Student = await _repository.GetStudentByIdAsync(_id);
                 Title = Student.DisplayName;
 
-                // 2. Contact Urgence (On prend le premier contact marqué comme urgence ou le premier tout court)
-                var contacts = await _repository.GetStudentContactsAsync(studentId);
-                var emergency = contacts.FirstOrDefault() ?? new StudentContact(); // Simplifié pour l'exemple
-                EmergencyContactInfo = emergency.Id != 0
-                    ? $"{emergency.PhoneNumber} ({emergency.FirstName} {emergency.LastName})"
+                // 2. Contact Urgence
+                var contacts = await _repository.GetStudentContactsAsync(_id);
+                var emergency = contacts.FirstOrDefault();
+                EmergencyContactInfo = emergency != null
+                    ? $"{emergency.PhoneNumber} ({emergency.FirstName} {emergency.Relation})"
                     : "Aucun contact";
 
-                // 3. Groupes (Inscriptions)
-                var groups = await _repository.GetGroupsByStudentAsync(studentId);
+                // 3. Groupes
+                var groups = await _repository.GetGroupsByStudentAsync(_id);
                 _allStudentGroups = groups;
                 ApplyGroupFilter();
 
                 // 4. Notes
-                var notes = await _repository.GetStudentNotesAsync(studentId);
+                var notes = await _repository.GetStudentNotesAsync(_id);
                 Notes.Clear();
                 foreach (var n in notes) Notes.Add(n);
-
             }
             finally
             {
@@ -103,13 +104,12 @@ namespace Coach_app.ViewModels.Students
             }
         }
 
-        // --- COMMANDES NAVIGATION ---
-
+        // --- NAVIGATION ---
         [RelayCommand]
         private async Task EditStudent()
         {
-            // L'écrou renvoie vers la page d'édition existante (StudentDetailView)
-            await Shell.Current.GoToAsync($"{nameof(StudentDetailView)}?Id={Student.Id}");
+            // CORRECTION : On remplace "Id" par "StudentId" pour correspondre à ce que StudentDetailViewModel attend
+            await Shell.Current.GoToAsync($"{nameof(StudentDetailView)}?StudentId={Student.Id}");
         }
 
         [RelayCommand]
@@ -119,20 +119,17 @@ namespace Coach_app.ViewModels.Students
             await Shell.Current.GoToAsync($"{nameof(GroupDashboardView)}?Id={group.Id}");
         }
 
-        // --- COMMANDES UI (Onglets & Filtres) ---
-
+        // --- UI ---
         [RelayCommand]
         private void SwitchTab(string indexStr)
         {
             if (int.TryParse(indexStr, out int index))
             {
                 SelectedTabIndex = index;
-                // Notifie la vue que les couleurs et visibilités ont changé
                 OnPropertyChanged(nameof(IsInscriptionsVisible));
                 OnPropertyChanged(nameof(IsPhotosVisible));
                 OnPropertyChanged(nameof(IsNotesVisible));
                 OnPropertyChanged(nameof(IsStatsVisible));
-
                 OnPropertyChanged(nameof(Tab0Color));
                 OnPropertyChanged(nameof(Tab1Color));
                 OnPropertyChanged(nameof(Tab2Color));
@@ -147,8 +144,6 @@ namespace Coach_app.ViewModels.Students
             {
                 InscriptionFilterIndex = index;
                 ApplyGroupFilter();
-
-                // Refresh visual colors
                 OnPropertyChanged(nameof(Filter0Color)); OnPropertyChanged(nameof(Filter0Text));
                 OnPropertyChanged(nameof(Filter1Color)); OnPropertyChanged(nameof(Filter1Text));
                 OnPropertyChanged(nameof(Filter2Color)); OnPropertyChanged(nameof(Filter2Text));
@@ -164,18 +159,14 @@ namespace Coach_app.ViewModels.Students
 
             switch (InscriptionFilterIndex)
             {
-                case 1: // Actuelles (En cours)
+                case 1: // Actuelles
                     result = result.Where(g => g.StartDate <= today && g.EndDate >= today);
                     break;
                 case 2: // Futures
                     result = result.Where(g => g.StartDate > today);
                     break;
-                case 3: //passées
+                case 3: // Passées
                     result = result.Where(g => g.StartDate < today);
-                    break;
-                case 0: // Tout
-                default:
-                    // Pas de filtre
                     break;
             }
 
