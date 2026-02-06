@@ -10,45 +10,52 @@
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadDataCommand}" />
     </ContentPage.Behaviors>
 
-    <Grid RowDefinitions="*, Auto" Padding="20">
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20" RowSpacing="10">
 
         <VerticalStackLayout Grid.Row="0" Spacing="10">
-            <Label Text="Sélectionnez les élèves à ajouter au groupe :" FontSize="14" TextColor="Gray"/>
+            <Label Text="Sélectionnez les élèves à importer :" FontSize="14" TextColor="Gray"/>
 
-            <CollectionView ItemsSource="{Binding AvailableStudents}">
-                <CollectionView.EmptyView>
-                    <Label Text="Aucun autre élève disponible." HorizontalOptions="Center" VerticalOptions="Center" Margin="0,50,0,0"/>
-                </CollectionView.EmptyView>
-
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame Padding="10" Margin="0,0,0,10" CornerRadius="10" BorderColor="LightGray">
-                            <Grid ColumnDefinitions="40, *, Auto">
-                                <Image Grid.Column="0" Source="{Binding ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
-                                       Aspect="AspectFill" HeightRequest="40" WidthRequest="40">
-                                    <Image.Clip>
-                                        <EllipseGeometry Center="20,20" RadiusX="20" RadiusY="20"/>
-                                    </Image.Clip>
-                                </Image>
-
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="10,0,0,0">
-                                    <Label Text="{Binding DisplayName}" FontAttributes="Bold"/>
-                                    <Label Text="{Binding MaxLevel, StringFormat='Niveau : {0}'}" FontSize="10" TextColor="Gray"/>
-                                </VerticalStackLayout>
-
-                                <Button Grid.Column="2" Text="Ajouter" 
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddExistingStudentViewModel}}, Path=AddStudentToGroupCommand}"
-                                        CommandParameter="{Binding .}"
-                                        FontSize="12" HeightRequest="35" Padding="10,0"
-                                        BackgroundColor="{StaticResource Primary}" TextColor="White"/>
-                            </Grid>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+            <SearchBar Placeholder="Rechercher par nom..."
+                       Text="{Binding SearchText}"
+                       BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#333}"
+                       CancelButtonColor="{StaticResource Primary}"/>
         </VerticalStackLayout>
 
-        <Button Grid.Row="1" Text="Terminé" Command="{Binding DoneCommand}" 
+        <CollectionView Grid.Row="1" ItemsSource="{Binding AvailableStudents}">
+            <CollectionView.EmptyView>
+                <Label Text="Aucun autre élève disponible." 
+                       HorizontalOptions="Center" VerticalOptions="Center" 
+                       TextColor="Gray" Margin="0,50,0,0"/>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="10" Margin="0,0,0,10" CornerRadius="10" BorderColor="LightGray" HasShadow="False">
+                        <Grid ColumnDefinitions="40, *, Auto">
+                            <Image Grid.Column="0" Source="{Binding ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
+                                   Aspect="AspectFill" HeightRequest="40" WidthRequest="40">
+                                <Image.Clip>
+                                    <EllipseGeometry Center="20,20" RadiusX="20" RadiusY="20"/>
+                                </Image.Clip>
+                            </Image>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="10,0,0,0">
+                                <Label Text="{Binding DisplayName}" FontAttributes="Bold"/>
+                                <Label Text="{Binding MaxLevel, StringFormat='Niveau : {0}'}" FontSize="10" TextColor="Gray"/>
+                            </VerticalStackLayout>
+
+                            <Button Grid.Column="2" Text="Ajouter" 
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddExistingStudentViewModel}}, Path=AddStudentToGroupCommand}"
+                                    CommandParameter="{Binding .}"
+                                    FontSize="12" HeightRequest="35" Padding="10,0"
+                                    BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2" Text="Terminé" Command="{Binding DoneCommand}" 
                 BackgroundColor="Transparent" TextColor="{StaticResource Primary}" Margin="0,10,0,0"/>
     </Grid>
 </ContentPage>

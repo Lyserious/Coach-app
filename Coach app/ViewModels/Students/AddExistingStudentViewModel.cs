@@ -7,14 +7,21 @@ using System.Collections.ObjectModel;
 
 namespace Coach_app.ViewModels.Students
 {
-    [QueryProperty(nameof(GroupId), "GroupId")]
+    [QueryProperty("GroupId", "GroupId")]
     public partial class AddExistingStudentViewModel : ViewModelBase
     {
         private readonly IStudentRepository _repository;
 
-        [ObservableProperty] private int _groupId;
+        // Cache contenant TOUS les élèves éligibles (copie invisible pour filtrer)
+        private List<Student> _allEligibleStudents = new();
 
-        // Liste des élèves disponibles (ceux qui ne sont PAS dans le groupe)
+        [ObservableProperty]
+        private int _groupId;
+
+        [ObservableProperty]
+        private string _searchText;
+
+        // La liste affichée à l'écran
         public ObservableCollection<Student> AvailableStudents { get; } = new();
 
         public AddExistingStudentViewModel(IStudentRepository repository)
@@ -28,33 +35,62 @@ namespace Coach_app.ViewModels.Students
             await LoadData();
         }
 
+        // Déclenché à chaque lettre tapée
+        partial void OnSearchTextChanged(string value)
+        {
+            ApplyFilter();
+        }
+
         [RelayCommand]
         public async Task LoadData()
         {
+            if (IsBusy) return;
             IsBusy = true;
+
             try
             {
-                AvailableStudents.Clear();
-
-                // 1. Récupérer TOUS les élèves de la base
+                // 1. On récupère tout le monde
                 var allStudents = await _repository.GetAllStudentsAsync();
 
-                // 2. Récupérer ceux DÉJÀ dans le groupe
+                // 2. On récupère ceux qui sont DÉJÀ dans le groupe
                 var studentsInGroup = await _repository.GetStudentsByGroupAsync(GroupId);
                 var existingIds = studentsInGroup.Select(s => s.Id).ToList();
 
-                // 3. Filtrer : On ne garde que ceux qui ne sont pas dans le groupe
+                // 3. On remplit le CACHE avec ceux qui ne sont PAS dans le groupe
+                _allEligibleStudents.Clear(); // Important : on vide le cache
                 foreach (var s in allStudents)
                 {
                     if (!existingIds.Contains(s.Id))
                     {
-                        AvailableStudents.Add(s);
+                        _allEligibleStudents.Add(s);
                     }
                 }
+
+                // 4. On met à jour l'affichage
+                ApplyFilter();
             }
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        private void ApplyFilter()
+        {
+            // IMPORTANT : On vide la liste visible pour éviter les doublons
+            AvailableStudents.Clear();
+
+            var filtered = _allEligibleStudents.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                filtered = filtered.Where(s =>
+                    s.DisplayName.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+            }
+
+            foreach (var s in filtered)
+            {
+                AvailableStudents.Add(s);
             }
         }
 
@@ -63,19 +99,17 @@ namespace Coach_app.ViewModels.Students
         {
             if (student == null) return;
 
-            // Ajout immédiat
+            // Ajout en base
             await _repository.AddStudentToGroupAsync(student.Id, GroupId);
 
-            // On le retire de la liste visuelle pour montrer qu'il est traité
+            // On le retire des listes pour qu'il disparaisse de l'écran
+            _allEligibleStudents.Remove(student);
             AvailableStudents.Remove(student);
-
-            // Petit feedback optionnel (Toast ou juste visuel)
         }
 
         [RelayCommand]
         private async Task Done()
         {
-            // Retour au Dashboard
             await Shell.Current.GoToAsync("..");
         }
     }
