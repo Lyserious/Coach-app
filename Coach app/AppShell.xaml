@@ -11,6 +11,7 @@
     xmlns:students="clr-namespace:Coach_app.Views.Students"
     Title="Coach Tracker"
     FlyoutBackgroundColor="{StaticResource Primary}"
+    Shell.NavBarIsVisible="False"
     >
 
     

@@ -13,7 +13,12 @@ namespace Coach_app.Models
         public string LastName { get; set; }
         public string Nickname { get; set; } // Surnom
 
-        public string ProfilePhotoPath { get; set; }
+
+        public string ProfilePhotoPath { get; set; } = "lezardo.png";
+        public DateTime BirthDate { get; set; } // Pour l'Age
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+
 
         // Niveau Max (ex: "6a"). Par défaut "3".
         public string MaxLevel { get; set; } = "3";
@@ -23,5 +28,17 @@ namespace Coach_app.Models
         // Propriété d'affichage (Propriété calculée)
         [Ignore]
         public string DisplayName => !string.IsNullOrEmpty(Nickname) ? $"{FirstName} \"{Nickname}\" {LastName}" : $"{FirstName} {LastName}";
+
+        [Ignore]
+        public int Age
+        {
+            get
+            {
+                var today = DateTime.Today;
+                var age = today.Year - BirthDate.Year;
+                if (BirthDate.Date > today.AddYears(-age)) age--;
+                return age;
+            }
+        }
     }
 }

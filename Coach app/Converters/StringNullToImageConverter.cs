@@ -12,8 +12,8 @@ namespace Coach_app.Converters
             if (!string.IsNullOrEmpty(path))
                 return path;
 
-            // Sinon, image par défaut (assure-toi d'avoir une image dotnet_bot.png ou autre dans Resources/Images)
-            return "dotnet_bot.png";
+            // Sinon, image par défaut dans Resources/Images
+            return "lezardo.png";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

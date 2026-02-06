@@ -40,7 +40,7 @@
 
                 <Frame Grid.Row="1" Grid.Column="0" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
                     <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="StudentLibraryView"/>
+                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//StudentLibraryView"/>
                     </Frame.GestureRecognizers>
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
                         <Label Text="🎓" FontSize="40" HorizontalOptions="Center"/>

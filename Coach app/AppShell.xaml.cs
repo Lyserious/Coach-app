@@ -23,7 +23,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(StudentLibraryView), typeof(StudentLibraryView));
         Routing.RegisterRoute(nameof(SettingsView), typeof(SettingsView));
         Routing.RegisterRoute(nameof(ExerciseLibraryView), typeof(ExerciseLibraryView));
-
+        Routing.RegisterRoute(nameof(StudentProfileView), typeof(StudentProfileView));
 
     }
 }

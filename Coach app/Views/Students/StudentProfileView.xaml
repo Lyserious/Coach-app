@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Students"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="Coach_app.Views.Students.StudentProfileView"
+             Title="Profil Élève">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Modifier" Command="{Binding EditStudentCommand}" IconImageSource="dotnet_bot.png"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto, Auto, Auto, *" Padding="0" BackgroundColor="White">
+
+        <Grid Grid.Row="0" ColumnDefinitions="120, *" Padding="20" ColumnSpacing="15">
+
+            <Frame Grid.Column="0" HeightRequest="120" WidthRequest="120" CornerRadius="60" 
+                   Padding="0" IsClippedToBounds="True" BorderColor="LightGray" HorizontalOptions="Center">
+                <Image Source="{Binding Student.ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
+                       Aspect="AspectFill"/>
+            </Frame>
+
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="8">
+                <Label Text="{Binding Student.DisplayName}" FontSize="20" FontAttributes="Bold" TextColor="Black"/>
+
+                <Label Text="{Binding Student.MaxLevel, StringFormat='Niveau Max : {0}'}" 
+                       FontSize="14" TextColor="{StaticResource Primary}" FontAttributes="Bold"/>
+
+                <BoxView HeightRequest="1" Color="LightGray" Margin="0,5"/>
+
+                <HorizontalStackLayout Spacing="5">
+                    <Label Text="📞" FontSize="14"/>
+                    <Label Text="{Binding Student.PhoneNumber, TargetNullValue='Non renseigné'}" FontSize="13" TextColor="Gray"/>
+                </HorizontalStackLayout>
+
+                <HorizontalStackLayout Spacing="5">
+                    <Label Text="🚑" FontSize="14" TextColor="Red"/>
+                    <Label Text="{Binding EmergencyContactInfo}" FontSize="13" TextColor="Gray"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" Padding="0,10">
+            <Button Grid.Column="0" Text="Inscriptions" Command="{Binding SwitchTabCommand}" CommandParameter="0" 
+                    BackgroundColor="Transparent" TextColor="{Binding Tab0Color}" FontAttributes="Bold" FontSize="12"/>
+
+            <Button Grid.Column="1" Text="Photos" Command="{Binding SwitchTabCommand}" CommandParameter="1" 
+                    BackgroundColor="Transparent" TextColor="{Binding Tab1Color}" FontAttributes="Bold" FontSize="12"/>
+
+            <Button Grid.Column="2" Text="Notes" Command="{Binding SwitchTabCommand}" CommandParameter="2" 
+                    BackgroundColor="Transparent" TextColor="{Binding Tab2Color}" FontAttributes="Bold" FontSize="12"/>
+
+            <Button Grid.Column="3" Text="Stats" Command="{Binding SwitchTabCommand}" CommandParameter="3" 
+                    BackgroundColor="Transparent" TextColor="{Binding Tab3Color}" FontAttributes="Bold" FontSize="12"/>
+
+            <BoxView Grid.ColumnSpan="4" HeightRequest="1" Color="LightGray" VerticalOptions="End"/>
+        </Grid>
+
+        <Grid Grid.Row="3" Padding="20">
+
+            <VerticalStackLayout IsVisible="{Binding IsInscriptionsVisible}" Spacing="15">
+
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="10">
+                        <Button Text="Tout" Command="{Binding FilterInscriptionsCommand}" CommandParameter="0"
+                                BackgroundColor="{Binding Filter0Color}" TextColor="{Binding Filter0Text}" 
+                                CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+
+                        <Button Text="Actuelles" Command="{Binding FilterInscriptionsCommand}" CommandParameter="1"
+                                BackgroundColor="{Binding Filter1Color}" TextColor="{Binding Filter1Text}" 
+                                CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+
+                        <Button Text="Futures" Command="{Binding FilterInscriptionsCommand}" CommandParameter="2"
+                                BackgroundColor="{Binding Filter2Color}" TextColor="{Binding Filter2Text}" 
+                                CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+
+                        <Button Text="Passées" Command="{Binding FilterInscriptionsCommand}" CommandParameter="3"
+                                BackgroundColor="{Binding Filter3Color}" TextColor="{Binding Filter3Text}" 
+                                CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <CollectionView ItemsSource="{Binding FilteredGroups}">
+                    <CollectionView.EmptyView>
+                        <Label Text="Aucune inscription trouvée." TextColor="Gray" HorizontalOptions="Center" Margin="0,30"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Padding="15" Margin="0,0,0,10" CornerRadius="10" HasShadow="True" BorderColor="Transparent">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentProfileViewModel}}, Path=GoToGroupCommand}" CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                        <Label Text="{Binding ScheduleDisplay}" FontSize="12" TextColor="Gray"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="›" FontSize="20" TextColor="LightGray" VerticalOptions="Center"/>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout IsVisible="{Binding IsPhotosVisible}">
+                <Label Text="Galerie photos à venir..." HorizontalOptions="Center" TextColor="Gray"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout IsVisible="{Binding IsNotesVisible}">
+                <CollectionView ItemsSource="{Binding Notes}">
+                    <CollectionView.EmptyView>
+                        <Label Text="Aucune note." TextColor="Gray" HorizontalOptions="Center"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Padding="15" Margin="0,0,0,10" BackgroundColor="#FFFBF0" BorderColor="Orange">
+                                <Label Text="{Binding Content}" TextColor="Black"/>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout IsVisible="{Binding IsStatsVisible}" VerticalOptions="Center">
+                <Label Text="🚧 Stats (A venir)" FontSize="20" TextColor="Gray" HorizontalOptions="Center"/>
+                <Label Text="Graphiques de progression..." FontSize="14" TextColor="LightGray" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+        </Grid>
+    </Grid>
+</ContentPage>

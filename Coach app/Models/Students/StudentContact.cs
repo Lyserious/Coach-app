@@ -2,8 +2,6 @@
 
 namespace Coach_app.Models
 {
-    public enum ContactType { Phone, Email, Instagram, Facebook, Other }
-
     [Table("StudentContacts")]
     public class StudentContact
     {
@@ -13,7 +11,16 @@ namespace Coach_app.Models
         [Indexed]
         public int StudentId { get; set; }
 
-        public ContactType Type { get; set; }
-        public string Value { get; set; } // Le numéro ou l'identifiant
+        // Les nouveaux champs attendus par le ViewModel
+        public string FirstName { get; set; }   // Ex: Marie
+        public string LastName { get; set; }    // Ex: Dupont
+        public string PhoneNumber { get; set; } // Ex: 06 12 34 56 78
+
+        // Optionnel : Pour préciser le lien (Mère, Père, Voisin...)
+        public string Relation { get; set; }
+
+        // Propriété calculée utile pour l'affichage (ex: "Marie Dupont")
+        [Ignore]
+        public string DisplayName => $"{FirstName} {LastName}".Trim();
     }
 }

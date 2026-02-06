@@ -58,7 +58,7 @@
                     TextColor="Black"
                     HorizontalOptions="Start"                   
                     Command="{Binding NavigateCommand}"
-                    CommandParameter="StudentLibraryView"/>
+                    CommandParameter="//StudentLibraryView"/>
             
 
         </VerticalStackLayout>
