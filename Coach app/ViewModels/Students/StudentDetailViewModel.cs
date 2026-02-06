@@ -24,7 +24,7 @@ namespace Coach_app.ViewModels.Students
         [ObservableProperty] private string _profilePhotoPath;
         [ObservableProperty] private string _phoneNumber;
         [ObservableProperty] private string _email;
-
+        [ObservableProperty] private DateTime _birthDate = DateTime.Today; // Par défaut aujourd'hui
         // --- LISTE DES CONTACTS ---
         public ObservableCollection<StudentContact> Contacts { get; } = new();
 
@@ -73,6 +73,8 @@ namespace Coach_app.ViewModels.Students
                     ProfilePhotoPath = s.ProfilePhotoPath;
                     PhoneNumber = s.PhoneNumber;
                     Email = s.Email;
+                    if (s.BirthDate != DateTime.MinValue)
+                        BirthDate = s.BirthDate;
                 }
 
                 Contacts.Clear();
@@ -150,6 +152,7 @@ namespace Coach_app.ViewModels.Students
                     ProfilePhotoPath = ProfilePhotoPath,
                     PhoneNumber = PhoneNumber,
                     Email = Email,
+                    BirthDate = BirthDate,
                     CreatedAt = StudentId > 0 ? (await _repository.GetStudentByIdAsync(StudentId))?.CreatedAt ?? DateTime.UtcNow : DateTime.UtcNow
                 };
 

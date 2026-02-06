@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Students"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Coach_app.Views.Students.StudentDetailView"
              Shell.NavBarIsVisible="False"
              Title="{Binding Title}">
@@ -10,7 +11,6 @@
 
         <Frame Grid.Row="0" Padding="15,10" CornerRadius="0" HasShadow="True" BackgroundColor="White" BorderColor="Transparent" ZIndex="1">
             <Grid ColumnDefinitions="Auto, *, Auto">
-
                 <ImageButton Grid.Column="0" Source="dotnet_bot.png" 
                              Command="{Binding CancelCommand}"
                              HeightRequest="30" WidthRequest="30" 
@@ -57,6 +57,16 @@
                         <VerticalStackLayout>
                             <Label Text="Surnom" FontSize="12" TextColor="Gray"/>
                             <Entry Text="{Binding Nickname}" Placeholder="Surnom (Optionnel)"/>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout>
+                            <Label Text="Date de naissance" FontSize="12" TextColor="Gray"/>
+                            <DatePicker Date="{Binding BirthDate}" 
+                                        Format="dd/MM/yyyy"
+                                        MinimumDate="01/01/1950"
+                                        MaximumDate="12/31/2030"
+                                        TextColor="Black"
+                                        FontAttributes="Bold"/>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout>
@@ -142,7 +152,6 @@
                         </Label.Triggers>
                     </Label>
                 </VerticalStackLayout>
-
 
                 <VerticalStackLayout Spacing="10" Margin="0,10,0,30">
                     <Button Text="Enregistrer tout" Command="{Binding SaveCommand}" 

@@ -27,7 +27,10 @@
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
 
                 <Grid ColumnDefinitions="*, Auto">
-                    <Label Grid.Column="0" Text="{Binding Student.DisplayName}" FontSize="20" FontAttributes="Bold" TextColor="Black" VerticalOptions="Center"/>
+                    <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                        <Label Text="{Binding Student.DisplayName}" FontSize="20" FontAttributes="Bold" TextColor="Black" LineBreakMode="TailTruncation"/>
+                        <Label Text="{Binding Student.Age, StringFormat='({0} ans)'}" FontSize="16" TextColor="Gray" VerticalOptions="End" Margin="0,0,0,2"/>
+                    </HorizontalStackLayout>
 
                     <Button Grid.Column="1" Text="✎" 
                             Command="{Binding EditStudentCommand}"
