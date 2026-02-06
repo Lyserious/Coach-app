@@ -75,6 +75,8 @@ namespace Coach_app.ViewModels.Students
                     Email = s.Email;
                     if (s.BirthDate != DateTime.MinValue)
                         BirthDate = s.BirthDate;
+                    if (!string.IsNullOrEmpty(s.PhotoConsent))
+                        PhotoConsent = s.PhotoConsent;
                 }
 
                 Contacts.Clear();
@@ -153,6 +155,7 @@ namespace Coach_app.ViewModels.Students
                     PhoneNumber = PhoneNumber,
                     Email = Email,
                     BirthDate = BirthDate,
+                    PhotoConsent = PhotoConsent,
                     CreatedAt = StudentId > 0 ? (await _repository.GetStudentByIdAsync(StudentId))?.CreatedAt ?? DateTime.UtcNow : DateTime.UtcNow
                 };
 
@@ -214,5 +217,14 @@ namespace Coach_app.ViewModels.Students
                 await Shell.Current.GoToAsync("..");
             }
         }
+        [ObservableProperty] private string _photoConsent = "Interne uniquement";
+
+        // La liste des choix pour le menu déroulant
+        public List<string> ConsentOptions { get; } = new()
+{
+    "Autorisé (Réseaux/Web)",
+    "Interne uniquement",
+    "Refusé (Pas de photo)"
+};
     }
 }

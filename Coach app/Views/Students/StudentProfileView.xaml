@@ -46,14 +46,25 @@
 
                 <BoxView HeightRequest="1" Color="LightGray" Margin="0,5"/>
 
-                <HorizontalStackLayout Spacing="5">
-                    <Label Text="📞" FontSize="14"/>
-                    <Label Text="{Binding Student.PhoneNumber, TargetNullValue='Non renseigné'}" FontSize="13" TextColor="Gray"/>
-                </HorizontalStackLayout>
+                <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Center">
+
+                    <HorizontalStackLayout Spacing="3" Margin="0,0,15,0">
+                        <Label Text="📞" FontSize="14"/>
+                        <Label Text="{Binding Student.PhoneNumber, TargetNullValue='-'}" FontSize="13" TextColor="Gray"/>
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Spacing="3">
+                        <Label Text="📧" FontSize="14"/>
+                        <Label Text="{Binding Student.Email, TargetNullValue='-'}" FontSize="13" TextColor="Gray" LineBreakMode="TailTruncation"/>
+                    </HorizontalStackLayout>
+                </FlexLayout>
 
                 <HorizontalStackLayout Spacing="5">
-                    <Label Text="📧" FontSize="14"/>
-                    <Label Text="{Binding Student.Email, TargetNullValue='Non renseigné'}" FontSize="13" TextColor="Gray"/>
+                    <Label Text="📷" FontSize="14"/>
+                    <Label Text="{Binding Student.PhotoConsent, TargetNullValue='Non défini'}" 
+                           FontSize="13" 
+                           TextColor="{StaticResource Primary}" 
+                           FontAttributes="Bold"/>
                 </HorizontalStackLayout>
 
                 <HorizontalStackLayout Spacing="5">

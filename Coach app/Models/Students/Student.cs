@@ -11,16 +11,16 @@ namespace Coach_app.Models
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Nickname { get; set; } // Surnom
+        public string Nickname { get; set; } 
 
 
         public string ProfilePhotoPath { get; set; } = "lezardo.png";
         public DateTime BirthDate { get; set; } // Pour l'Age
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+       
+        public string PhotoConsent { get; set; } = "Interne uniquement";
 
-
-        // Niveau Max (ex: "6a"). Par défaut "3".
         public string MaxLevel { get; set; } = "3";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

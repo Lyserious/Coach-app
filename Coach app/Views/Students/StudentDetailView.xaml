@@ -70,6 +70,15 @@
                         </VerticalStackLayout>
 
                         <VerticalStackLayout>
+                            <Label Text="Droit à l'image" FontSize="12" TextColor="Gray"/>
+                            <Border Stroke="LightGray" StrokeThickness="1" Padding="5" StrokeShape="RoundRectangle 5">
+                                <Picker ItemsSource="{Binding ConsentOptions}" 
+                                        SelectedItem="{Binding PhotoConsent}"
+                                        Title="Choisir l'autorisation"/>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout>
                             <Label Text="Niveau" FontSize="12" TextColor="Gray"/>
                             <Picker ItemsSource="{Binding Levels}" SelectedItem="{Binding SelectedLevel}" Title="Choisir un niveau"/>
                         </VerticalStackLayout>
