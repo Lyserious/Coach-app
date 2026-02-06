@@ -10,6 +10,19 @@
         <ScrollView Grid.Row="0" Padding="20">
             <VerticalStackLayout Spacing="20">
 
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="10" Margin="0,0,0,10">
+                    <Frame HeightRequest="120" WidthRequest="120" CornerRadius="60" 
+                           Padding="0" IsClippedToBounds="True" BorderColor="LightGray">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PickPhotoCommand}"/>
+                        </Frame.GestureRecognizers>
+                        <Image Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
+                               Aspect="AspectFill"/>
+                    </Frame>
+                    <Label Text="Toucher pour changer la photo" FontSize="11" TextColor="{StaticResource Primary}" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+
                 <Frame Padding="15" CornerRadius="10">
                     <VerticalStackLayout Spacing="15">
                         <Label Text="Général" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>

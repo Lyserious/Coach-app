@@ -25,6 +25,10 @@ namespace Coach_app.ViewModels.Groups
         [ObservableProperty]
         private string _groupName;
 
+        // AJOUT : La propriété nécessaire pour l'affichage de la photo dans l'en-tête
+        [ObservableProperty]
+        private string _photoPath;
+
         // Liste des élèves
         public ObservableCollection<Student> Students { get; } = new();
 
@@ -34,11 +38,9 @@ namespace Coach_app.ViewModels.Groups
             _studentRepository = studentRepository;
         }
 
-        // Cette méthode est appelée automatiquement quand l'ID change via la navigation
-        // Assurez-vous qu'elle n'apparaît qu'UNE SEULE FOIS dans ce fichier
         async partial void OnGroupIdChanged(int value)
         {
-            await LoadData();
+            if (value > 0) await LoadData();
         }
 
         [RelayCommand]
@@ -50,20 +52,29 @@ namespace Coach_app.ViewModels.Groups
             try
             {
                 // 1. Charger le Groupe
-                if (CurrentGroup == null)
+                // IMPORTANT : J'ai retiré le "if (CurrentGroup == null)" pour forcer 
+                // la mise à jour si on vient de modifier la photo ou le nom.
+                var group = await _repository.GetGroupByIdAsync(GroupId);
+
+                if (group != null)
                 {
-                    CurrentGroup = await _repository.GetGroupByIdAsync(GroupId);
-                    if (CurrentGroup != null)
-                    {
-                        GroupName = CurrentGroup.Name;
-                        Title = CurrentGroup.Name;
-                    }
+                    CurrentGroup = group;
+                    GroupName = group.Name;
+                    Title = group.Name;
+
+                    // AJOUT : On charge le chemin de la photo pour la vue
+                    PhotoPath = group.PhotoPath;
                 }
 
                 // 2. Charger les Élèves
+                // Note: Assure-toi que GetStudentsByGroupAsync existe bien dans ton repo (ou GetStudentsByGroupIdAsync)
                 var studentsList = await _studentRepository.GetStudentsByGroupAsync(GroupId);
+
                 Students.Clear();
-                foreach (var s in studentsList) Students.Add(s);
+                foreach (var s in studentsList)
+                {
+                    Students.Add(s);
+                }
             }
             finally
             {
@@ -92,6 +103,7 @@ namespace Coach_app.ViewModels.Groups
         {
             await Shell.Current.GoToAsync("..");
         }
+
         [RelayCommand]
         private async Task ImportStudent()
         {

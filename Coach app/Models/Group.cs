@@ -27,7 +27,7 @@ namespace Coach_app.Models
 
         // Heure de fin (ex: 20h00)
         public TimeSpan EndTime { get; set; }
-
+        public string PhotoPath { get; set; }= "ecto.png";
         // Jour de récurrence (null si c'est un événement ponctuel sur plusieurs jours consécutifs comme un stage bloqué)
         // 0 = Dimanche, 1 = Lundi, ... 4 = Jeudi
         public DayOfWeek? RecurrenceDay { get; set; }

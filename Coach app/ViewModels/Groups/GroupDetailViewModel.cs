@@ -7,7 +7,6 @@ using System.Globalization;
 
 namespace Coach_app.ViewModels.Groups
 {
-    // Cette annotation permet de recevoir l'ID lors de la navigation
     [QueryProperty(nameof(GroupId), "Id")]
     public partial class GroupDetailViewModel : ViewModelBase
     {
@@ -17,22 +16,15 @@ namespace Coach_app.ViewModels.Groups
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsEditMode))]
-        [NotifyPropertyChangedFor(nameof(SubmitButtonText))] 
+        [NotifyPropertyChangedFor(nameof(SubmitButtonText))]
         [NotifyPropertyChangedFor(nameof(TitleText))]
         private int _groupId;
 
         public bool IsEditMode => GroupId > 0;
-
         public string SubmitButtonText => IsEditMode ? "Mettre à jour" : "Créer le groupe";
-
         public string TitleText => IsEditMode ? "Modifier le groupe" : "Nouveau Groupe";
 
-
-
-
-
-        [ObservableProperty]
-        private string _name;
+        [ObservableProperty] private string _name;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsWeekly))]
@@ -40,20 +32,14 @@ namespace Coach_app.ViewModels.Groups
         [NotifyPropertyChangedFor(nameof(IsEvent))]
         private int _selectedTypeIndex;
 
-        [ObservableProperty]
-        private int _selectedDayIndex; // 0=Lundi
+        [ObservableProperty] private int _selectedDayIndex; // 0=Lundi
+        [ObservableProperty] private DateTime _startDate;
+        [ObservableProperty] private DateTime _endDate;
+        [ObservableProperty] private TimeSpan _startTime;
+        [ObservableProperty] private TimeSpan _endTime;
 
-        [ObservableProperty]
-        private DateTime _startDate;
-
-        [ObservableProperty]
-        private DateTime _endDate;
-
-        [ObservableProperty]
-        private TimeSpan _startTime;
-
-        [ObservableProperty]
-        private TimeSpan _endTime;
+        // Propriété Image
+        [ObservableProperty] private string _photoPath;
 
         // --- LISTES ---
         public List<string> GroupTypeNames { get; } = new List<string>
@@ -77,7 +63,6 @@ namespace Coach_app.ViewModels.Groups
             _repository = repository;
             Title = "Nouveau Groupe";
 
-            // Génération Jours (Lundi..Dimanche)
             var culture = new CultureInfo("fr-FR");
             DayNames = culture.DateTimeFormat.DayNames
                 .Skip(1)
@@ -85,7 +70,6 @@ namespace Coach_app.ViewModels.Groups
                 .Select(d => char.ToUpper(d[0]) + d.Substring(1))
                 .ToList();
 
-            // Valeurs par défaut
             SelectedTypeIndex = 0;
             SelectedDayIndex = 0;
             StartTime = new TimeSpan(18, 0, 0);
@@ -107,6 +91,8 @@ namespace Coach_app.ViewModels.Groups
                     {
                         Title = "Modifier le Groupe";
                         Name = group.Name;
+                        // CHARGEMENT DE LA PHOTO
+                        PhotoPath = group.PhotoPath;
 
                         SelectedTypeIndex = group.Type switch
                         {
@@ -137,6 +123,20 @@ namespace Coach_app.ViewModels.Groups
         }
 
         // --- COMMANDES ---
+
+        [RelayCommand]
+        private async Task PickPhoto()
+        {
+            try
+            {
+                var result = await MediaPicker.Default.PickPhotoAsync();
+                if (result != null) PhotoPath = result.FullPath;
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Erreur", "Impossible d'accéder aux photos.", "OK");
+            }
+        }
 
         [RelayCommand]
         private async Task Save()
@@ -173,7 +173,9 @@ namespace Coach_app.ViewModels.Groups
                     StartDate = IsPrivate ? DateTime.Today : StartDate,
                     EndDate = IsPrivate ? DateTime.Today.AddYears(1) : EndDate,
                     StartTime = IsPrivate ? TimeSpan.Zero : StartTime,
-                    EndTime = IsPrivate ? TimeSpan.Zero : EndTime
+                    EndTime = IsPrivate ? TimeSpan.Zero : EndTime,
+                    // SAUVEGARDE DE LA PHOTO
+                    PhotoPath = PhotoPath
                 };
 
                 if (GroupId > 0)
@@ -181,8 +183,10 @@ namespace Coach_app.ViewModels.Groups
                     var old = await _repository.GetGroupByIdAsync(GroupId);
                     if (old != null)
                     {
-                        groupToSave.CoverImagePath = old.CoverImagePath;
                         groupToSave.CreatedAt = old.CreatedAt;
+                        // On garde la photo si on ne l'a pas changée (optionnel si PhotoPath est bien bindé)
+                        if (string.IsNullOrEmpty(PhotoPath))
+                            groupToSave.PhotoPath = old.PhotoPath;
                     }
                 }
 

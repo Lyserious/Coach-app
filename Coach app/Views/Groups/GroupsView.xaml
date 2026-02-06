@@ -20,12 +20,12 @@
 
         <shared:SidebarView Grid.Column="0" IsVisible="{OnPlatform WinUI='True', MacCatalyst='True', Default='False'}" />
 
-        <Grid Grid.Column="1" RowDefinitions="Auto, *" Padding="20">
+        <Grid Grid.Column="1" RowDefinitions="Auto, *" Padding="20" BackgroundColor="#F5F5F5">
 
             <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,20">
-                <Label Text="Groupes récurrents &amp; Stages" FontSize="20" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Label Text="Groupes récurrents &amp; Stages" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" TextColor="Black"/>
                 <Button Grid.Column="1" Text="+ Créer" Command="{Binding AddGroupCommand}"
-                        BackgroundColor="{StaticResource Primary}" TextColor="White" HeightRequest="40"/>
+                        BackgroundColor="{StaticResource Primary}" TextColor="White" HeightRequest="40" CornerRadius="20"/>
             </Grid>
 
             <CollectionView Grid.Row="1" 
@@ -37,20 +37,34 @@
                     <GridItemsLayout Orientation="Vertical" Span="{OnIdiom Phone=1, Tablet=2, Desktop=3}" VerticalItemSpacing="15" HorizontalItemSpacing="15"/>
                 </CollectionView.ItemsLayout>
 
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
+                        <Label Text="📭" FontSize="40" HorizontalOptions="Center"/>
+                        <Label Text="Aucun groupe trouvé" TextColor="Gray" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Group">
-                        <Frame Padding="0" CornerRadius="15" HasShadow="True" BorderColor="Transparent" HeightRequest="200">
-                            <Grid RowDefinitions="2*, 1*">
-                                <Image Source="{Binding CoverImagePath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill" Grid.RowSpan="2"/>
-                                <BoxView Color="Black" Opacity="0.3" Grid.RowSpan="2"/>
+                        <Frame Padding="0" CornerRadius="15" HasShadow="True" BorderColor="Transparent" HeightRequest="200" IsClippedToBounds="True">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GroupLibraryViewModel}}, Path=GoToGroupDetailCommand}" CommandParameter="{Binding .}"/>
+                            </Frame.GestureRecognizers>
 
-                                <Border BackgroundColor="White" HorizontalOptions="End" VerticalOptions="Start" Margin="10" Padding="8,4" StrokeShape="RoundRectangle 10">
+                            <Grid RowDefinitions="2*, 1*">
+                                <Image Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
+                                       Aspect="AspectFill" 
+                                       Grid.RowSpan="2"
+                                       BackgroundColor="#333"/>
+                                <BoxView Color="Black" Opacity="0.1" Grid.RowSpan="2"/>
+
+                                <Border BackgroundColor="White" HorizontalOptions="End" VerticalOptions="Start" Margin="10" Padding="8,4" StrokeShape="RoundRectangle 10" StrokeThickness="0">
                                     <Label Text="{Binding Type}" FontSize="10" FontAttributes="Bold" TextColor="Black"/>
                                 </Border>
 
-                                <VerticalStackLayout Grid.Row="1" BackgroundColor="White" Padding="15,10">
+                                <VerticalStackLayout Grid.Row="1" BackgroundColor="White" Padding="15,10" Spacing="2">
                                     <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="Black"/>
-                                    <Label Text="{Binding ScheduleDisplay}" FontSize="12" TextColor="Gray" Margin="0,5,0,0"/>
+                                    <Label Text="{Binding Schedule}" FontSize="12" TextColor="Gray"/>
                                 </VerticalStackLayout>
                             </Grid>
                         </Frame>
