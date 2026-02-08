@@ -165,5 +165,22 @@ namespace Coach_app.Data.Repositories
             else
                 await _database.InsertAsync(note);
         }
+        public async Task<List<Student>> GetStudentsByGroupIdAsync(int groupId)
+        {
+            await Init();
+
+            var links = await _database.Table<StudentGroup>()
+                                       .Where(x => x.GroupId == groupId)
+                                       .ToListAsync();
+
+            if (links == null || !links.Any())
+                return new List<Student>();
+
+
+            var studentIds = links.Select(l => l.StudentId).ToList();
+            var allStudents = await _database.Table<Student>().ToListAsync();
+
+            return allStudents.Where(s => studentIds.Contains(s.Id)).ToList();
+        }
     }
 }

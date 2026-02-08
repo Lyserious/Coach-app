@@ -90,6 +90,9 @@
 	  <MauiXaml Update="Views\Groups\GroupsView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\Groups\SessionDetailView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Home\DashboardView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

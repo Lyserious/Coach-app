@@ -70,7 +70,7 @@ namespace Coach_app
             builder.Services.AddTransient<AddExistingStudentView>();
             builder.Services.AddTransient<StudentLibraryView>();
             builder.Services.AddTransient<StudentProfileView>();
-
+            builder.Services.AddTransient<SessionDetailView>();
 
             // ViewModels
 
@@ -85,6 +85,12 @@ namespace Coach_app
             builder.Services.AddTransient<ViewModels.Settings.SettingsViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<StudentProfileViewModel>();
+            builder.Services.AddTransient<SessionDetailViewModel>();
+
+
+
+
+
 
             return builder.Build();
         }

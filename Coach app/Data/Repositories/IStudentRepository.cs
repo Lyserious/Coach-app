@@ -30,5 +30,8 @@ namespace Coach_app.Data.Repositories
         // On garde le nom explicite "GetStudentNotesAsync" pour le ViewModel
         Task<List<StudentNote>> GetStudentNotesAsync(int studentId);
         Task SaveNoteAsync(StudentNote note);
+
+
+        Task<List<Student>> GetStudentsByGroupIdAsync(int groupId);
     }
 }

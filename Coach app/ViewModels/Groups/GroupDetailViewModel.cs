@@ -174,7 +174,6 @@ namespace Coach_app.ViewModels.Groups
                     EndDate = IsPrivate ? DateTime.Today.AddYears(1) : EndDate,
                     StartTime = IsPrivate ? TimeSpan.Zero : StartTime,
                     EndTime = IsPrivate ? TimeSpan.Zero : EndTime,
-                    // SAUVEGARDE DE LA PHOTO
                     PhotoPath = PhotoPath
                 };
 
@@ -184,13 +183,17 @@ namespace Coach_app.ViewModels.Groups
                     if (old != null)
                     {
                         groupToSave.CreatedAt = old.CreatedAt;
-                        // On garde la photo si on ne l'a pas changée (optionnel si PhotoPath est bien bindé)
                         if (string.IsNullOrEmpty(PhotoPath))
                             groupToSave.PhotoPath = old.PhotoPath;
                     }
                 }
 
+                // 1. Sauvegarder le groupe
                 await _repository.SaveGroupAsync(groupToSave);
+
+                // AJOUT ÉTAPE 4 : Générer les séances automatiquement
+                await _repository.GenerateSessionsForGroupAsync(groupToSave);
+
                 await Shell.Current.GoToAsync("..");
             }
             finally
