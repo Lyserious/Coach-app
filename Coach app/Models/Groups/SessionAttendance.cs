@@ -8,13 +8,13 @@ namespace Coach_app.Models
         public int Id { get; set; }
 
         [Indexed]
-        public int GroupSessionId { get; set; } // Lien vers la séance du jour
+        public int GroupSessionId { get; set; }
 
         [Indexed]
-        public int StudentId { get; set; }      // Lien vers l'élève
+        public int StudentId { get; set; }
+      
+        public string Status { get; set; }
 
-        public bool IsPresent { get; set; }     // Présent ou Absent
-
-        public string Note { get; set; }        // Ex: "Arrivé en retard", "Blessé"
+        public string Note { get; set; }
     }
 }

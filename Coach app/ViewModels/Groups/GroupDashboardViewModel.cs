@@ -110,5 +110,16 @@ namespace Coach_app.ViewModels.Groups
             // Navigation vers la page d'import
             await Shell.Current.GoToAsync($"{nameof(AddExistingStudentView)}?GroupId={GroupId}");
         }
+        [RelayCommand]
+        private async Task GoToCalendar()
+        {
+            // On navigue vers la nouvelle page de gestion
+            await Shell.Current.GoToAsync($"{nameof(GroupSessionsView)}?Id={GroupId}");
+        }
+        [RelayCommand]
+        private async Task GoToGallery()
+        {
+            await Shell.Current.GoToAsync($"{nameof(GroupGalleryView)}?Id={GroupId}");
+        }
     }
 }

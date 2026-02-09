@@ -11,6 +11,7 @@ namespace Coach_app.ViewModels.Groups
     public partial class GroupDetailViewModel : ViewModelBase
     {
         private readonly IGroupRepository _repository;
+        private Group _currentGroup; // Stocke l'objet complet pour la suppression
 
         // --- PROPRIETES ---
 
@@ -38,7 +39,6 @@ namespace Coach_app.ViewModels.Groups
         [ObservableProperty] private TimeSpan _startTime;
         [ObservableProperty] private TimeSpan _endTime;
 
-        // Propriété Image
         [ObservableProperty] private string _photoPath;
 
         // --- LISTES ---
@@ -86,15 +86,15 @@ namespace Coach_app.ViewModels.Groups
                 IsBusy = true;
                 try
                 {
-                    var group = await _repository.GetGroupByIdAsync(value);
-                    if (group != null)
+                    _currentGroup = await _repository.GetGroupByIdAsync(value);
+
+                    if (_currentGroup != null)
                     {
                         Title = "Modifier le Groupe";
-                        Name = group.Name;
-                        // CHARGEMENT DE LA PHOTO
-                        PhotoPath = group.PhotoPath;
+                        Name = _currentGroup.Name;
+                        PhotoPath = _currentGroup.PhotoPath;
 
-                        SelectedTypeIndex = group.Type switch
+                        SelectedTypeIndex = _currentGroup.Type switch
                         {
                             GroupType.Class => 0,
                             GroupType.PrivateLesson => 1,
@@ -102,14 +102,14 @@ namespace Coach_app.ViewModels.Groups
                             _ => 3
                         };
 
-                        StartDate = group.StartDate;
-                        EndDate = group.EndDate;
-                        StartTime = group.StartTime;
-                        EndTime = group.EndTime;
+                        StartDate = _currentGroup.StartDate;
+                        EndDate = _currentGroup.EndDate;
+                        StartTime = _currentGroup.StartTime;
+                        EndTime = _currentGroup.EndTime;
 
-                        if (group.RecurrenceDay.HasValue)
+                        if (_currentGroup.RecurrenceDay.HasValue)
                         {
-                            int dayIndex = ((int)group.RecurrenceDay.Value - 1);
+                            int dayIndex = ((int)_currentGroup.RecurrenceDay.Value - 1);
                             if (dayIndex < 0) dayIndex = 6;
                             SelectedDayIndex = dayIndex;
                         }
@@ -179,20 +179,21 @@ namespace Coach_app.ViewModels.Groups
 
                 if (GroupId > 0)
                 {
-                    var old = await _repository.GetGroupByIdAsync(GroupId);
-                    if (old != null)
+                    // On récupère la date de création originale
+                    if (_currentGroup == null)
+                        _currentGroup = await _repository.GetGroupByIdAsync(GroupId);
+
+                    if (_currentGroup != null)
                     {
-                        groupToSave.CreatedAt = old.CreatedAt;
+                        groupToSave.CreatedAt = _currentGroup.CreatedAt;
                         if (string.IsNullOrEmpty(PhotoPath))
-                            groupToSave.PhotoPath = old.PhotoPath;
+                            groupToSave.PhotoPath = _currentGroup.PhotoPath;
                     }
                 }
 
                 // 1. Sauvegarder le groupe
+                // Le repository gère maintenant lui-même la génération des séances après le Save.
                 await _repository.SaveGroupAsync(groupToSave);
-
-                // AJOUT ÉTAPE 4 : Générer les séances automatiquement
-                await _repository.GenerateSessionsForGroupAsync(groupToSave);
 
                 await Shell.Current.GoToAsync("..");
             }
@@ -206,11 +207,30 @@ namespace Coach_app.ViewModels.Groups
         private async Task Delete()
         {
             if (GroupId == 0) return;
-            bool confirm = await Shell.Current.DisplayAlert("Archiver", "Voulez-vous archiver ce groupe ?", "Oui", "Non");
+
+            bool confirm = await Shell.Current.DisplayAlert("Supprimer", "Cette action est irréversible (photos, séances et présences incluses). Continuer ?", "Oui", "Non");
+
             if (confirm)
             {
-                await _repository.DeleteGroupAsync(GroupId);
-                await Shell.Current.GoToAsync("..");
+                IsBusy = true;
+                try
+                {
+                    // CORRECTION ICI : On doit passer l'objet Group complet, pas juste l'ID
+                    if (_currentGroup == null)
+                    {
+                        _currentGroup = await _repository.GetGroupByIdAsync(GroupId);
+                    }
+
+                    if (_currentGroup != null)
+                    {
+                        await _repository.DeleteGroupAsync(_currentGroup);
+                        await Shell.Current.GoToAsync("..");
+                    }
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
             }
         }
 

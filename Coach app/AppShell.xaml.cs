@@ -25,6 +25,11 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(ExerciseLibraryView), typeof(ExerciseLibraryView));
         Routing.RegisterRoute(nameof(StudentProfileView), typeof(StudentProfileView));
         Routing.RegisterRoute(nameof(Views.Groups.SessionDetailView), typeof(Views.Groups.SessionDetailView));
+        Routing.RegisterRoute(nameof(Views.Groups.GroupSessionsView), typeof(Views.Groups.GroupSessionsView));
+        Routing.RegisterRoute(nameof(Views.Groups.GroupGalleryView), typeof(Views.Groups.GroupGalleryView));
+        Routing.RegisterRoute(nameof(PhotoDetailView), typeof(PhotoDetailView));
+
+
 
     }
 }

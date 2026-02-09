@@ -58,6 +58,7 @@ namespace Coach_app.ViewModels.Home
             await LoadSessions();
         }
 
+        
         [RelayCommand]
         public async Task LoadSessions()
         {
@@ -65,10 +66,18 @@ namespace Coach_app.ViewModels.Home
             try
             {
                 TodaysSessions.Clear();
-                // On récupère les séances via le Repository qu'on a créé à l'étape précédente
-                var sessions = await _groupRepository.GetSessionsByDateAsync(SelectedDate);
 
-                foreach (var session in sessions)
+                // 1. On récupère tout (y compris les doublons)
+                var rawSessions = await _groupRepository.GetSessionsByDateAsync(SelectedDate);
+
+                // 2. FILTRE ANTI-DOUBLON : On groupe par (ID du Groupe + Heure de début) et on prend le premier
+                var uniqueSessions = rawSessions
+                    .GroupBy(s => new { s.GroupId, s.StartTime })
+                    .Select(g => g.First())
+                    .ToList();
+
+                // 3. On affiche la liste propre
+                foreach (var session in uniqueSessions)
                 {
                     var group = await _groupRepository.GetGroupByIdAsync(session.GroupId);
                     if (group != null)
@@ -90,7 +99,6 @@ namespace Coach_app.ViewModels.Home
                 IsBusy = false;
             }
         }
-
         [RelayCommand]
         private void PreviousDay() => SelectedDate = SelectedDate.AddDays(-1);
 

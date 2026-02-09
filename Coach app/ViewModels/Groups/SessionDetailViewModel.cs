@@ -19,7 +19,9 @@ namespace Coach_app.ViewModels.Groups
         [ObservableProperty] private string _dateDisplay;
         [ObservableProperty] private string _timeDisplay;
 
-        // La liste des élèves avec leur état (Présent/Absent)
+        // Contrôle l'affichage de la zone d'appel (plié/déplié)
+        [ObservableProperty] private bool _isAttendanceVisible = true;
+
         public ObservableCollection<StudentAttendanceItem> AttendanceList { get; } = new();
 
         private GroupSession _currentSession;
@@ -36,18 +38,17 @@ namespace Coach_app.ViewModels.Groups
         }
 
         [RelayCommand]
+        private void ToggleAttendanceVisibility()
+        {
+            IsAttendanceVisible = !IsAttendanceVisible;
+        }
+
+        [RelayCommand]
         private async Task LoadData()
         {
             IsBusy = true;
             try
             {
-                // 1. Charger les infos de la séance
-                // (Petite astuce : On n'a pas fait de GetSessionById, on va le faire "à la main" ou l'ajouter au repo plus tard. 
-                // Pour l'instant on va supposer qu'on peut récupérer la session via le repo.
-                // Si la méthode n'existe pas, on va tricher un peu en récupérant via la date ou le groupe, 
-                // MAIS pour faire propre, on va AJOUTER GetSessionByIdAsync dans le Repo juste après).
-
-                // ... En attendant, imaginons qu'on l'a :
                 _currentSession = await _groupRepository.GetSessionByIdAsync(SessionId);
 
                 if (_currentSession != null)
@@ -58,16 +59,12 @@ namespace Coach_app.ViewModels.Groups
                     var group = await _groupRepository.GetGroupByIdAsync(_currentSession.GroupId);
                     GroupName = group?.Name ?? "Groupe Inconnu";
 
-                    // 2. Charger les élèves du groupe
                     var students = await _studentRepository.GetStudentsByGroupIdAsync(_currentSession.GroupId);
-
-                    // 3. Charger les présences DÉJÀ enregistrées (s'il y en a)
                     var existingAttendance = await _groupRepository.GetAttendanceForSessionAsync(SessionId);
 
                     AttendanceList.Clear();
                     foreach (var student in students)
                     {
-                        // On cherche si cet élève a déjà une ligne de présence
                         var record = existingAttendance.FirstOrDefault(a => a.StudentId == student.Id);
 
                         AttendanceList.Add(new StudentAttendanceItem
@@ -75,8 +72,12 @@ namespace Coach_app.ViewModels.Groups
                             StudentId = student.Id,
                             DisplayName = student.DisplayName,
                             PhotoPath = student.ProfilePhotoPath,
-                            IsPresent = record?.IsPresent ?? false, // Par défaut absent si pas d'info
-                            AttendanceId = record?.Id ?? 0,          // 0 si c'est nouveau
+                            AttendanceId = record?.Id ?? 0,
+
+                           
+                            // Si "record?.Status" est null (pas encore noté), on met "Absent" par défaut.
+                            Status = record?.Status ?? "Absent",
+
                             Note = record?.Note
                         });
                     }
@@ -84,7 +85,7 @@ namespace Coach_app.ViewModels.Groups
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Erreur Technique", ex.Message, "OK");
+                await Shell.Current.DisplayAlert("Erreur", ex.Message, "OK");
             }
             finally
             {
@@ -93,12 +94,18 @@ namespace Coach_app.ViewModels.Groups
         }
 
         [RelayCommand]
-        private void TogglePresence(StudentAttendanceItem item)
+        private void CycleStatus(StudentAttendanceItem item)
         {
-            // Inverse l'état (Présent <-> Absent)
+            // LOGIQUE DU CYCLE : Rien -> Présent -> Absent -> En Retard -> Rien
             if (item != null)
             {
-                item.IsPresent = !item.IsPresent;
+                item.Status = item.Status switch
+                {
+                    "Absent" => "Present",    // 1er clic : Il est là !
+                    "Present" => "Late",      // 2ème clic : Il est là mais en retard
+                    "Late" => "Absent",       // 3ème clic : Finalement il n'est pas là
+                    _ => "Absent"             // Sécurité (ou si c'était null avant)
+                };
             }
         }
 
@@ -112,21 +119,19 @@ namespace Coach_app.ViewModels.Groups
 
                 foreach (var item in AttendanceList)
                 {
-                    // On ne sauvegarde que ceux qui sont "Présents" ou qui ont déjà une ID (pour mettre à jour en Absent)
-                    // Ou plus simple : on sauvegarde tout le monde pour garder l'historique "Absent".
                     listToSave.Add(new SessionAttendance
                     {
                         Id = item.AttendanceId,
                         GroupSessionId = SessionId,
                         StudentId = item.StudentId,
-                        IsPresent = item.IsPresent,
+                        Status = item.Status, // On sauvegarde le string
                         Note = item.Note
                     });
                 }
 
                 await _groupRepository.SaveAttendanceListAsync(listToSave);
-                await Shell.Current.DisplayAlert("Succès", "L'appel a été enregistré !", "OK");
-                await Shell.Current.GoToAsync("..");
+                // On reste sur la page ou on affiche un petit toast, mais on ne quitte pas forcément
+                await Shell.Current.DisplayAlert("Succès", "Appel enregistré", "OK");
             }
             finally
             {
@@ -138,16 +143,16 @@ namespace Coach_app.ViewModels.Groups
         private async Task Cancel() => await Shell.Current.GoToAsync("..");
     }
 
-    // Classe "Wrapper" pour l'affichage
     public partial class StudentAttendanceItem : ObservableObject
     {
         public int StudentId { get; set; }
-        public int AttendanceId { get; set; } // ID de la ligne dans la BDD (0 si nouveau)
+        public int AttendanceId { get; set; }
         public string DisplayName { get; set; }
         public string PhotoPath { get; set; }
 
+        // C'est cette propriété qui change tout
         [ObservableProperty]
-        private bool _isPresent; // Si on change ça, l'interface se mettra à jour (couleur verte/grise)
+        private string _status;
 
         [ObservableProperty]
         private string _note;

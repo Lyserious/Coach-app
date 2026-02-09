@@ -19,16 +19,12 @@ namespace Coach_app.ViewModels.Groups
         private Group _selectedGroup;
 
         // Cette méthode est appelée automatiquement quand on clique sur un item
-        partial void OnSelectedGroupChanged(Group value)
+        async partial void OnSelectedGroupChanged(Group value)
         {
             if (value != null)
             {
-                // AVANT (Modif) :
-                // Shell.Current.GoToAsync($"{nameof(GroupDetailView)}?Id={value.Id}");
-
-                // MAINTENANT (Dashboard) :
-                Shell.Current.GoToAsync($"{nameof(GroupDashboardView)}?Id={value.Id}");
-
+                // On navigue vers le Dashboard du groupe
+                await Shell.Current.GoToAsync($"{nameof(GroupDashboardView)}?Id={value.Id}");
                 SelectedGroup = null;
             }
         }
@@ -48,7 +44,8 @@ namespace Coach_app.ViewModels.Groups
             try
             {
                 Groups.Clear();
-                var items = await _repository.GetActiveGroupsAsync();
+                // CORRECTION ICI : On utilise la méthode standard GetGroupsAsync
+                var items = await _repository.GetGroupsAsync();
                 foreach (var item in items) Groups.Add(item);
             }
             finally

@@ -27,6 +27,7 @@ namespace Coach_app.Data
             await _database.CreateTableAsync<StudentContact>();
             await _database.CreateTableAsync<SessionAttendance>();
             await _database.CreateTableAsync<GroupSession>();
+            await _database.CreateTableAsync<GroupPhoto>();
         }
     }
 }

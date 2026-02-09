@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Groups"
+             x:Class="Coach_app.Views.Groups.PhotoDetailView"
+             Title="Détail Photo"
+             BackgroundColor="Black">
+
+    <Grid>
+        <Image Source="{Binding ImagePath}" 
+               Aspect="AspectFit" 
+               HorizontalOptions="Fill" 
+               VerticalOptions="Fill"/>
+
+        <Button Text="..." 
+                Command="{Binding ShowOptionsCommand}"
+                FontSize="24"
+                FontAttributes="Bold"
+                BackgroundColor="#80000000" 
+                TextColor="White"
+                CornerRadius="25"
+                HeightRequest="50"
+                WidthRequest="50"
+                Padding="0"
+                Margin="0,10,10,0"
+                HorizontalOptions="End"
+                VerticalOptions="Start"/>
+        <Grid IsVisible="{Binding IsTaggingVisible}" BackgroundColor="#AA000000" VerticalOptions="Fill" HorizontalOptions="Fill">
+
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding HideTaggingCommand}"/>
+            </Grid.GestureRecognizers>
+
+            <Frame VerticalOptions="End" CornerRadius="20" BackgroundColor="White" Padding="20" Margin="10,10,10,20" HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+
+                    <Grid ColumnDefinitions="*, Auto">
+                        <Label Text="Qui est sur cette photo ?" FontAttributes="Bold" FontSize="16" TextColor="Black" VerticalOptions="Center"/>
+                        <Button Text="✕" Command="{Binding HideTaggingCommand}" BackgroundColor="Transparent" TextColor="Gray" Grid.Column="1"/>
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding Students}" HeightRequest="200">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto, *" Padding="5">
+                                    <CheckBox IsChecked="{Binding IsTagged}" Grid.Column="0" Color="{StaticResource Primary}"/>
+                                    <Label Text="{Binding Name}" VerticalOptions="Center" Grid.Column="1" TextColor="Black"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Text="Enregistrer" Command="{Binding SaveTagsCommand}" 
+                            BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="10"/>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+
+    </Grid>
+</ContentPage>
