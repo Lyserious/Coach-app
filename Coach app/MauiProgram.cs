@@ -44,7 +44,6 @@ namespace Coach_app
             builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
             builder.Services.AddSingleton<IAuthService, AuthService>();
             builder.Services.AddSingleton<ISessionService, SessionService>();
-            builder.Services.AddTransient<Views.Settings.SettingsView>();
 
 
 
@@ -53,7 +52,7 @@ namespace Coach_app
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<IExerciseRepository, ExerciseRepository>();
             builder.Services.AddTransient<IStudentRepository, StudentRepository>();
-
+            builder.Services.AddSingleton<INoteRepository, NoteRepository>();
 
 
 
@@ -76,6 +75,7 @@ namespace Coach_app
             builder.Services.AddTransient<PhotoDetailView>();
             builder.Services.AddTransient<Views.Templates.SessionTemplatesView>();
             builder.Services.AddTransient<Views.Templates.SessionTemplateDetailView>();
+            builder.Services.AddTransient<Views.Settings.SettingsView>();
 
 
 

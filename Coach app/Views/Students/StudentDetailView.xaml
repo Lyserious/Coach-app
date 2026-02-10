@@ -148,7 +148,7 @@
                         </BindableLayout.ItemTemplate>
                     </StackLayout>
 
-                    <Label Text="Aucun contact d'urgence." 
+                    <Label Text="Aucun contact d'urgence."
                            HorizontalOptions="Center" 
                            TextColor="Gray" 
                            FontSize="12" 
@@ -160,6 +160,34 @@
                             </DataTrigger>
                         </Label.Triggers>
                     </Label>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding IsEditMode}">
+                    <Label Text="Suivi &amp; Notes" FontSize="14" FontAttributes="Bold" TextColor="Black"/>
+
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                        <Entry Grid.Column="0" Text="{Binding NewNoteText}" Placeholder="Ajouter une note..." BackgroundColor="White"/>
+                        <Button Grid.Column="1" Text="Envoyer" Command="{Binding AddNoteCommand}" BackgroundColor="Black" TextColor="White" CornerRadius="10"/>
+                    </Grid>
+
+                    <StackLayout BindableLayout.ItemsSource="{Binding Notes}" Spacing="5">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Padding="10" BackgroundColor="#FFFBE6" BorderColor="Transparent" CornerRadius="5">
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label Text="{Binding Content}" TextColor="Black" FontSize="14"/>
+                                            <Label Text="{Binding Date, StringFormat='{0:dd/MM/yyyy}'}" TextColor="Gray" FontSize="10"/>
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1" Text="🗑️" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentDetailViewModel}}, Path=DeleteNoteCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="Transparent" TextColor="Red" HeightRequest="30"/>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
                 </VerticalStackLayout>
 
                 <VerticalStackLayout Spacing="10" Margin="0,10,0,30">
