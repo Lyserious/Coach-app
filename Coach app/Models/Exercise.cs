@@ -24,6 +24,8 @@ namespace Coach_app.Models
 
         public string Comments { get; set; } // "Rétroversion bassin", astuces coach
 
+        public PerformanceType ScoringType { get; set; } = PerformanceType.Numeric;
+
         // Lien vers une vidéo YouTube (https://...) ou un fichier local (file://...)
         public string MediaUrl { get; set; }
 

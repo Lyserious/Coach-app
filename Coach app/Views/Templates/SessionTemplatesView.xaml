@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Templates"
+             x:Class="Coach_app.Views.Templates.SessionTemplatesView"
+             Title="Mes Séances Types"
+             BackgroundColor="#F5F5F5">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadTemplatesCommand}" xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"/>
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="*, Auto">
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Templates}" Margin="10">
+            <CollectionView.EmptyView>
+                <Label Text="Aucun modèle enregistré." TextColor="Gray" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,0,0,10" Padding="15" CornerRadius="10" BackgroundColor="White">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionTemplatesViewModel}}, Path=EditTemplateCommand}" CommandParameter="{Binding .}"/>
+                        </Frame.GestureRecognizers>
+
+                        <Grid ColumnDefinitions="*, Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="Black"/>
+                                <Label Text="{Binding Category}" FontSize="12" TextColor="Gray"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="✏️" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="1" Text="+ Créer une séance type" Command="{Binding AddTemplateCommand}" 
+                BackgroundColor="Black" TextColor="White" Margin="20" CornerRadius="25"/>
+    </Grid>
+</ContentPage>

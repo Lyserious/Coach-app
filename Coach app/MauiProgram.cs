@@ -74,6 +74,9 @@ namespace Coach_app
             builder.Services.AddTransient<GroupSessionsView>();
             builder.Services.AddTransient<GroupGalleryView>();
             builder.Services.AddTransient<PhotoDetailView>();
+            builder.Services.AddTransient<Views.Templates.SessionTemplatesView>();
+            builder.Services.AddTransient<Views.Templates.SessionTemplateDetailView>();
+
 
 
             // ViewModels
@@ -93,9 +96,13 @@ namespace Coach_app
             builder.Services.AddTransient<GroupSessionsViewModel>();
             builder.Services.AddTransient<GroupGalleryViewModel>();
             builder.Services.AddTransient<PhotoDetailViewModel>();
+            builder.Services.AddTransient<ViewModels.Templates.SessionTemplatesViewModel>();
+            builder.Services.AddTransient<ViewModels.Templates.SessionTemplateDetailViewModel>();
 
 
 
+
+            //return builder.Build();
             return builder.Build();
         }
     }

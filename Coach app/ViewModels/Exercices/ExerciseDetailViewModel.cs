@@ -27,12 +27,13 @@ namespace Coach_app.ViewModels.Exercises
         [ObservableProperty] private string _equipment;
         [ObservableProperty] private string _comments;
 
-        // AJOUT ICI : On notifie HasMedia quand l'URL change
+        // NOUVEAU : Le type de notation géré ici
+        [ObservableProperty] private PerformanceType _scoringType;
+
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasMedia))]
         private string _mediaUrl;
 
-        // Propriété calculée pour savoir si on affiche le bouton vidéo
         public bool HasMedia => !string.IsNullOrWhiteSpace(MediaUrl);
 
         public List<ExerciseCategory> Categories { get; } = Enum.GetValues(typeof(ExerciseCategory)).Cast<ExerciseCategory>().ToList();
@@ -47,7 +48,7 @@ namespace Coach_app.ViewModels.Exercises
         {
             if (value > 0)
             {
-                IsEditMode = false; // Mode Lecture par défaut
+                IsEditMode = false;
 
                 var exo = await _repository.GetExerciseByIdAsync(value);
                 if (exo != null)
@@ -59,13 +60,15 @@ namespace Coach_app.ViewModels.Exercises
                     Equipment = exo.Equipment;
                     Comments = exo.Comments;
                     MediaUrl = exo.MediaUrl;
+                    ScoringType = exo.ScoringType; // On charge le type
                 }
             }
             else
             {
-                IsEditMode = true; // Création -> Mode Édition
+                IsEditMode = true;
                 Title = "Créer un exercice";
                 SelectedCategory = ExerciseCategory.WarmUp;
+                ScoringType = PerformanceType.Numeric; // Défaut = Numérique
             }
         }
 
@@ -75,10 +78,8 @@ namespace Coach_app.ViewModels.Exercises
         private async Task OpenMedia()
         {
             if (string.IsNullOrWhiteSpace(MediaUrl)) return;
-
             try
             {
-                // Ouvre le lien dans le navigateur par défaut ou l'app YouTube
                 await Launcher.Default.OpenAsync(new Uri(MediaUrl));
             }
             catch (Exception)
@@ -112,7 +113,8 @@ namespace Coach_app.ViewModels.Exercises
                 Goal = Goal,
                 Equipment = Equipment,
                 Comments = Comments,
-                MediaUrl = MediaUrl
+                MediaUrl = MediaUrl,
+                ScoringType = ScoringType // On sauvegarde le type choisi
             };
 
             if (ExerciseId > 0)
@@ -123,7 +125,6 @@ namespace Coach_app.ViewModels.Exercises
 
             await _repository.SaveExerciseAsync(exo);
 
-            // Retour en mode lecture pour voir le résultat
             IsEditMode = false;
             Title = "Détail Exercice";
         }
@@ -150,7 +151,7 @@ namespace Coach_app.ViewModels.Exercises
             else
             {
                 IsEditMode = false;
-                OnExerciseIdChanged(ExerciseId); // Recharge les données originales
+                OnExerciseIdChanged(ExerciseId);
             }
         }
     }

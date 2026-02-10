@@ -28,7 +28,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(Views.Groups.GroupSessionsView), typeof(Views.Groups.GroupSessionsView));
         Routing.RegisterRoute(nameof(Views.Groups.GroupGalleryView), typeof(Views.Groups.GroupGalleryView));
         Routing.RegisterRoute(nameof(PhotoDetailView), typeof(PhotoDetailView));
-
+        Routing.RegisterRoute(nameof(Views.Templates.SessionTemplateDetailView), typeof(Views.Templates.SessionTemplateDetailView));
 
 
     }

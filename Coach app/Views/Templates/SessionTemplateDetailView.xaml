@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Coach_app.ViewModels.Templates"
+             x:Class="Coach_app.Views.Templates.SessionTemplateDetailView"
+             Title="{Binding Title}"
+             BackgroundColor="#F5F5F5">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <Frame Grid.Row="0" Margin="10" Padding="15" BackgroundColor="White" CornerRadius="10">
+            <VerticalStackLayout Spacing="10">
+                <Entry Placeholder="Nom de la séance (ex: Force Poutre)" Text="{Binding Name}" FontSize="18" FontAttributes="Bold"/>
+                <Entry Placeholder="Catégorie (ex: Force)" Text="{Binding Category}"/>
+                <Editor Placeholder="Description..." Text="{Binding Description}" HeightRequest="60"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}" Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,0,0,10" Padding="10" CornerRadius="10">
+                        <Grid ColumnDefinitions="*, Auto, Auto">
+                            <Label Grid.Column="0" Text="{Binding ExerciseId}" VerticalOptions="Center"/>
+                            <HorizontalStackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center">
+                                <Entry Text="{Binding Sets}" WidthRequest="40" HorizontalTextAlignment="Center"/>
+                                <Label Text="x" VerticalOptions="Center"/>
+                                <Entry Text="{Binding Reps}" WidthRequest="50" HorizontalTextAlignment="Center"/>
+                            </HorizontalStackLayout>
+
+                            <Button Grid.Column="2" Text="X" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionTemplateDetailViewModel}}, Path=RemoveExerciseCommand}" CommandParameter="{Binding .}" 
+                                    BackgroundColor="Transparent" TextColor="Red"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*, *" Padding="20" ColumnSpacing="10">
+            <Button Grid.Column="0" Text="+ Exercice" Command="{Binding AddExerciseCommand}" BackgroundColor="Gray"/>
+            <Button Grid.Column="1" Text="Enregistrer" Command="{Binding SaveCommand}" BackgroundColor="{StaticResource Primary}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

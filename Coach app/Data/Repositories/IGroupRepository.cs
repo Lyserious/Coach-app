@@ -33,5 +33,22 @@ namespace Coach_app.Data.Repositories
         Task AddPhotoAsync(GroupPhoto photo);
         Task UpdatePhotoAsync(GroupPhoto photo);
         Task DeletePhotoAsync(GroupPhoto photo);
+
+        // --- CONTENU SÉANCE ---
+        Task<List<SessionExercise>> GetExercisesForSessionAsync(int sessionId);
+        Task SaveSessionExerciseAsync(SessionExercise sessionExercise);
+        Task DeleteSessionExerciseAsync(SessionExercise sessionExercise);
+
+        // --- TEMPLATES (RECUEIL) ---
+        Task<List<SessionTemplate>> GetAllTemplatesAsync();
+        Task SaveTemplateAsync(SessionTemplate template, List<SessionTemplateExercise> exercises);
+        Task ImportTemplateToSessionAsync(int templateId, int targetSessionId);
+
+        // --- PERFORMANCES ---
+        Task<List<Performance>> GetPerformancesAsync(int sessionId, int exerciseId);
+        Task SavePerformanceAsync(Performance perf);
+        Task DeletePerformanceAsync(Performance perf);
+
+
     }
 }
