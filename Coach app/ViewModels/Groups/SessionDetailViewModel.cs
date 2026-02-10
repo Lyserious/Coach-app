@@ -245,12 +245,49 @@ namespace Coach_app.ViewModels.Groups
         [RelayCommand]
         private async Task ImportTemplate()
         {
-            var templates = await _groupRepository.GetAllTemplatesAsync(); if (!templates.Any()) return;
-            var names = templates.Select(t => t.Name).ToArray(); string choice = await Shell.Current.DisplayActionSheet("Importer", "Annuler", null, names);
-            if (!string.IsNullOrEmpty(choice) && choice != "Annuler")
+            try
             {
-                var tmpl = templates.First(t => t.Name == choice);
-                await _groupRepository.ImportTemplateToSessionAsync(tmpl.Id, SessionId); await LoadData();
+                // 1. Récupérer les templates
+                var templates = await _groupRepository.GetAllTemplatesAsync();
+
+                if (templates == null || !templates.Any())
+                {
+                    await Shell.Current.DisplayAlert("Information", "Votre librairie de séances types est vide. Créez d'abord un modèle.", "OK");
+                    return;
+                }
+
+                // 2. Afficher la liste
+                var names = templates.Select(t => t.Name).ToArray();
+                string choice = await Shell.Current.DisplayActionSheet("Choisir un modèle à importer", "Annuler", null, names);
+
+                if (!string.IsNullOrEmpty(choice) && choice != "Annuler")
+                {
+                    var tmpl = templates.First(t => t.Name == choice);
+
+                    bool confirm = await Shell.Current.DisplayAlert("Confirmation", $"Voulez-vous copier les exercices de '{tmpl.Name}' dans cette séance ?", "Oui", "Non");
+
+                    if (confirm)
+                    {
+                        IsBusy = true;
+
+                        // 3. Exécuter l'importation (Copie en base de données)
+                        // Note: Les exos sont copiés, donc modifier la séance après ne touche PAS au modèle.
+                        await _groupRepository.ImportTemplateToSessionAsync(tmpl.Id, SessionId);
+
+                        // 4. Recharger l'interface pour voir les nouveaux exos
+                        await LoadData();
+
+                        await Shell.Current.DisplayAlert("Succès", "Exercices importés !", "OK");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Erreur", $"L'importation a échoué : {ex.Message}", "OK");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
     }

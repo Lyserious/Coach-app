@@ -23,42 +23,36 @@ namespace Coach_app.ViewModels.Templates
         private async Task LoadTemplates()
         {
             IsBusy = true;
-            try
-            {
-                Templates.Clear();
-                var list = await _repository.GetAllTemplatesAsync();
-                foreach (var t in list) Templates.Add(t);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            Templates.Clear();
+            var list = await _repository.GetAllTemplatesAsync();
+            foreach (var t in list) Templates.Add(t);
+            IsBusy = false;
         }
 
         [RelayCommand]
         private async Task AddTemplate()
         {
-            // On va vers la page détail avec un ID=0 pour créer
+            // On navigue vers la page détail avec ID=0 (Création)
             await Shell.Current.GoToAsync(nameof(SessionTemplateDetailView));
         }
 
         [RelayCommand]
-        private async Task EditTemplate(SessionTemplate template)
+        private async Task EditTemplate(SessionTemplate tmpl)
         {
-            if (template == null) return;
-            await Shell.Current.GoToAsync($"{nameof(SessionTemplateDetailView)}?Id={template.Id}");
+            if (tmpl == null) return;
+            // On navigue vers la page détail avec l'ID existant
+            await Shell.Current.GoToAsync($"{nameof(SessionTemplateDetailView)}?Id={tmpl.Id}");
         }
 
         [RelayCommand]
-        private async Task DeleteTemplate(SessionTemplate template)
+        private async Task DeleteTemplate(SessionTemplate tmpl)
         {
-            // Note: Il faudra ajouter DeleteTemplateAsync dans ton Repository si ce n'est pas fait !
-            // Pour l'instant on simule ou tu l'ajoutes après.
-            bool confirm = await Shell.Current.DisplayAlert("Supprimer", "Supprimer ce modèle ?", "Oui", "Non");
+            if (tmpl == null) return;
+            bool confirm = await Shell.Current.DisplayAlert("Supprimer", "Supprimer définitivement ce modèle ?", "Oui", "Non");
             if (confirm)
             {
-                // await _repository.DeleteTemplateAsync(template); // À implémenter
-                Templates.Remove(template);
+                await _repository.DeleteTemplateAsync(tmpl);
+                Templates.Remove(tmpl);
             }
         }
     }

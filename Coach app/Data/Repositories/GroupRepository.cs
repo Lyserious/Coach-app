@@ -5,7 +5,8 @@ using SQLite;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using System.Threading; // Nécessaire pour le SemaphoreSlim
+using System.Threading; // Indispensable pour SemaphoreSlim
+using System.IO; // Nécessaire pour File.Delete (Photos)
 
 namespace Coach_app.Data.Repositories
 {
@@ -14,8 +15,7 @@ namespace Coach_app.Data.Repositories
         private SQLiteAsyncConnection _database;
         private readonly ISessionService _sessionService;
 
-        // --- SECURITÉ INITIALISATION (Ajout) ---
-        // Ce verrou empêche que deux parties de l'app essaient de créer les tables en même temps
+        // --- SÉCURITÉ INITIALISATION ---
         private readonly SemaphoreSlim _initLock = new SemaphoreSlim(1, 1);
         private bool _isInitialized = false;
 
@@ -24,17 +24,13 @@ namespace Coach_app.Data.Repositories
             _sessionService = sessionService;
         }
 
-        // Méthode Init() sécurisée
         private async Task Init()
         {
-            // 1. Si c'est déjà prêt, on ne fait rien (Rapide)
             if (_isInitialized && _database != null) return;
 
-            // 2. Sinon, on attend son tour (Sécurité)
             await _initLock.WaitAsync();
             try
             {
-                // 3. On revérifie une fois qu'on a le ticket d'entrée
                 if (_isInitialized && _database != null) return;
 
                 var currentCoach = _sessionService.CurrentCoach;
@@ -43,7 +39,6 @@ namespace Coach_app.Data.Repositories
                 string dbPath = Constants.GetCoachDbPath(currentCoach.DataFileName);
                 _database = new SQLiteAsyncConnection(dbPath, Constants.Flags);
 
-                // 4. Création des tables (Ordre garanti)
                 await _database.CreateTableAsync<Group>();
                 await _database.CreateTableAsync<GroupSession>();
                 await _database.CreateTableAsync<Student>();
@@ -92,7 +87,6 @@ namespace Coach_app.Data.Repositories
             else
                 await _database.InsertAsync(group);
 
-            // Important : On lance la génération des séances après sauvegarde
             await GenerateSessionsForGroupAsync(group);
         }
 
@@ -101,19 +95,15 @@ namespace Coach_app.Data.Repositories
             await Init();
             if (_database == null) return;
 
-            // 1. Supprimer les séances
             var sessions = await GetSessionsByGroupIdAsync(group.Id);
             foreach (var s in sessions) await DeleteSessionAsync(s.Id);
 
-            // 2. Supprimer les liens élèves
             var links = await _database.Table<StudentGroup>().Where(l => l.GroupId == group.Id).ToListAsync();
             foreach (var l in links) await _database.DeleteAsync(l);
 
-            // 3. Supprimer les photos
             var photos = await GetPhotosByGroupIdAsync(group.Id);
             foreach (var p in photos) await DeletePhotoAsync(p);
 
-            // 4. Supprimer le groupe
             await _database.DeleteAsync(group);
         }
 
@@ -125,8 +115,6 @@ namespace Coach_app.Data.Repositories
         {
             await Init();
             if (_database == null) return new List<Student>();
-
-            // Requête SQL pour récupérer les élèves liés au groupe
             return await _database.QueryAsync<Student>(
                 "SELECT S.* FROM Student S INNER JOIN StudentGroup SG ON S.Id = SG.StudentId WHERE SG.GroupId = ?",
                 groupId);
@@ -167,13 +155,11 @@ namespace Coach_app.Data.Repositories
 
             var today = DateTime.Today;
 
-            // 1. Supprimer les séances futures
             var futureSessions = await _database.Table<GroupSession>()
                                              .Where(s => s.GroupId == group.Id && s.Date >= today && s.Status == "Scheduled")
                                              .ToListAsync();
             foreach (var s in futureSessions) await _database.DeleteAsync(s);
 
-            // 2. Récupérer les existantes passées (anti-doublon)
             var existingPastSessions = await _database.Table<GroupSession>()
                                                       .Where(s => s.GroupId == group.Id && s.Date < today)
                                                       .ToListAsync();
@@ -304,15 +290,11 @@ namespace Coach_app.Data.Repositories
             await Init();
             if (_database == null) return;
             await _database.DeleteAsync(photo);
-
-            if (File.Exists(photo.FilePath))
-            {
-                try { File.Delete(photo.FilePath); } catch { }
-            }
+            if (File.Exists(photo.FilePath)) try { File.Delete(photo.FilePath); } catch { }
         }
 
         // =========================================================
-        // 7. GESTION DU CONTENU DES SÉANCES & TEMPLATES
+        // 7. CONTENU SÉANCES (PROGRAMME)
         // =========================================================
 
         public async Task<List<SessionExercise>> GetExercisesForSessionAsync(int sessionId)
@@ -345,12 +327,21 @@ namespace Coach_app.Data.Repositories
             await _database.DeleteAsync(sessionExercise);
         }
 
-        // --- GESTION DES TEMPLATES ---
+        // =========================================================
+        // 8. TEMPLATES (Séances types)
+        // =========================================================
 
         public async Task<List<SessionTemplate>> GetAllTemplatesAsync()
         {
             await Init();
             return await _database.Table<SessionTemplate>().ToListAsync();
+        }
+
+        // --- AJOUT 1 : La méthode manquante pour récupérer le contenu d'un template ---
+        public async Task<List<SessionTemplateExercise>> GetTemplateExercisesAsync(int templateId)
+        {
+            await Init();
+            return await _database.Table<SessionTemplateExercise>().Where(x => x.TemplateId == templateId).ToListAsync();
         }
 
         public async Task SaveTemplateAsync(SessionTemplate template, List<SessionTemplateExercise> exercises)
@@ -359,6 +350,7 @@ namespace Coach_app.Data.Repositories
             if (template.Id != 0) await _database.UpdateAsync(template);
             else await _database.InsertAsync(template);
 
+            // On efface les anciens pour éviter les doublons
             var oldExos = await _database.Table<SessionTemplateExercise>().Where(x => x.TemplateId == template.Id).ToListAsync();
             foreach (var old in oldExos) await _database.DeleteAsync(old);
 
@@ -369,15 +361,32 @@ namespace Coach_app.Data.Repositories
             if (exercises.Any()) await _database.InsertAllAsync(exercises);
         }
 
+        // --- AJOUT 2 : La méthode manquante pour supprimer un template ---
+        public async Task DeleteTemplateAsync(SessionTemplate template)
+        {
+            await Init();
+            // On supprime d'abord les exos liés
+            var exos = await GetTemplateExercisesAsync(template.Id);
+            foreach (var ex in exos) await _database.DeleteAsync(ex);
+
+            // Puis le template lui-même
+            await _database.DeleteAsync(template);
+        }
+
         public async Task ImportTemplateToSessionAsync(int templateId, int targetSessionId)
         {
             await Init();
 
+            // On utilise la méthode interne (ou la nouvelle méthode publique GetTemplateExercisesAsync)
             var templateExercises = await _database.Table<SessionTemplateExercise>()
                                                    .Where(x => x.TemplateId == templateId)
                                                    .ToListAsync();
 
             var newSessionExercises = new List<SessionExercise>();
+
+            // Pour ne pas écraser l'ordre existant si la séance a déjà des exos
+            var existing = await _database.Table<SessionExercise>().Where(x => x.GroupSessionId == targetSessionId).ToListAsync();
+            int startIndex = existing.Count + 1;
 
             foreach (var tExo in templateExercises)
             {
@@ -385,7 +394,7 @@ namespace Coach_app.Data.Repositories
                 {
                     GroupSessionId = targetSessionId,
                     ExerciseId = tExo.ExerciseId,
-                    OrderIndex = tExo.OrderIndex,
+                    OrderIndex = startIndex++,
                     Sets = tExo.Sets,
                     Reps = tExo.Reps,
                     Weight = tExo.Weight,
@@ -393,19 +402,17 @@ namespace Coach_app.Data.Repositories
                     Note = tExo.Note
                 });
             }
-
-            if (newSessionExercises.Any())
-                await _database.InsertAllAsync(newSessionExercises);
+            if (newSessionExercises.Any()) await _database.InsertAllAsync(newSessionExercises);
         }
 
         // =========================================================
-        // 8. GESTION DES PERFORMANCES (Corrigé pour doublons d'exos)
+        // 9. PERFORMANCES (Méthode corrigée pour doublons d'exos)
         // =========================================================
 
         public async Task<List<Performance>> GetPerformancesBySessionExerciseAsync(int sessionExerciseId)
         {
             await Init();
-            // On cherche les notes liées spécifiquement à CETTE ligne du programme
+            // On cherche par ID de ligne de programme (pour gérer les doublons d'exos)
             return await _database.Table<Performance>()
                                   .Where(p => p.SessionExerciseId == sessionExerciseId)
                                   .ToListAsync();

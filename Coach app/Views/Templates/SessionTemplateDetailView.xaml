@@ -6,39 +6,86 @@
              Title="{Binding Title}"
              BackgroundColor="#F5F5F5">
 
-    <Grid RowDefinitions="Auto, *, Auto">
+    <Grid>
+        <Grid IsVisible="{Binding IsReadMode}" RowDefinitions="Auto, *, Auto">
 
-        <Frame Grid.Row="0" Margin="10" Padding="15" BackgroundColor="White" CornerRadius="10">
-            <VerticalStackLayout Spacing="10">
-                <Entry Placeholder="Nom de la séance (ex: Force Poutre)" Text="{Binding Name}" FontSize="18" FontAttributes="Bold"/>
-                <Entry Placeholder="Catégorie (ex: Force)" Text="{Binding Category}"/>
-                <Editor Placeholder="Description..." Text="{Binding Description}" HeightRequest="60"/>
-            </VerticalStackLayout>
-        </Frame>
+            <Frame Grid.Row="0" Margin="10" Padding="20" BackgroundColor="White" CornerRadius="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="{Binding Name}" FontSize="22" FontAttributes="Bold" TextColor="Black"/>
+                    <Label Text="{Binding Category}" FontSize="14" TextColor="Gray" TextTransform="Uppercase"/>
+                    <Label Text="{Binding Description}" FontSize="14" TextColor="#333" FontAttributes="Italic" Margin="0,10,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}" Margin="10">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Margin="0,0,0,10" Padding="10" CornerRadius="10">
-                        <Grid ColumnDefinitions="*, Auto, Auto">
-                            <Label Grid.Column="0" Text="{Binding ExerciseId}" VerticalOptions="Center"/>
-                            <HorizontalStackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center">
-                                <Entry Text="{Binding Sets}" WidthRequest="40" HorizontalTextAlignment="Center"/>
-                                <Label Text="x" VerticalOptions="Center"/>
-                                <Entry Text="{Binding Reps}" WidthRequest="50" HorizontalTextAlignment="Center"/>
-                            </HorizontalStackLayout>
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}" Margin="10,0">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,5" Padding="15" CornerRadius="10" BackgroundColor="White" BorderColor="Transparent">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" TextColor="Black" VerticalOptions="Center"/>
+                                <HorizontalStackLayout Grid.Column="1" Spacing="5">
+                                    <Label Text="{Binding Sets}" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                                    <Label Text="x" TextColor="Gray"/>
+                                    <Label Text="{Binding Reps}" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                                    <Label Text="{Binding Weight}" TextColor="Gray"/>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-                            <Button Grid.Column="2" Text="X" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionTemplateDetailViewModel}}, Path=RemoveExerciseCommand}" CommandParameter="{Binding .}" 
-                                    BackgroundColor="Transparent" TextColor="Red"/>
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-
-        <Grid Grid.Row="2" ColumnDefinitions="*, *" Padding="20" ColumnSpacing="10">
-            <Button Grid.Column="0" Text="+ Exercice" Command="{Binding AddExerciseCommand}" BackgroundColor="Gray"/>
-            <Button Grid.Column="1" Text="Enregistrer" Command="{Binding SaveCommand}" BackgroundColor="{StaticResource Primary}"/>
+            <Button Grid.Row="2" Text="✏️ Modifier la fiche" Command="{Binding EnableEditModeCommand}" 
+                    BackgroundColor="Black" TextColor="White" Margin="20" CornerRadius="25"/>
         </Grid>
+
+
+        <Grid IsVisible="{Binding IsEditMode}" RowDefinitions="Auto, *, Auto">
+
+            <Frame Grid.Row="0" Margin="10" Padding="15" BackgroundColor="White" CornerRadius="10">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="INFORMATIONS GÉNÉRALES" FontSize="10" TextColor="Gray" FontAttributes="Bold"/>
+                    <Entry Placeholder="Nom de la séance (Obligatoire)" Text="{Binding Name}" FontSize="16" FontAttributes="Bold"/>
+                    <Entry Placeholder="Catégorie (ex: Force, Cardio)" Text="{Binding Category}"/>
+                    <Editor Placeholder="Description ou notes..." Text="{Binding Description}" HeightRequest="60"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}" Margin="10,0">
+                <CollectionView.EmptyView>
+                    <Label Text="Ajoutez des exercices..." TextColor="Gray" HorizontalOptions="Center" Margin="20"/>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,5" Padding="10" CornerRadius="10" BackgroundColor="White" BorderColor="#EEE">
+                            <Grid ColumnDefinitions="*, Auto, Auto">
+                                <Label Grid.Column="0" Text="{Binding Name}" FontAttributes="Bold" VerticalOptions="Center" TextColor="Black"/>
+
+                                <HorizontalStackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center" Margin="10,0">
+                                    <Entry Text="{Binding Sets}" Placeholder="S" WidthRequest="35" HorizontalTextAlignment="Center" FontSize="14"/>
+                                    <Label Text="x" VerticalOptions="Center"/>
+                                    <Entry Text="{Binding Reps}" Placeholder="R" WidthRequest="35" HorizontalTextAlignment="Center" FontSize="14"/>
+                                    <Entry Text="{Binding Weight}" Placeholder="Kg" WidthRequest="35" HorizontalTextAlignment="Center" FontSize="14"/>
+                                </HorizontalStackLayout>
+
+                                <Button Grid.Column="2" Text="✕" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionTemplateDetailViewModel}}, Path=RemoveExerciseCommand}" CommandParameter="{Binding .}" 
+                                        BackgroundColor="#FFEBEE" TextColor="Red" Padding="0" HeightRequest="30" WidthRequest="30" CornerRadius="15"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <VerticalStackLayout Grid.Row="2" Spacing="10" Margin="20">
+                <Button Text="+ Ajouter un exercice" Command="{Binding AddExerciseCommand}" 
+                        BackgroundColor="White" TextColor="Black" BorderColor="Black" BorderWidth="1" CornerRadius="10"/>
+
+                <Grid ColumnDefinitions="*,*">
+                    <Button Grid.Column="0" Text="Annuler" Command="{Binding CancelEditCommand}" BackgroundColor="Transparent" TextColor="Gray"/>
+                    <Button Grid.Column="1" Text="Enregistrer" Command="{Binding SaveCommand}" BackgroundColor="Black" TextColor="White" CornerRadius="25"/>
+                </Grid>
+            </VerticalStackLayout>
+        </Grid>
+
     </Grid>
 </ContentPage>

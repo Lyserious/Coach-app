@@ -40,12 +40,14 @@ namespace Coach_app.Data.Repositories
         Task SaveSessionExerciseAsync(SessionExercise sessionExercise);
         Task DeleteSessionExerciseAsync(SessionExercise sessionExercise);
 
-        // Templates
+        // 8. Templates (Recueil) - LISTE NETTOYÉE
         Task<List<SessionTemplate>> GetAllTemplatesAsync();
+        Task<List<SessionTemplateExercise>> GetTemplateExercisesAsync(int templateId);
         Task SaveTemplateAsync(SessionTemplate template, List<SessionTemplateExercise> exercises);
+        Task DeleteTemplateAsync(SessionTemplate template);
         Task ImportTemplateToSessionAsync(int templateId, int targetSessionId);
 
-        // 8. Performances
+        // 9. Performances
         Task<List<Performance>> GetPerformancesBySessionExerciseAsync(int sessionExerciseId);
         Task SavePerformanceAsync(Performance perf);
         Task DeletePerformanceAsync(Performance perf);

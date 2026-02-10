@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 
-
 namespace Coach_app.ViewModels.Templates
 {
     [QueryProperty(nameof(TemplateId), "Id")]
@@ -15,61 +14,123 @@ namespace Coach_app.ViewModels.Templates
         private readonly IExerciseRepository _exerciseRepository;
 
         [ObservableProperty] private int _templateId;
+
+        // --- ÉTATS D'AFFICHAGE ---
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsReadMode))]
+        private bool _isEditMode;
+        public bool IsReadMode => !IsEditMode;
+
+        // --- DONNÉES ---
         [ObservableProperty] private string _name;
         [ObservableProperty] private string _category;
         [ObservableProperty] private string _description;
 
-        public ObservableCollection<SessionTemplateExercise> Exercises { get; } = new();
+        public ObservableCollection<TemplateExerciseItem> Exercises { get; } = new();
 
         public SessionTemplateDetailViewModel(IGroupRepository repository, IExerciseRepository exerciseRepository)
         {
             _repository = repository;
             _exerciseRepository = exerciseRepository;
-            Title = "Nouvelle Séance Type";
         }
 
         async partial void OnTemplateIdChanged(int value)
         {
-            if (value > 0) await LoadData();
+            if (value > 0)
+            {
+                // Si on ouvre un modèle existant -> Mode Lecture
+                IsEditMode = false;
+                await LoadData(value);
+            }
+            else
+            {
+                // Création -> Mode Édition direct
+                IsEditMode = true;
+                Title = "Nouveau Modèle";
+                Exercises.Clear();
+            }
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int id)
         {
             IsBusy = true;
-            // Note: Il faudra ajouter GetTemplateByIdAsync et GetExercisesForTemplateAsync dans le Repository
-            // Pour l'instant, on suppose que SaveTemplateAsync gère tout.
-            // ... (Implémentation simplifiée pour l'exemple, voir étape Repository)
+            try
+            {
+                var all = await _repository.GetAllTemplatesAsync();
+                var t = all.FirstOrDefault(x => x.Id == id);
+                if (t != null)
+                {
+                    Name = t.Name;
+                    Category = t.Category;
+                    Description = t.Description;
+                    Title = t.Name; // Le titre de la page devient le nom de la séance
+                }
 
-            // Simulation chargement si tu n'as pas encore créé les méthodes Get
-            // var t = await _repository.GetTemplateByIdAsync(TemplateId); 
-            IsBusy = false;
+                var exos = await _repository.GetTemplateExercisesAsync(id);
+                var allExos = await _exerciseRepository.GetAllExercisesAsync();
+
+                Exercises.Clear();
+                foreach (var ex in exos)
+                {
+                    var realExo = allExos.FirstOrDefault(e => e.Id == ex.ExerciseId);
+                    Exercises.Add(new TemplateExerciseItem
+                    {
+                        ExerciseId = ex.ExerciseId,
+                        Name = realExo?.Name ?? "Exercice inconnu",
+                        Sets = ex.Sets,
+                        Reps = ex.Reps,
+                        Weight = ex.Weight
+                    });
+                }
+            }
+            finally { IsBusy = false; }
+        }
+
+        // --- ACTIONS ---
+
+        [RelayCommand]
+        private void EnableEditMode()
+        {
+            IsEditMode = true;
+            Title = "Modification...";
+        }
+
+        [RelayCommand]
+        private async Task CancelEdit()
+        {
+            if (TemplateId == 0)
+            {
+                await Shell.Current.GoToAsync("..");
+            }
+            else
+            {
+                IsEditMode = false;
+                await LoadData(TemplateId); // On recharge les données d'origine (annulation)
+            }
         }
 
         [RelayCommand]
         private async Task AddExercise()
         {
-            var allExercises = await _exerciseRepository.GetAllExercisesAsync();
-            var names = allExercises.Select(e => e.Name).ToArray();
+            var all = await _exerciseRepository.GetAllExercisesAsync();
+            var names = all.Select(e => e.Name).ToArray();
             string choice = await Shell.Current.DisplayActionSheet("Ajouter un exercice", "Annuler", null, names);
 
             if (!string.IsNullOrEmpty(choice) && choice != "Annuler")
             {
-                var exo = allExercises.First(e => e.Name == choice);
-                Exercises.Add(new SessionTemplateExercise
+                var sel = all.First(e => e.Name == choice);
+                Exercises.Add(new TemplateExerciseItem
                 {
-                    ExerciseId = exo.Id,
-                    OrderIndex = Exercises.Count + 1,
+                    ExerciseId = sel.Id,
+                    Name = sel.Name,
                     Sets = "4",
                     Reps = "10"
-                    // Astuce: On n'a pas l'objet "Exercise" complet ici pour l'affichage, 
-                    // il faudra peut-être une propriété temporaire "ExerciseName" dans SessionTemplateExercise
-                    // ou faire une classe wrapper comme pour l'Appel.
                 });
             }
         }
 
         [RelayCommand]
-        private void RemoveExercise(SessionTemplateExercise item)
+        private void RemoveExercise(TemplateExerciseItem item)
         {
             Exercises.Remove(item);
         }
@@ -77,7 +138,11 @@ namespace Coach_app.ViewModels.Templates
         [RelayCommand]
         private async Task Save()
         {
-            if (string.IsNullOrWhiteSpace(Name)) return;
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                await Shell.Current.DisplayAlert("Erreur", "Le modèle doit avoir un nom !", "OK");
+                return;
+            }
 
             var template = new SessionTemplate
             {
@@ -87,8 +152,43 @@ namespace Coach_app.ViewModels.Templates
                 Description = Description
             };
 
-            await _repository.SaveTemplateAsync(template, Exercises.ToList());
-            await Shell.Current.GoToAsync("..");
+            var listToSave = new List<SessionTemplateExercise>();
+            int order = 1;
+            foreach (var item in Exercises)
+            {
+                listToSave.Add(new SessionTemplateExercise
+                {
+                    TemplateId = TemplateId,
+                    ExerciseId = item.ExerciseId,
+                    OrderIndex = order++,
+                    Sets = item.Sets,
+                    Reps = item.Reps,
+                    Weight = item.Weight
+                });
+            }
+
+            await _repository.SaveTemplateAsync(template, listToSave);
+
+            // Si c'était une création, on récupère l'ID (optionnel, mais propre)
+            // Pour l'instant on repasse juste en mode lecture
+            IsEditMode = false;
+            Title = Name;
+
+            // Si ID était 0, il faut recharger la liste ou revenir en arrière pour voir le nouvel ID
+            if (TemplateId == 0)
+            {
+                await Shell.Current.DisplayAlert("Succès", "Séance type créée !", "OK");
+                await Shell.Current.GoToAsync("..");
+            }
         }
+    }
+
+    public class TemplateExerciseItem
+    {
+        public int ExerciseId { get; set; }
+        public string Name { get; set; }
+        public string Sets { get; set; }
+        public string Reps { get; set; }
+        public string Weight { get; set; }
     }
 }
