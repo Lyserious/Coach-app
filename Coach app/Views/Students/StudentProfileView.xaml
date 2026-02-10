@@ -5,6 +5,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Coach_app.Views.Students.StudentProfileView"
              Title="{Binding Student.DisplayName}">
+
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadDataCommand}" />
     </ContentPage.Behaviors>
@@ -21,22 +22,16 @@
                 <Image Source="{Binding Student.ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
                        Aspect="AspectFill"/>
             </Frame>
-
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
                 <Grid ColumnDefinitions="*, Auto">
                     <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
                         <Label Text="{Binding Student.DisplayName}" FontSize="20" FontAttributes="Bold" TextColor="Black" LineBreakMode="TailTruncation"/>
                         <Label Text="{Binding Student.Age, StringFormat='({0} ans)'}" FontSize="16" TextColor="Gray" VerticalOptions="End" Margin="0,0,0,2"/>
                     </HorizontalStackLayout>
-                    <Button Grid.Column="1" Text="✎" 
-                            Command="{Binding EditStudentCommand}"
-                            FontSize="22" TextColor="{StaticResource Primary}"
-                            BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40" Padding="0" Margin="0,-5,0,0"/>
+                    <Button Grid.Column="1" Text="✎" Command="{Binding EditStudentCommand}" FontSize="22" TextColor="{StaticResource Primary}" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40" Padding="0" Margin="0,-5,0,0"/>
                 </Grid>
-
                 <Label Text="{Binding Student.MaxLevel, StringFormat='Niveau Max : {0}'}" FontSize="14" TextColor="{StaticResource Primary}" FontAttributes="Bold"/>
                 <BoxView HeightRequest="1" Color="LightGray" Margin="0,5"/>
-
                 <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Center">
                     <HorizontalStackLayout Spacing="3" Margin="0,0,15,0">
                         <Label Text="📞" FontSize="14"/>
@@ -47,7 +42,6 @@
                         <Label Text="{Binding Student.Email, TargetNullValue='-'}" FontSize="13" TextColor="Gray" LineBreakMode="TailTruncation"/>
                     </HorizontalStackLayout>
                 </FlexLayout>
-
                 <HorizontalStackLayout Spacing="5">
                     <Label Text="📷" FontSize="14"/>
                     <Label Text="{Binding Student.PhotoConsent, TargetNullValue='Non défini'}" FontSize="13" TextColor="{StaticResource Primary}" FontAttributes="Bold"/>
@@ -56,61 +50,52 @@
         </Grid>
 
         <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" Padding="0,10">
-            <Button Grid.Column="0" Text="Inscriptions" Command="{Binding SwitchTabCommand}" CommandParameter="0" 
-                    BackgroundColor="Transparent" TextColor="{Binding Tab0Color}" FontAttributes="Bold" FontSize="12"/>
-            <Button Grid.Column="1" Text="Photos" Command="{Binding SwitchTabCommand}" CommandParameter="1" 
-                    BackgroundColor="Transparent" TextColor="{Binding Tab1Color}" FontAttributes="Bold" FontSize="12"/>
-            <Button Grid.Column="2" Text="Notes" Command="{Binding SwitchTabCommand}" CommandParameter="2" 
-                    BackgroundColor="Transparent" TextColor="{Binding Tab2Color}" FontAttributes="Bold" FontSize="12"/>
-            <Button Grid.Column="3" Text="Stats" Command="{Binding SwitchTabCommand}" CommandParameter="3" 
-                    BackgroundColor="Transparent" TextColor="{Binding Tab3Color}" FontAttributes="Bold" FontSize="12"/>
+            <Button Grid.Column="0" Text="Inscriptions" Command="{Binding SwitchTabCommand}" CommandParameter="0" BackgroundColor="Transparent" TextColor="{Binding Tab0Color}" FontAttributes="Bold" FontSize="12"/>
+            <Button Grid.Column="1" Text="Photos" Command="{Binding SwitchTabCommand}" CommandParameter="1" BackgroundColor="Transparent" TextColor="{Binding Tab1Color}" FontAttributes="Bold" FontSize="12"/>
+            <Button Grid.Column="2" Text="Notes" Command="{Binding SwitchTabCommand}" CommandParameter="2" BackgroundColor="Transparent" TextColor="{Binding Tab2Color}" FontAttributes="Bold" FontSize="12"/>
+            <Button Grid.Column="3" Text="Stats" Command="{Binding SwitchTabCommand}" CommandParameter="3" BackgroundColor="Transparent" TextColor="{Binding Tab3Color}" FontAttributes="Bold" FontSize="12"/>
             <BoxView Grid.ColumnSpan="4" HeightRequest="1" Color="LightGray" VerticalOptions="End"/>
         </Grid>
-
 
         <Grid Grid.Row="2" Padding="20">
 
             <VerticalStackLayout IsVisible="{Binding IsInscriptionsVisible}" Spacing="15">
-                <Label Text="Liste des groupes (Code abrégé pour l'exemple)..." TextColor="Gray"/>
-            </VerticalStackLayout>
-
-
-            <VerticalStackLayout IsVisible="{Binding IsPhotosVisible}">
-                <Label Text="Galerie photos à venir..." HorizontalOptions="Center" TextColor="Gray"/>
-            </VerticalStackLayout>
-
-
-            <Grid IsVisible="{Binding IsNotesVisible}">
-
-                <CollectionView ItemsSource="{Binding Notes}">
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="10">
+                        <Button Text="Tout" Command="{Binding FilterInscriptionsCommand}" CommandParameter="0" BackgroundColor="{Binding Filter0Color}" TextColor="{Binding Filter0Text}" CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+                        <Button Text="Actuelles" Command="{Binding FilterInscriptionsCommand}" CommandParameter="1" BackgroundColor="{Binding Filter1Color}" TextColor="{Binding Filter1Text}" CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+                        <Button Text="Futures" Command="{Binding FilterInscriptionsCommand}" CommandParameter="2" BackgroundColor="{Binding Filter2Color}" TextColor="{Binding Filter2Text}" CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+                        <Button Text="Passées" Command="{Binding FilterInscriptionsCommand}" CommandParameter="3" BackgroundColor="{Binding Filter3Color}" TextColor="{Binding Filter3Text}" CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+                    </HorizontalStackLayout>
+                </ScrollView>
+                <CollectionView ItemsSource="{Binding FilteredGroups}">
                     <CollectionView.EmptyView>
-                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                            <Label Text="Aucune note." TextColor="Gray" HorizontalOptions="Center"/>
-                            <Label Text="Utilisez le + pour ajouter une observation." TextColor="LightGray" FontSize="10" HorizontalOptions="Center"/>
-                        </VerticalStackLayout>
+                        <Label Text="Aucune inscription trouvée." TextColor="Gray" HorizontalOptions="Center" Margin="0,30"/>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Padding="15" Margin="0,0,0,10" CornerRadius="10" BackgroundColor="#FFFBF0" BorderColor="#FFE0B2" HasShadow="True">
+                            <Frame Padding="15" Margin="0,0,0,10" CornerRadius="10" HasShadow="True" BorderColor="Transparent">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentProfileViewModel}}, Path=GoToGroupCommand}" CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
                                 <Grid ColumnDefinitions="*, Auto">
-                                    <VerticalStackLayout Spacing="5">
-                                        <Label Text="{Binding Content}" TextColor="Black" FontSize="14"/>
-                                        <Label Text="{Binding Date, StringFormat='{0:dd MMM yyyy à HH:mm}'}" TextColor="Gray" FontSize="10"/>
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                        <Label Text="{Binding ScheduleDisplay}" FontSize="12" TextColor="Gray"/>
                                     </VerticalStackLayout>
-
-                                    <ImageButton Grid.Column="1" Source="dotnet_bot.png" 
-                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentProfileViewModel}}, Path=DeleteNoteCommand}"
-                                                 CommandParameter="{Binding .}"
-                                                 HeightRequest="20" WidthRequest="20"
-                                                 VerticalOptions="Start" BackgroundColor="Transparent" Opacity="0.5"/>
+                                    <Label Grid.Column="1" Text="›" FontSize="20" TextColor="LightGray" VerticalOptions="Center"/>
                                 </Grid>
                             </Frame>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+            </VerticalStackLayout>
+
+
+            <Grid IsVisible="{Binding IsPhotosVisible}">
 
                 <Button Text="+" 
-                        Command="{Binding AddNoteCommand}"
+                        Command="{Binding AddPhotoCommand}"
                         FontSize="30"
                         TextColor="White"
                         BackgroundColor="{StaticResource Primary}"
@@ -123,6 +108,74 @@
                         Shadow="{Shadow Brush=Black, Offset='2,4', Opacity=0.4}"/>
             </Grid>
 
+
+            <Grid IsVisible="{Binding IsPhotosVisible}">
+
+                <ScrollView>
+                    <FlexLayout BindableLayout.ItemsSource="{Binding Photos}" 
+                                Wrap="Wrap" 
+                                JustifyContent="Start"
+                                AlignItems="Start"
+                                AlignContent="Start"
+                                Padding="0,0,0,80">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border StrokeShape="RoundRectangle 12"
+                                        StrokeThickness="1"
+                                        Stroke="LightGray"
+                                        BackgroundColor="#F0F0F0"
+                                        Margin="0,0,10,10"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Start">
+
+                                    <Grid>
+                                        <Image Source="{Binding FilePath}" 
+                                               Aspect="AspectFit"
+                                               HeightRequest="150"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+
+                                        <ImageButton Source="dotnet_bot.png" 
+                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentProfileViewModel}}, Path=DeletePhotoCommand}"
+                                                     CommandParameter="{Binding .}"
+                                                     HeightRequest="24" WidthRequest="24"
+                                                     HorizontalOptions="End" VerticalOptions="Start"
+                                                     Margin="5" 
+                                                     BackgroundColor="#CCFFFFFF" 
+                                                     CornerRadius="12"
+                                                     Padding="4"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </ScrollView>
+
+                <Label Text="Aucune photo." 
+                       TextColor="Gray" 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center"
+                       IsVisible="False">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding Photos.Count}" Value="0">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+
+                <Button Text="+" 
+                        Command="{Binding AddPhotoCommand}"
+                        FontSize="30"
+                        TextColor="White"
+                        BackgroundColor="{StaticResource Primary}"
+                        CornerRadius="30"
+                        HeightRequest="60"
+                        WidthRequest="60"
+                        HorizontalOptions="End"
+                        VerticalOptions="End"
+                        Margin="20"
+                        Shadow="{Shadow Brush=Black, Offset='2,4', Opacity=0.4}"/>
+            </Grid>
 
             <VerticalStackLayout IsVisible="{Binding IsStatsVisible}" VerticalOptions="Center">
                 <Label Text="🚧 Stats (A venir)" FontSize="20" TextColor="Gray" HorizontalOptions="Center"/>

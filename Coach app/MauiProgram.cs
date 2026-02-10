@@ -53,7 +53,7 @@ namespace Coach_app
             builder.Services.AddTransient<IExerciseRepository, ExerciseRepository>();
             builder.Services.AddTransient<IStudentRepository, StudentRepository>();
             builder.Services.AddSingleton<INoteRepository, NoteRepository>();
-
+            builder.Services.AddSingleton<IPhotoRepository, PhotoRepository>();
 
 
 
@@ -76,7 +76,7 @@ namespace Coach_app
             builder.Services.AddTransient<Views.Templates.SessionTemplatesView>();
             builder.Services.AddTransient<Views.Templates.SessionTemplateDetailView>();
             builder.Services.AddTransient<Views.Settings.SettingsView>();
-
+            builder.Services.AddTransient<StudentPhotoDetailView>();
 
 
             // ViewModels
@@ -98,7 +98,7 @@ namespace Coach_app
             builder.Services.AddTransient<PhotoDetailViewModel>();
             builder.Services.AddTransient<ViewModels.Templates.SessionTemplatesViewModel>();
             builder.Services.AddTransient<ViewModels.Templates.SessionTemplateDetailViewModel>();
-
+            builder.Services.AddTransient<StudentPhotoDetailViewModel>();
 
 
 
