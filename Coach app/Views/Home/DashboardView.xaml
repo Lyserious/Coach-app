@@ -18,8 +18,6 @@
                     <Label Text="{Binding WelcomeMessage}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
                     <Label Text="Prêt pour une nouvelle séance ?" TextColor="Gray" />
                 </VerticalStackLayout>
-
-              
             </Grid>
 
 
@@ -63,7 +61,7 @@
 
             <Label Text="Accès Rapide" FontAttributes="Bold" FontSize="18" TextColor="Black"/>
 
-            <Grid ColumnDefinitions="*,*" RowDefinitions="140, 140" ColumnSpacing="15" RowSpacing="15">
+            <Grid ColumnDefinitions="*,*" RowDefinitions="140, 140, 140" ColumnSpacing="15" RowSpacing="15">
 
                 <Frame Grid.Row="0" Grid.Column="0" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
                     <Frame.GestureRecognizers>
@@ -96,6 +94,16 @@
                 </Frame>
 
                 <Frame Grid.Row="1" Grid.Column="1" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//SessionTemplates"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <Label Text="📋" FontSize="35" HorizontalOptions="Center"/>
+                        <Label Text="Séances Types" FontAttributes="Bold" TextColor="Black"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
                     <Frame.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="SettingsView"/>
                     </Frame.GestureRecognizers>

@@ -59,7 +59,18 @@
                     HorizontalOptions="Start"                   
                     Command="{Binding NavigateCommand}"
                     CommandParameter="//StudentLibraryView"/>
-            
+
+            <Button Text="Séances Types" 
+        ImageSource="dotnet_bot.png"
+        ContentLayout="Left,15"
+        HeightRequest="45"
+        CornerRadius="10"
+        BackgroundColor="Transparent" 
+        TextColor="Black"
+        HorizontalOptions="Start"                   
+        Command="{Binding NavigateCommand}"
+        CommandParameter="//SessionTemplates"/>
+
 
         </VerticalStackLayout>
 

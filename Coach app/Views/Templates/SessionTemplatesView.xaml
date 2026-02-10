@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Templates"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:shared="clr-namespace:Coach_app.Views.Shared" 
              x:Class="Coach_app.Views.Templates.SessionTemplatesView"
              Title="Mes Séances Types"
              BackgroundColor="#F5F5F5">
@@ -11,38 +12,55 @@
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadTemplatesCommand}"/>
     </ContentPage.Behaviors>
 
-    <Grid RowDefinitions="*, Auto">
-        <CollectionView Grid.Row="0" ItemsSource="{Binding Templates}" Margin="10">
-            <CollectionView.EmptyView>
-                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                    <Label Text="Aucun modèle enregistré." TextColor="Gray"/>
-                    <Label Text="Créez des séances types pour gagner du temps." TextColor="Gray" FontSize="10"/>
-                </VerticalStackLayout>
-            </CollectionView.EmptyView>
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Margin="0,5" Padding="15" CornerRadius="10" BackgroundColor="White">
-                        <Frame.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionTemplatesViewModel}}, Path=EditTemplateCommand}" CommandParameter="{Binding .}"/>
-                        </Frame.GestureRecognizers>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-                        <Grid ColumnDefinitions="*, Auto">
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="Black"/>
-                                <Label Text="{Binding Category}" FontSize="12" TextColor="Gray" TextTransform="Uppercase"/>
-                            </VerticalStackLayout>
+        <shared:SidebarView Grid.Column="0" WidthRequest="250">
+            <shared:SidebarView.IsVisible>
+                <OnPlatform x:TypeArguments="x:Boolean">
+                    <On Platform="MacCatalyst,WinUI" Value="True"/>
+                    <On Platform="Android,iOS" Value="False"/>
+                </OnPlatform>
+            </shared:SidebarView.IsVisible>
+        </shared:SidebarView>
 
-                            <Button Grid.Column="1" Text="🗑️" 
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionTemplatesViewModel}}, Path=DeleteTemplateCommand}" 
-                                    CommandParameter="{Binding .}"
-                                    BackgroundColor="Transparent" TextColor="Red"/>
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+        <Grid Grid.Column="1" RowDefinitions="*, Auto">
 
-        <Button Grid.Row="1" Text="+ Créer une séance type" Command="{Binding AddTemplateCommand}" 
-                BackgroundColor="Black" TextColor="White" Margin="20" CornerRadius="25"/>
+            <CollectionView Grid.Row="0" ItemsSource="{Binding Templates}" Margin="10">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="Aucun modèle enregistré." TextColor="Gray"/>
+                        <Label Text="Créez des séances types pour gagner du temps." TextColor="Gray" FontSize="10"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,5" Padding="15" CornerRadius="10" BackgroundColor="White" HasShadow="True" BorderColor="Transparent">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionTemplatesViewModel}}, Path=EditTemplateCommand}" CommandParameter="{Binding .}"/>
+                            </Frame.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="*, Auto">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="Black"/>
+                                    <Label Text="{Binding Category}" FontSize="12" TextColor="Gray" TextTransform="Uppercase"/>
+                                </VerticalStackLayout>
+
+                                <Button Grid.Column="1" Text="🗑️" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SessionTemplatesViewModel}}, Path=DeleteTemplateCommand}" 
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="Transparent" TextColor="Red"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Grid.Row="1" Text="+ Créer une séance type" Command="{Binding AddTemplateCommand}" 
+                    BackgroundColor="Black" TextColor="White" Margin="20" CornerRadius="25"/>
+        </Grid>
     </Grid>
 </ContentPage>

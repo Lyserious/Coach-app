@@ -9,13 +9,10 @@
     xmlns:exercises="clr-namespace:Coach_app.Views.Exercises"
     xmlns:settings="clr-namespace:Coach_app.Views.Settings"
     xmlns:students="clr-namespace:Coach_app.Views.Students"
+    xmlns:templates="clr-namespace:Coach_app.Views.Templates" 
     Title="Coach Tracker"
     FlyoutBackgroundColor="{StaticResource Primary}"
-    Shell.NavBarIsVisible="False"
-    >
-
-    
-
+    Shell.NavBarIsVisible="False">
     <Shell.FlyoutBehavior>
         <OnPlatform x:TypeArguments="FlyoutBehavior">
             <On Platform="Android,iOS" Value="Flyout" />
@@ -44,14 +41,21 @@
     <FlyoutItem Title="Accueil" Icon="dotnet_bot.png">
         <ShellContent ContentTemplate="{DataTemplate home:DashboardView}" Route="Dashboard" />
     </FlyoutItem>
+
     <FlyoutItem Title="Mes Groupes" Icon="dotnet_bot.png">
         <ShellContent ContentTemplate="{DataTemplate groups:GroupsView}" Route="Groups" />
     </FlyoutItem>
+
     <FlyoutItem Title="Bibliothèque d'exercices" Icon="dotnet_bot.png">
         <ShellContent ContentTemplate="{DataTemplate exercises:ExerciseLibraryView}" Route="Exercises" />
     </FlyoutItem>
+
     <FlyoutItem Title="Annuaire Élèves" Icon="dotnet_bot.png">
         <ShellContent ContentTemplate="{DataTemplate students:StudentLibraryView}" Route="StudentLibraryView" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Séances Types" Icon="dotnet_bot.png">
+        <ShellContent ContentTemplate="{DataTemplate templates:SessionTemplatesView}" Route="SessionTemplates" />
     </FlyoutItem>
 
 </Shell>
