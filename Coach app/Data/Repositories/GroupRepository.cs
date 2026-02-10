@@ -5,8 +5,8 @@ using SQLite;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using System.Threading; // Indispensable pour SemaphoreSlim
-using System.IO; // Nécessaire pour File.Delete (Photos)
+using System.Threading;
+using System.IO;
 
 namespace Coach_app.Data.Repositories
 {
@@ -216,6 +216,13 @@ namespace Coach_app.Data.Repositories
             await _database.InsertAsync(session);
         }
 
+        // --- CELLE-CI DOIT RESTER (Pour sauvegarder la description) ---
+        public async Task UpdateSessionAsync(GroupSession session)
+        {
+            await Init();
+            if (_database != null) await _database.UpdateAsync(session);
+        }
+
         public async Task DeleteSessionAsync(int sessionId)
         {
             await Init();
@@ -337,7 +344,6 @@ namespace Coach_app.Data.Repositories
             return await _database.Table<SessionTemplate>().ToListAsync();
         }
 
-        // --- AJOUT 1 : La méthode manquante pour récupérer le contenu d'un template ---
         public async Task<List<SessionTemplateExercise>> GetTemplateExercisesAsync(int templateId)
         {
             await Init();
@@ -350,7 +356,6 @@ namespace Coach_app.Data.Repositories
             if (template.Id != 0) await _database.UpdateAsync(template);
             else await _database.InsertAsync(template);
 
-            // On efface les anciens pour éviter les doublons
             var oldExos = await _database.Table<SessionTemplateExercise>().Where(x => x.TemplateId == template.Id).ToListAsync();
             foreach (var old in oldExos) await _database.DeleteAsync(old);
 
@@ -361,15 +366,11 @@ namespace Coach_app.Data.Repositories
             if (exercises.Any()) await _database.InsertAllAsync(exercises);
         }
 
-        // --- AJOUT 2 : La méthode manquante pour supprimer un template ---
         public async Task DeleteTemplateAsync(SessionTemplate template)
         {
             await Init();
-            // On supprime d'abord les exos liés
             var exos = await GetTemplateExercisesAsync(template.Id);
             foreach (var ex in exos) await _database.DeleteAsync(ex);
-
-            // Puis le template lui-même
             await _database.DeleteAsync(template);
         }
 
@@ -377,14 +378,17 @@ namespace Coach_app.Data.Repositories
         {
             await Init();
 
-            // On utilise la méthode interne (ou la nouvelle méthode publique GetTemplateExercisesAsync)
-            var templateExercises = await _database.Table<SessionTemplateExercise>()
-                                                   .Where(x => x.TemplateId == templateId)
-                                                   .ToListAsync();
+            var template = await _database.Table<SessionTemplate>().Where(t => t.Id == templateId).FirstOrDefaultAsync();
+            var templateExercises = await GetTemplateExercisesAsync(templateId);
+
+            var targetSession = await GetSessionByIdAsync(targetSessionId);
+            if (targetSession != null && template != null)
+            {
+                targetSession.Description = template.Description;
+                await UpdateSessionAsync(targetSession);
+            }
 
             var newSessionExercises = new List<SessionExercise>();
-
-            // Pour ne pas écraser l'ordre existant si la séance a déjà des exos
             var existing = await _database.Table<SessionExercise>().Where(x => x.GroupSessionId == targetSessionId).ToListAsync();
             int startIndex = existing.Count + 1;
 
@@ -406,13 +410,12 @@ namespace Coach_app.Data.Repositories
         }
 
         // =========================================================
-        // 9. PERFORMANCES (Méthode corrigée pour doublons d'exos)
+        // 9. PERFORMANCES
         // =========================================================
 
         public async Task<List<Performance>> GetPerformancesBySessionExerciseAsync(int sessionExerciseId)
         {
             await Init();
-            // On cherche par ID de ligne de programme (pour gérer les doublons d'exos)
             return await _database.Table<Performance>()
                                   .Where(p => p.SessionExerciseId == sessionExerciseId)
                                   .ToListAsync();

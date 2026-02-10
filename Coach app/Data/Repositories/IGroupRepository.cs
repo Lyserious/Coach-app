@@ -22,6 +22,10 @@ namespace Coach_app.Data.Repositories
         Task GenerateSessionsForGroupAsync(Group group);
         Task<GroupSession> GetSessionByIdAsync(int id);
         Task AddSessionAsync(GroupSession session);
+
+        // --- C'EST CETTE LIGNE QUI MANQUAIT ---
+        Task UpdateSessionAsync(GroupSession session);
+
         Task DeleteSessionAsync(int sessionId);
 
         // 4. Présences
@@ -40,7 +44,7 @@ namespace Coach_app.Data.Repositories
         Task SaveSessionExerciseAsync(SessionExercise sessionExercise);
         Task DeleteSessionExerciseAsync(SessionExercise sessionExercise);
 
-        // 8. Templates (Recueil) - LISTE NETTOYÉE
+        // 8. Templates (Recueil)
         Task<List<SessionTemplate>> GetAllTemplatesAsync();
         Task<List<SessionTemplateExercise>> GetTemplateExercisesAsync(int templateId);
         Task SaveTemplateAsync(SessionTemplate template, List<SessionTemplateExercise> exercises);

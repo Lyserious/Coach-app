@@ -17,7 +17,8 @@ namespace Coach_app.Models
         // "Scheduled" (Prévu), "Cancelled" (Annulé), "Holiday" (Vacances)
         public string Status { get; set; } = "Scheduled";
 
-        // Pour noter le thème de la séance (ex: "Bloc Force", "Technique pieds")
         public string Note { get; set; }
+
+        public string Description { get; set; }
     }
 }

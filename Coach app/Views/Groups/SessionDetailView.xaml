@@ -32,8 +32,29 @@
         </VerticalStackLayout>
 
         <Grid Grid.Row="1" IsVisible="{Binding IsProgramVisible}">
-            <Grid RowDefinitions="*, Auto">
-                <CollectionView Grid.Row="0" ItemsSource="{Binding SessionExercises}" Margin="10">
+            <Grid RowDefinitions="Auto, *, Auto">
+
+                <Frame Grid.Row="0" Margin="10,10,10,0" Padding="10" BackgroundColor="White" CornerRadius="10" BorderColor="Transparent">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Objectifs / Description" FontSize="10" TextColor="Gray" FontAttributes="Bold"/>
+                        <Editor Text="{Binding SessionDescription}" 
+                                Placeholder="Description de la séance..." 
+                                AutoSize="TextChanges" 
+                                MaximumHeightRequest="100"
+                                FontSize="14"/>
+                        <Button Text="Enregistrer le texte" 
+                                Command="{Binding SaveDescriptionCommand}" 
+                                FontSize="10" 
+                                HeightRequest="30" 
+                                Padding="0"
+                                BackgroundColor="#EEE" 
+                                TextColor="Black" 
+                                HorizontalOptions="End"
+                                CornerRadius="5"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding SessionExercises}" Margin="10">
                     <CollectionView.EmptyView>
                         <Label Text="Aucun exercice" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Gray"/>
                     </CollectionView.EmptyView>
@@ -63,7 +84,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Padding="20" ColumnSpacing="10">
+                <Grid Grid.Row="2" ColumnDefinitions="*, Auto" Padding="20" ColumnSpacing="10">
                     <Button Grid.Column="0" Text="+ Ajouter Exercice" Command="{Binding AddExerciseCommand}" BackgroundColor="Black" TextColor="White" CornerRadius="10"/>
                     <Button Grid.Column="1" Text="📥" Command="{Binding ImportTemplateCommand}" BackgroundColor="White" TextColor="Black" BorderColor="Black" BorderWidth="1" WidthRequest="50" CornerRadius="10"/>
                 </Grid>

@@ -3,61 +3,79 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Groups"
              x:Class="Coach_app.Views.Groups.GroupSessionsView"
-             Title="Gestion Calendrier">
+             Title="Gestion Calendrier"
+             BackgroundColor="#F5F5F5">
 
     <Grid RowDefinitions="Auto, *">
 
-        <Frame Grid.Row="0" BackgroundColor="White" Padding="15" HasShadow="True" Margin="0,0,0,10" CornerRadius="0">
-            <VerticalStackLayout Spacing="10">
-                <Label Text="Ajouter une séance" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+        <Frame Grid.Row="0" BackgroundColor="White" Padding="15" HasShadow="True" Margin="10" CornerRadius="15">
+            <VerticalStackLayout Spacing="15">
+                <Label Text="Planifier une nouvelle séance" FontAttributes="Bold" TextColor="Black" FontSize="16"/>
 
-                <Grid ColumnDefinitions="*, Auto">
-                    <DatePicker Date="{Binding NewDate, Mode=TwoWay}" Format="dddd dd MMMM" Grid.Column="0"/>
-
-                    <Button Text="+ Ajouter" Command="{Binding AddSessionCommand}" Grid.Column="1" 
-                            BackgroundColor="{StaticResource Primary}" TextColor="White" HeightRequest="35" Padding="10,0"/>
-                </Grid>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Date de la séance" FontSize="12" TextColor="Gray"/>
+                    <Border Stroke="#DDD" StrokeThickness="1" StrokeShape="RoundRectangle 5" Padding="10">
+                        <DatePicker Date="{Binding NewDate, Mode=TwoWay}" 
+                                    Format="dddd dd MMMM yyyy" 
+                                    TextColor="{StaticResource Primary}" 
+                                    FontSize="16" 
+                                    HorizontalOptions="Fill"/>
+                    </Border>
+                </VerticalStackLayout>
 
                 <Grid ColumnDefinitions="*, Auto, *">
-                    <TimePicker Time="{Binding NewStartTime}" Grid.Column="0"/>
-                    <Label Text="à" HorizontalOptions="Center" VerticalOptions="Center" Grid.Column="1"/>
-                    <TimePicker Time="{Binding NewEndTime}" Grid.Column="2"/>
+                    <VerticalStackLayout Grid.Column="0" Spacing="5">
+                        <Label Text="Début" FontSize="12" TextColor="Gray" HorizontalOptions="Center"/>
+                        <TimePicker Time="{Binding NewStartTime}" TextColor="Black" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+
+                    <Label Text="à" Grid.Column="1" VerticalOptions="Center" TextColor="Gray"/>
+
+                    <VerticalStackLayout Grid.Column="2" Spacing="5">
+                        <Label Text="Fin" FontSize="12" TextColor="Gray" HorizontalOptions="Center"/>
+                        <TimePicker Time="{Binding NewEndTime}" TextColor="Black" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
                 </Grid>
+
+                <Button Text="Ajouter au calendrier" 
+                        Command="{Binding AddSessionCommand}" 
+                        BackgroundColor="Black" 
+                        TextColor="White" 
+                        CornerRadius="25" 
+                        HeightRequest="45"
+                        FontAttributes="Bold"/>
             </VerticalStackLayout>
         </Frame>
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Sessions}" Margin="15">
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Sessions}" Margin="10,0">
             <CollectionView.EmptyView>
                 <Label Text="Aucune séance prévue." HorizontalOptions="Center" VerticalOptions="Center" TextColor="Gray"/>
             </CollectionView.EmptyView>
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-
-                    <Frame Margin="0,0,0,10" Padding="10" CornerRadius="10" BackgroundColor="#F5F5F5" BorderColor="Transparent">
-
+                    <Frame Margin="0,5" Padding="15" CornerRadius="10" BackgroundColor="White" BorderColor="Transparent">
                         <Frame.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GroupSessionsViewModel}}, Path=GoToSessionCommand}" CommandParameter="{Binding .}"/>
                         </Frame.GestureRecognizers>
 
                         <Grid ColumnDefinitions="Auto, *, Auto">
-
-                            <VerticalStackLayout Grid.Column="0" WidthRequest="60" VerticalOptions="Center">
-                                <Label Text="{Binding Date, StringFormat='{0:dd}'}" 
-                                       FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" TextColor="{StaticResource Primary}"/>
-                                <Label Text="{Binding Date, StringFormat='{0:MMM}'}" 
-                                       FontSize="12" HorizontalOptions="Center" TextColor="Gray" TextTransform="Uppercase"/>
-                            </VerticalStackLayout>
+                            <Border Grid.Column="0" Stroke="Black" StrokeThickness="2" WidthRequest="50" HeightRequest="50" StrokeShape="RoundRectangle 10" VerticalOptions="Center" Margin="0,0,15,0">
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="0">
+                                    <Label Text="{Binding Date, StringFormat='{0:dd}'}" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" TextColor="Black"/>
+                                    <Label Text="{Binding Date, StringFormat='{0:MMM}'}" FontSize="10" HorizontalOptions="Center" TextColor="Black" TextTransform="Uppercase"/>
+                                </VerticalStackLayout>
+                            </Border>
 
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                                <Label Text="{Binding Date, StringFormat='{0:dddd dd MMMM}'}" FontAttributes="Bold" TextColor="Black"/>
-                                <Label Text="{Binding StartTime, StringFormat='{0:hh\\:mm} - ...'}" TextColor="Gray" FontSize="12"/>
+                                <Label Text="{Binding Date, StringFormat='{0:dddd dd MMMM}'}" FontAttributes="Bold" TextColor="Black" FontSize="16"/>
+                                <Label Text="{Binding StartTime, StringFormat='{0:hh\\:mm} - ...'}" TextColor="Gray" FontSize="14"/>
                             </VerticalStackLayout>
 
-                            <ImageButton Grid.Column="2" Source="dotnet_bot.png" HeightRequest="30" WidthRequest="30"
-                                         BackgroundColor="Transparent"
-                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GroupSessionsViewModel}}, Path=DeleteSessionCommand}" 
-                                         CommandParameter="{Binding .}"/>
+                            <Button Grid.Column="2" Text="🗑️" 
+                                    BackgroundColor="Transparent" TextColor="Red"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GroupSessionsViewModel}}, Path=DeleteSessionCommand}" 
+                                    CommandParameter="{Binding .}"/>
                         </Grid>
                     </Frame>
                 </DataTemplate>

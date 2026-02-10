@@ -18,6 +18,7 @@ namespace Coach_app.ViewModels.Groups
         [ObservableProperty] private int _sessionId;
         [ObservableProperty] private string _groupName;
         [ObservableProperty] private string _dateDisplay;
+        [ObservableProperty] private string _sessionDescription;
 
         // --- NAVIGATION ONGLETS ---
         [ObservableProperty]
@@ -66,7 +67,7 @@ namespace Coach_app.ViewModels.Groups
                     DateDisplay = session.Date.ToString("D", new CultureInfo("fr-FR"));
                     var group = await _groupRepository.GetGroupByIdAsync(session.GroupId);
                     GroupName = group?.Name;
-
+                    SessionDescription = session.Description;
                     SessionExercises.Clear();
                     var exos = await _groupRepository.GetExercisesForSessionAsync(SessionId);
                     foreach (var ex in exos) SessionExercises.Add(ex);
@@ -76,7 +77,17 @@ namespace Coach_app.ViewModels.Groups
             }
             finally { IsBusy = false; }
         }
-
+        [RelayCommand]
+        private async Task SaveDescription()
+        {
+            var session = await _groupRepository.GetSessionByIdAsync(SessionId);
+            if (session != null)
+            {
+                session.Description = SessionDescription;
+                await _groupRepository.UpdateSessionAsync(session);
+                await Shell.Current.DisplayAlert("Succès", "Description mise à jour", "OK");
+            }
+        }
         private async Task LoadAttendanceData()
         {
             var session = await _groupRepository.GetSessionByIdAsync(SessionId);
