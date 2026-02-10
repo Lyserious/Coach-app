@@ -119,21 +119,21 @@ namespace Coach_app.ViewModels.Groups
             IsBusy = true;
             try
             {
-                var existingPerfs = await _groupRepository.GetPerformancesAsync(SessionId, exo.ExerciseId);
+                var existingPerfs = await _groupRepository.GetPerformancesBySessionExerciseAsync(exo.Id);
+
                 StudentPerformances.Clear();
 
-                // CORRECTION ICI : On prend tout le monde SAUF "Absent"
+                // (Le reste du filtrage des présents ne change pas)
                 var presentStudents = AttendanceList
                     .Where(a => !string.Equals(a.Status, "Absent", StringComparison.OrdinalIgnoreCase))
                     .ToList();
-
-                // Si personne n'est présent, la liste reste vide (c'est le comportement voulu)
 
                 var scoringType = exo.Exercise.ScoringType;
 
                 foreach (var s in presentStudents)
                 {
                     var p = existingPerfs.FirstOrDefault(x => x.StudentId == s.StudentId && x.SetNumber == 1);
+
                     var item = new StudentPerformanceItem
                     {
                         StudentId = s.StudentId,
@@ -164,7 +164,22 @@ namespace Coach_app.ViewModels.Groups
             foreach (var item in StudentPerformances)
             {
                 string val = type == PerformanceType.Completion ? (item.IsCompleted ? "true" : "false") : item.ValueDisplay;
-                var perf = new Performance { Id = item.PerfId, GroupSessionId = SessionId, ExerciseId = SelectedExerciseForPerf.ExerciseId, StudentId = item.StudentId, Value = val, SetNumber = 1, Type = type };
+
+                var perf = new Performance
+                {
+                    Id = item.PerfId,
+                    GroupSessionId = SessionId,
+                    ExerciseId = SelectedExerciseForPerf.ExerciseId, // On garde ça pour l'historique global si besoin
+
+                    // IMPORTANT : On sauvegarde l'ID unique de la ligne
+                    SessionExerciseId = SelectedExerciseForPerf.Id,
+
+                    StudentId = item.StudentId,
+                    Value = val,
+                    SetNumber = 1,
+                    Type = type
+                };
+
                 await _groupRepository.SavePerformanceAsync(perf);
                 if (item.PerfId == 0) item.PerfId = perf.Id;
             }

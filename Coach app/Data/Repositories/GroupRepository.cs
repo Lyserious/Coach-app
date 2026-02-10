@@ -399,14 +399,15 @@ namespace Coach_app.Data.Repositories
         }
 
         // =========================================================
-        // 8. GESTION DES PERFORMANCES
+        // 8. GESTION DES PERFORMANCES (Corrigé pour doublons d'exos)
         // =========================================================
 
-        public async Task<List<Performance>> GetPerformancesAsync(int sessionId, int exerciseId)
+        public async Task<List<Performance>> GetPerformancesBySessionExerciseAsync(int sessionExerciseId)
         {
             await Init();
+            // On cherche les notes liées spécifiquement à CETTE ligne du programme
             return await _database.Table<Performance>()
-                                  .Where(p => p.GroupSessionId == sessionId && p.ExerciseId == exerciseId)
+                                  .Where(p => p.SessionExerciseId == sessionExerciseId)
                                   .ToListAsync();
         }
 
