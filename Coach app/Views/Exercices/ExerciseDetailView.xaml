@@ -3,54 +3,128 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Exercises"
              x:Class="Coach_app.Views.Exercises.ExerciseDetailView"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="#F5F5F5">
 
-    <Grid RowDefinitions="*, Auto">
-        <ScrollView Grid.Row="0" Padding="20">
-            <VerticalStackLayout Spacing="15">
+    <Grid>
+        <ScrollView IsVisible="{Binding IsReadMode}">
+            <Grid RowDefinitions="*, Auto">
+                <VerticalStackLayout Spacing="20" Padding="20">
 
-                <Frame Padding="15" CornerRadius="10">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="Général" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
-                        <Entry Placeholder="Nom de l'exercice (ex: Suspensions Max)" Text="{Binding Name}" FontSize="18"/>
-                        <Label Text="Catégorie" FontSize="12" TextColor="Gray"/>
-                        <Picker ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}"/>
-                    </VerticalStackLayout>
-                </Frame>
+                    <Frame BackgroundColor="White" CornerRadius="15" HasShadow="True" Padding="20">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Name}" FontSize="26" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                            <Label Text="{Binding SelectedCategory}" FontSize="14" TextColor="Gray" TextTransform="Uppercase"/>
+                        </VerticalStackLayout>
+                    </Frame>
 
-                <Frame Padding="15" CornerRadius="10">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="Détails" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                    <Button Text="▶️ Voir la Vidéo / Lien"
+                            Command="{Binding OpenMediaCommand}"
+                            IsVisible="{Binding HasMedia}"
+                            BackgroundColor="#CC0000" 
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="10"
+                            HeightRequest="50"/>
 
-                        <Label Text="But de l'exercice" FontSize="12" TextColor="Gray"/>
-                        <Entry Placeholder="ex: Gagner en force max" Text="{Binding Goal}"/>
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <Frame BackgroundColor="#E3F2FD" Padding="15" CornerRadius="10" BorderColor="Transparent">
+                            <VerticalStackLayout>
+                                <Label Text="🎯 OBJECTIF" FontSize="10" TextColor="#1565C0" FontAttributes="Bold"/>
+                                <Label Text="{Binding Goal}" TextColor="#0D47A1" FontSize="14"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        <Frame BackgroundColor="#FFF3E0" Padding="15" CornerRadius="10" BorderColor="Transparent">
+                            <VerticalStackLayout>
+                                <Label Text="🎒 MATÉRIEL" FontSize="10" TextColor="#EF6C00" FontAttributes="Bold"/>
+                                <Label Text="{Binding Equipment}" TextColor="#E65100" FontSize="14"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </Grid>
 
-                        <Label Text="Équipement nécessaire" FontSize="12" TextColor="Gray"/>
-                        <Entry Placeholder="ex: Poutre, Lest" Text="{Binding Equipment}"/>
+                    <Frame BackgroundColor="White" CornerRadius="10" Padding="15">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="📋 Consignes &amp; Exécution" FontAttributes="Bold" FontSize="16"/>
+                            <Label Text="{Binding Description}" LineBreakMode="WordWrap" FontSize="15" TextColor="#333"/>
+                        </VerticalStackLayout>
+                    </Frame>
 
-                        <Label Text="Description / Consignes" FontSize="12" TextColor="Gray"/>
-                        <Editor Placeholder="ex: 7s suspension, 3min repos..." Text="{Binding Description}" HeightRequest="100"/>
+                    <Frame BackgroundColor="White" CornerRadius="10" Padding="15" BorderColor="{StaticResource Primary}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="💡 Le Conseil du Coach" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}"/>
+                            <Label Text="{Binding Comments}" FontAttributes="Italic" TextColor="Black"/>
+                        </VerticalStackLayout>
+                    </Frame>
 
-                        <Label Text="Commentaires / Astuces Coach" FontSize="12" TextColor="Gray"/>
-                        <Editor Placeholder="ex: Attention à la rétroversion du bassin..." Text="{Binding Comments}" HeightRequest="60"/>
-                    </VerticalStackLayout>
-                </Frame>
+                    <BoxView HeightRequest="80" Color="Transparent"/>
+                </VerticalStackLayout>
 
-                <Frame Padding="15" CornerRadius="10">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="Média" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
-                        <Label Text="Lien Vidéo ou Image (URL)" FontSize="12" TextColor="Gray"/>
-                        <Entry Placeholder="https://youtube.com/..." Text="{Binding MediaUrl}"/>
-                    </VerticalStackLayout>
-                </Frame>
-
-            </VerticalStackLayout>
+                <Button Grid.Row="1"
+                        Text="✏️ Modifier la fiche" 
+                        Command="{Binding EnableEditModeCommand}"
+                        BackgroundColor="Black" TextColor="White"
+                        Margin="20" CornerRadius="25" HeightRequest="50"
+                        FontAttributes="Bold"
+                        Shadow="{Shadow Brush=Black, Offset='0,5', Opacity=0.2}"/>
+            </Grid>
         </ScrollView>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, *, *" ColumnSpacing="10" Padding="20" BackgroundColor="{AppThemeBinding Light=White, Dark=Black}">
-            <Button Grid.Column="0" Text="Archiver" Command="{Binding DeleteCommand}" BackgroundColor="DarkRed" TextColor="White"/>
-            <Button Grid.Column="1" Text="Annuler" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="Gray" BorderColor="Gray" BorderWidth="1"/>
-            <Button Grid.Column="2" Text="Enregistrer" Command="{Binding SaveCommand}" BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+
+        <Grid IsVisible="{Binding IsEditMode}" RowDefinitions="*, Auto">
+            <ScrollView Grid.Row="0" Padding="20">
+                <VerticalStackLayout Spacing="15">
+
+                    <Label Text="Mode Édition" TextColor="Red" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+                    <Frame Padding="15" CornerRadius="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Général" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                            <Entry Placeholder="Nom de l'exercice" Text="{Binding Name}" FontSize="16"/>
+                            <Label Text="Catégorie" FontSize="12" TextColor="Gray"/>
+                            <Picker ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <Frame Padding="15" CornerRadius="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Détails Techniques" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+
+                            <Label Text="But / Objectif" FontSize="12" TextColor="Gray"/>
+                            <Entry Placeholder="Gagner en force..." Text="{Binding Goal}"/>
+
+                            <Label Text="Matériel" FontSize="12" TextColor="Gray"/>
+                            <Entry Placeholder="Poutre, élastique..." Text="{Binding Equipment}"/>
+
+                            <Label Text="Description" FontSize="12" TextColor="Gray"/>
+                            <Editor Placeholder="Explique le mouvement..." Text="{Binding Description}" HeightRequest="100"/>
+
+                            <Label Text="Astuces Coach" FontSize="12" TextColor="Gray"/>
+                            <Editor Placeholder="Attention au dos..." Text="{Binding Comments}" HeightRequest="60"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <Frame Padding="15" CornerRadius="10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Média" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                            <Label Text="Lien Youtube, Instagram ou Web" FontSize="10" TextColor="Gray"/>
+                            <Entry Placeholder="https://..." Text="{Binding MediaUrl}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <Button Text="🗑️ Archiver cet exercice" 
+                            Command="{Binding DeleteCommand}" 
+                            BackgroundColor="#FFEBEE" TextColor="Red" Margin="0,20,0,0"/>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <Grid Grid.Row="1" ColumnDefinitions="*, *" ColumnSpacing="15" Padding="20" BackgroundColor="White">
+                <Button Grid.Column="0" Text="Annuler" Command="{Binding CancelCommand}" 
+                        BackgroundColor="Transparent" TextColor="Gray" BorderColor="Gray" BorderWidth="1"/>
+                <Button Grid.Column="1" Text="Enregistrer" Command="{Binding SaveCommand}" 
+                        BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+            </Grid>
         </Grid>
+
     </Grid>
 </ContentPage>

@@ -1,5 +1,4 @@
-﻿
-using Coach_app.Data.Repositories;
+﻿using Coach_app.Data.Repositories;
 using Coach_app.Models;
 using Coach_app.ViewModels.Base;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,33 +11,47 @@ namespace Coach_app.ViewModels.Exercises
     {
         private readonly IExerciseRepository _repository;
 
+        // --- ÉTATS D'AFFICHAGE ---
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsReadMode))]
+        private bool _isEditMode;
+
+        public bool IsReadMode => !IsEditMode;
+
+        // --- DONNÉES ---
         [ObservableProperty] private int _exerciseId;
         [ObservableProperty] private string _name;
         [ObservableProperty] private ExerciseCategory _selectedCategory;
         [ObservableProperty] private string _description;
-        [ObservableProperty] private string _goal;        // But
-        [ObservableProperty] private string _equipment;   // Matériel
-        [ObservableProperty] private string _comments;    // Commentaires
-        [ObservableProperty] private string _mediaUrl;    // Vidéo/Lien
+        [ObservableProperty] private string _goal;
+        [ObservableProperty] private string _equipment;
+        [ObservableProperty] private string _comments;
 
-        // Liste pour le Picker
+        // AJOUT ICI : On notifie HasMedia quand l'URL change
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasMedia))]
+        private string _mediaUrl;
+
+        // Propriété calculée pour savoir si on affiche le bouton vidéo
+        public bool HasMedia => !string.IsNullOrWhiteSpace(MediaUrl);
+
         public List<ExerciseCategory> Categories { get; } = Enum.GetValues(typeof(ExerciseCategory)).Cast<ExerciseCategory>().ToList();
 
         public ExerciseDetailViewModel(IExerciseRepository repository)
         {
             _repository = repository;
-            Title = "Nouvel Exercice";
-            SelectedCategory = ExerciseCategory.WarmUp;
+            Title = "Détail Exercice";
         }
 
         async partial void OnExerciseIdChanged(int value)
         {
             if (value > 0)
             {
+                IsEditMode = false; // Mode Lecture par défaut
+
                 var exo = await _repository.GetExerciseByIdAsync(value);
                 if (exo != null)
                 {
-                    Title = "Modifier l'exercice";
                     Name = exo.Name;
                     SelectedCategory = exo.Category;
                     Description = exo.Description;
@@ -48,6 +61,37 @@ namespace Coach_app.ViewModels.Exercises
                     MediaUrl = exo.MediaUrl;
                 }
             }
+            else
+            {
+                IsEditMode = true; // Création -> Mode Édition
+                Title = "Créer un exercice";
+                SelectedCategory = ExerciseCategory.WarmUp;
+            }
+        }
+
+        // --- COMMANDES ---
+
+        [RelayCommand]
+        private async Task OpenMedia()
+        {
+            if (string.IsNullOrWhiteSpace(MediaUrl)) return;
+
+            try
+            {
+                // Ouvre le lien dans le navigateur par défaut ou l'app YouTube
+                await Launcher.Default.OpenAsync(new Uri(MediaUrl));
+            }
+            catch (Exception)
+            {
+                await Shell.Current.DisplayAlert("Erreur", "Impossible d'ouvrir ce lien.", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private void EnableEditMode()
+        {
+            IsEditMode = true;
+            Title = "Modification...";
         }
 
         [RelayCommand]
@@ -71,7 +115,6 @@ namespace Coach_app.ViewModels.Exercises
                 MediaUrl = MediaUrl
             };
 
-            // Si modif, on garde la date de création
             if (ExerciseId > 0)
             {
                 var old = await _repository.GetExerciseByIdAsync(ExerciseId);
@@ -79,7 +122,10 @@ namespace Coach_app.ViewModels.Exercises
             }
 
             await _repository.SaveExerciseAsync(exo);
-            await Shell.Current.GoToAsync("..");
+
+            // Retour en mode lecture pour voir le résultat
+            IsEditMode = false;
+            Title = "Détail Exercice";
         }
 
         [RelayCommand]
@@ -95,6 +141,17 @@ namespace Coach_app.ViewModels.Exercises
         }
 
         [RelayCommand]
-        private async Task Cancel() => await Shell.Current.GoToAsync("..");
+        private async Task Cancel()
+        {
+            if (ExerciseId == 0)
+            {
+                await Shell.Current.GoToAsync("..");
+            }
+            else
+            {
+                IsEditMode = false;
+                OnExerciseIdChanged(ExerciseId); // Recharge les données originales
+            }
+        }
     }
 }
