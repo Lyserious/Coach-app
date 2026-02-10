@@ -15,6 +15,7 @@ namespace Coach_app.ViewModels.Students
     {
         private readonly IStudentRepository _repository;
         private readonly IGroupRepository _groupRepository;
+        private readonly INoteRepository _noteRepository; // 1. AJOUT DU REPO
 
         // Toutes les inscriptions de l'élève (Cache)
         private List<Group> _allStudentGroups = new();
@@ -30,7 +31,9 @@ namespace Coach_app.ViewModels.Students
         [ObservableProperty] private int _inscriptionFilterIndex = 0;
 
         public ObservableCollection<Group> FilteredGroups { get; } = new();
-        public ObservableCollection<StudentNote> Notes { get; } = new();
+
+        // 2. CHANGEMENT DE TYPE : StudentNote -> AppNote
+        public ObservableCollection<AppNote> Notes { get; } = new();
 
         // Propriétés visuelles
         public bool IsInscriptionsVisible => SelectedTabIndex == 0;
@@ -52,51 +55,50 @@ namespace Coach_app.ViewModels.Students
         public Color Filter3Color => InscriptionFilterIndex == 3 ? Color.Parse("#512BD4") : Colors.LightGray;
         public Color Filter3Text => InscriptionFilterIndex == 3 ? Colors.White : Colors.Black;
 
-        public StudentProfileViewModel(IStudentRepository repository, IGroupRepository groupRepository)
+        // 3. CONSTRUCTEUR MIS À JOUR
+        public StudentProfileViewModel(IStudentRepository repository, IGroupRepository groupRepository, INoteRepository noteRepository)
         {
             _repository = repository;
             _groupRepository = groupRepository;
+            _noteRepository = noteRepository;
         }
 
-        // Quand l'ID change (premier chargement)
         async partial void OnIdChanged(int value)
         {
             if (value > 0)
             {
-                _id = value;
+                // Pas besoin de réassigner _id car 'value' est déjà la nouvelle valeur de Id
+                // Mais pour être sûr on garde ta logique
                 await LoadData();
             }
         }
 
-        // Cette méthode est maintenant une commande publique pour le rafraichissement
         [RelayCommand]
         public async Task LoadData()
         {
-            if (_id == 0) return;
+            if (Id == 0) return; // Utilisation de la propriété publique Id
 
             IsBusy = true;
             try
             {
                 // 1. Infos Élève
-                Student = await _repository.GetStudentByIdAsync(_id);
-                Title = Student.DisplayName;
+                Student = await _repository.GetStudentByIdAsync(Id);
+                if (Student != null) Title = Student.DisplayName;
 
                 // 2. Contact Urgence
-                var contacts = await _repository.GetStudentContactsAsync(_id);
+                var contacts = await _repository.GetStudentContactsAsync(Id);
                 var emergency = contacts.FirstOrDefault();
                 EmergencyContactInfo = emergency != null
                     ? $"{emergency.PhoneNumber} ({emergency.FirstName} {emergency.Relation})"
                     : "Aucun contact";
 
                 // 3. Groupes
-                var groups = await _repository.GetGroupsByStudentAsync(_id);
+                var groups = await _repository.GetGroupsByStudentAsync(Id);
                 _allStudentGroups = groups;
                 ApplyGroupFilter();
 
-                // 4. Notes
-                var notes = await _repository.GetStudentNotesAsync(_id);
-                Notes.Clear();
-                foreach (var n in notes) Notes.Add(n);
+                // 4. Notes (NOUVELLE LOGIQUE)
+                await LoadNotes();
             }
             finally
             {
@@ -104,12 +106,55 @@ namespace Coach_app.ViewModels.Students
             }
         }
 
+        // --- MÉTHODES POUR LES NOTES (AJOUT) ---
+
+        private async Task LoadNotes()
+        {
+            var noteList = await _noteRepository.GetNotesAsync(NoteTargetType.Student, Id);
+            Notes.Clear();
+            foreach (var n in noteList) Notes.Add(n);
+        }
+
+        [RelayCommand]
+        private async Task AddNote()
+        {
+            if (Id == 0) return;
+
+            string result = await Shell.Current.DisplayPromptAsync("Nouvelle Note", "Entrez votre observation :", "Ajouter", "Annuler");
+
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                var note = new AppNote
+                {
+                    TargetType = NoteTargetType.Student,
+                    TargetId = Id,
+                    Content = result,
+                    Date = DateTime.Now
+                };
+
+                await _noteRepository.SaveNoteAsync(note);
+                Notes.Insert(0, note); // Ajoute en haut
+            }
+        }
+
+        [RelayCommand]
+        private async Task DeleteNote(AppNote note)
+        {
+            if (note == null) return;
+            bool confirm = await Shell.Current.DisplayAlert("Supprimer", "Effacer cette note ?", "Oui", "Non");
+            if (confirm)
+            {
+                await _noteRepository.DeleteNoteAsync(note);
+                Notes.Remove(note);
+            }
+        }
+
         // --- NAVIGATION ---
         [RelayCommand]
         private async Task EditStudent()
         {
-            // CORRECTION : On remplace "Id" par "StudentId" pour correspondre à ce que StudentDetailViewModel attend
-            await Shell.Current.GoToAsync($"{nameof(StudentDetailView)}?StudentId={Student.Id}");
+            if (Student != null)
+                await Shell.Current.GoToAsync($"{nameof(StudentDetailView)}?StudentId={Student.Id}");
         }
 
         [RelayCommand]

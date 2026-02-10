@@ -12,7 +12,7 @@ namespace Coach_app.ViewModels.Students
     public partial class StudentDetailViewModel : ViewModelBase, IQueryAttributable
     {
         private readonly IStudentRepository _repository;
-        private readonly INoteRepository _noteRepository; // AJOUT
+        private readonly INoteRepository _noteRepository; // AJOUT : Repository des notes
 
         [ObservableProperty] private int _groupId;
         [ObservableProperty] private int _studentId;
@@ -28,12 +28,12 @@ namespace Coach_app.ViewModels.Students
         [ObservableProperty] private DateTime _birthDate = DateTime.Today;
         [ObservableProperty] private string _photoConsent = "Interne uniquement";
 
-        // --- LISTES ---
+        // --- LISTE DES CONTACTS ---
         public ObservableCollection<StudentContact> Contacts { get; } = new();
-        public ObservableCollection<AppNote> Notes { get; } = new(); // AJOUT
 
-        // --- NOUVELLE NOTE ---
-        [ObservableProperty] private string _newNoteText; // AJOUT
+        // --- NOTES (AJOUT) ---
+        public ObservableCollection<AppNote> Notes { get; } = new(); // Liste des notes affichée
+        [ObservableProperty] private string _newNoteText; // Champ de saisie
 
         public List<string> Levels => ClimbingGrades.All;
         public bool IsEditMode => StudentId > 0;
@@ -45,7 +45,7 @@ namespace Coach_app.ViewModels.Students
             "Refusé (Pas de photo)"
         };
 
-        // Constructeur modifié pour inclure INoteRepository
+        // Constructeur mis à jour avec INoteRepository
         public StudentDetailViewModel(IStudentRepository repository, INoteRepository noteRepository)
         {
             _repository = repository;
@@ -99,7 +99,7 @@ namespace Coach_app.ViewModels.Students
                 var list = await _repository.GetStudentContactsAsync(value);
                 foreach (var c in list) Contacts.Add(c);
 
-                await LoadNotes(); // Charger les notes
+                await LoadNotes(); // AJOUT : Charger les notes
             }
             else
             {
@@ -107,12 +107,12 @@ namespace Coach_app.ViewModels.Students
                 FirstName = "";
                 LastName = "";
                 Contacts.Clear();
-                Notes.Clear(); // Vider les notes
+                Notes.Clear(); // AJOUT : Vider les notes
                 OnPropertyChanged(nameof(IsEditMode));
             }
         }
 
-        // --- LOGIQUE NOTES (AJOUT) ---
+        // --- METHODES NOTES (AJOUT) ---
 
         private async Task LoadNotes()
         {
@@ -136,8 +136,8 @@ namespace Coach_app.ViewModels.Students
             };
 
             await _noteRepository.SaveNoteAsync(note);
-            Notes.Insert(0, note);
-            NewNoteText = string.Empty;
+            Notes.Insert(0, note); // Ajoute au début de la liste
+            NewNoteText = string.Empty; // Vide le champ
         }
 
         [RelayCommand]
@@ -152,7 +152,7 @@ namespace Coach_app.ViewModels.Students
             }
         }
 
-        // --- COMMANDES EXISTANTES ---
+        // --- METHODES ORIGINALES INCHANGÉES ---
 
         [RelayCommand]
         private void AddContact()
@@ -236,10 +236,13 @@ namespace Coach_app.ViewModels.Students
                     await _repository.AddStudentToGroupAsync(savedId, GroupId);
                 }
 
+                // --- CORRECTION DU BUG AMBIGUOUS ROUTES ---
+                // On force le retour à l'annuaire PUIS au profil de l'élève mis à jour
                 await Shell.Current.GoToAsync($"//StudentLibraryView/{nameof(StudentProfileView)}?Id={savedId}");
             }
             catch (Exception ex)
             {
+                // En cas de pépin, retour à la liste principale
                 await Shell.Current.GoToAsync("//StudentLibraryView");
             }
             finally
