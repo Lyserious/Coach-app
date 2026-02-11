@@ -1,7 +1,8 @@
-﻿using SQLite;
+﻿using Coach_app.Models.Domains.Groups;
+using SQLite;
 using System;
 
-namespace Coach_app.Models
+namespace Coach_app.Models.Domains.Training
 {
     [Table("Exercises")]
     public class Exercise

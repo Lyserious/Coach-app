@@ -68,7 +68,9 @@
 
 	<ItemGroup>
 	  <Folder Include="Controls\" />
-	  <Folder Include="Data\Context\" />
+	  <Folder Include="Data\Entities\" />
+	  <Folder Include="Services\Business\" />
+	  <Folder Include="Services\Navigation\" />
 	</ItemGroup>
 
 	<ItemGroup>

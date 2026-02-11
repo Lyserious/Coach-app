@@ -1,5 +1,5 @@
 ﻿using Coach_app.Data.Repositories;
-using Coach_app.Models;
+using Coach_app.Models.Domains.Students;
 using Coach_app.ViewModels.Base;
 using Coach_app.Views.Students;
 using CommunityToolkit.Mvvm.ComponentModel;

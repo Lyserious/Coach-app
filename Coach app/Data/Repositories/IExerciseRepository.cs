@@ -1,4 +1,4 @@
-﻿using Coach_app.Models;
+﻿using Coach_app.Models.Domains.Training;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

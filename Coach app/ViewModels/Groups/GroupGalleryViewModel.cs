@@ -1,7 +1,7 @@
 ﻿using Coach_app.Data.Repositories;
-using Coach_app.Models;
+using Coach_app.Models.Domains.Groups;
 using Coach_app.ViewModels.Base;
-using Coach_app.Views.Groups; 
+using Coach_app.Views.Groups;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;

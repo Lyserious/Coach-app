@@ -1,7 +1,7 @@
 ﻿using SQLite;
 using System;
 
-namespace Coach_app.Models
+namespace Coach_app.Models.Domains.Groups
 {
     [Table("Groups")]
     public class Group

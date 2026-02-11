@@ -1,4 +1,5 @@
-﻿using Coach_app.Models;
+﻿using Coach_app.Models.Domains.Groups;
+using Coach_app.Models.Domains.Students;
 
 namespace Coach_app.Data.Repositories
 {

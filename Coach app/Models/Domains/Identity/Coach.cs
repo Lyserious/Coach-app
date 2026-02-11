@@ -1,7 +1,7 @@
 ﻿using SQLite;
 using System;
 
-namespace Coach_app.Models
+namespace Coach_app.Models.Domains.Identity
 {
     [Table("Coaches")]
     public class Coach

@@ -1,7 +1,6 @@
-﻿
-using SQLite;
+﻿using SQLite;
 
-namespace Coach_app.Models
+namespace Coach_app.Models.Domains.Students
 {
     [Table("Students")]
     public class Student

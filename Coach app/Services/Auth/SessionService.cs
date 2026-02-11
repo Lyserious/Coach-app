@@ -1,4 +1,4 @@
-﻿using Coach_app.Models;
+﻿using Coach_app.Models.Domains.Identity;
 
 namespace Coach_app.Services.Auth
 {

@@ -1,4 +1,6 @@
-﻿using SQLite;
+﻿using Coach_app.Models.Domains.Groups;
+using Coach_app.Models.Domains.Training;
+using SQLite;
 
 namespace Coach_app.Models
 {

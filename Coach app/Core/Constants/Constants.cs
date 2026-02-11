@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Coach_app.Configurations
+namespace Coach_app.Core.Constants
 {
     public static class Constants
     {
