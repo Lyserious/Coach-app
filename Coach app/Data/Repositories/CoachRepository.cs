@@ -1,5 +1,5 @@
-﻿using Coach_app.Configurations;
-using Coach_app.Models;
+﻿using Coach_app.Core.Constants;
+using Coach_app.Models.Domains.Identity;
 using SQLite;
 using System;
 using System.Collections.Generic;

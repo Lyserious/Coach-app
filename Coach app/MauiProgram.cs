@@ -1,7 +1,7 @@
 ﻿using Coach_app.Data.Repositories;
 using Coach_app.Services.Auth;
 using Coach_app.ViewModels.Auth;
-using Coach_app.ViewModels.Exercises; 
+using Coach_app.ViewModels.Exercises;
 using Coach_app.ViewModels.Groups;
 using Coach_app.ViewModels.Home;
 using Coach_app.ViewModels.Students;
@@ -11,7 +11,7 @@ using Coach_app.Views.Exercises;
 using Coach_app.Views.Groups;
 using Coach_app.Views.Home;
 using Coach_app.Views.Students;
-using CommunityToolkit.Maui; 
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
 
@@ -101,7 +101,7 @@ namespace Coach_app
             builder.Services.AddTransient<StudentPhotoDetailViewModel>();
 
 
-
+            builder.Services.AddSingleton<Coach_app.Data.Context.CoachDbContext>();
             //return builder.Build();
             return builder.Build();
         }

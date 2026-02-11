@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace Coach_app.Models
+namespace Coach_app.Models.Domains.Groups
 {
     public class GroupSession
     {

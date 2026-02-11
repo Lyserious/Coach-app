@@ -1,5 +1,6 @@
-﻿using Coach_app.Configurations;
-using Coach_app.Models;
+﻿using Coach_app.Core.Constants;
+using Coach_app.Models.Domains.Groups;
+using Coach_app.Models.Domains.Students;
 using Coach_app.Services.Auth;
 using SQLite;
 

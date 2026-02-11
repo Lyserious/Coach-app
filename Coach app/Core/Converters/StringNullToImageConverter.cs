@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Coach_app.Converters
+namespace Coach_app.Core.Converters
 {
     public class StringNullToImageConverter : IValueConverter
     {

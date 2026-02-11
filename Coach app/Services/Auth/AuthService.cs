@@ -1,5 +1,5 @@
 ﻿using Coach_app.Data.Repositories;
-using Coach_app.Models;
+using Coach_app.Models.Domains.Identity;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -1,4 +1,6 @@
 ﻿using Coach_app.Models;
+using Coach_app.Models.Domains.Groups;
+using Coach_app.Models.Domains.Students;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

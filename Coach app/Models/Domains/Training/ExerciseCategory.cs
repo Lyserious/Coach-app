@@ -1,4 +1,4 @@
-﻿namespace Coach_app.Models
+﻿namespace Coach_app.Models.Domains.Training
 {
     public enum ExerciseCategory
     {

@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace Coach_app.Models
+namespace Coach_app.Models.Domains.Students
 {
     // Table de liaison : Un élève peut appartenir à plusieurs groupes
     [Table("StudentGroups")]

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Coach_app.Helpers
+namespace Coach_app.Core.Helpers
 {
     public static class ClimbingGrades
     {
