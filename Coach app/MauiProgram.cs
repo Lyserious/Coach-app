@@ -7,7 +7,6 @@ using Coach_app.ViewModels.Home;
 using Coach_app.ViewModels.Students;
 using Coach_app.Views.Auth;
 using Coach_app.Views.Exercises;
-using Coach_app.Views.Exercises;
 using Coach_app.Views.Groups;
 using Coach_app.Views.Home;
 using Coach_app.Views.Students;
