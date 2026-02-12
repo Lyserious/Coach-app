@@ -141,7 +141,7 @@
                                                      HeightRequest="24" WidthRequest="24"
                                                      HorizontalOptions="End" VerticalOptions="Start"
                                                      Margin="5" 
-                                                     BackgroundColor="#CCFFFFFF" 
+                                                     BackgroundColor="Transparent" 
                                                      CornerRadius="12"
                                                      Padding="4"/>
                                     </Grid>
