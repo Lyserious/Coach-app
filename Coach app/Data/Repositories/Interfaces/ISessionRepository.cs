@@ -1,28 +1,29 @@
-﻿using Coach_app.Models;
-using Coach_app.Models.Domains.Groups; 
+﻿using Coach_app.Models.Domains.Groups;
 using Coach_app.Models.Domains.Training;
+using Coach_app.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Coach_app.Data.Repositories.Interfaces
 {
     public interface ISessionRepository
     {
-        Task<GroupSession> GetSessionByIdAsync(int id);
+        // Session CRUD
         Task<List<GroupSession>> GetSessionsByGroupIdAsync(int groupId);
         Task<List<GroupSession>> GetSessionsByDateAsync(DateTime date);
+        Task<GroupSession> GetSessionByIdAsync(int id);
         Task AddSessionAsync(GroupSession session);
         Task UpdateSessionAsync(GroupSession session);
         Task DeleteSessionAsync(int sessionId);
+        Task GenerateSessionsForGroupAsync(Group group);
 
-        // Gestion du contenu de séance
+        // Contenu de séance
         Task<List<SessionExercise>> GetExercisesForSessionAsync(int sessionId);
         Task SaveSessionExerciseAsync(SessionExercise sessionExercise);
         Task DeleteSessionExerciseAsync(SessionExercise sessionExercise);
 
-        // Gestion de l'appel
-        Task<List<SessionAttendance>> GetAttendanceForSessionAsync(int sessionId);
-        Task SaveAttendanceListAsync(List<SessionAttendance> attendanceList);
-
-        // Logique de génération 
-        Task GenerateSessionsForGroupAsync(Group group);
+        // Méthode qui posait problème (CS1061)
+        Task ImportTemplateToSessionAsync(int templateId, int targetSessionId, ITemplateRepository templateRepo);
     }
 }

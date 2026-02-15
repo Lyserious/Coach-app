@@ -1,4 +1,5 @@
-﻿using Coach_app.Core.Constants;
+﻿using Coach_app.Data.Repositories.Interfaces;
+using Coach_app.Core.Constants;
 using Coach_app.Models.Domains.Training;
 using Coach_app.Services.Auth;
 using SQLite;

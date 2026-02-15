@@ -1,5 +1,6 @@
-﻿using Coach_app.Models.Domains.Training;
-using Coach_app.Models; 
+﻿using Coach_app.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Coach_app.Data.Repositories.Interfaces
 {
@@ -9,6 +10,6 @@ namespace Coach_app.Data.Repositories.Interfaces
         Task<List<SessionTemplateExercise>> GetTemplateExercisesAsync(int templateId);
         Task SaveTemplateAsync(SessionTemplate template, List<SessionTemplateExercise> exercises);
         Task DeleteTemplateAsync(SessionTemplate template);
-        Task ImportTemplateToSessionAsync(int templateId, int targetSessionId);
+        Task<SessionTemplate> GetTemplateByIdAsync(int id);
     }
 }

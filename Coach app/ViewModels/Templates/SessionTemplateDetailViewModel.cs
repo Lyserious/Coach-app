@@ -1,4 +1,4 @@
-﻿using Coach_app.Data.Repositories;
+﻿using Coach_app.Data.Repositories.Interfaces;
 using Coach_app.Models;
 using Coach_app.ViewModels.Base;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,27 +10,23 @@ namespace Coach_app.ViewModels.Templates
     [QueryProperty(nameof(TemplateId), "Id")]
     public partial class SessionTemplateDetailViewModel : ViewModelBase
     {
-        private readonly IGroupRepository _repository;
+        private readonly ITemplateRepository _templateRepository; // Changement
         private readonly IExerciseRepository _exerciseRepository;
 
         [ObservableProperty] private int _templateId;
-
-        // --- ÉTATS D'AFFICHAGE ---
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsReadMode))]
-        private bool _isEditMode;
+        [ObservableProperty][NotifyPropertyChangedFor(nameof(IsReadMode))] private bool _isEditMode;
         public bool IsReadMode => !IsEditMode;
 
-        // --- DONNÉES ---
         [ObservableProperty] private string _name;
         [ObservableProperty] private string _category;
         [ObservableProperty] private string _description;
 
         public ObservableCollection<TemplateExerciseItem> Exercises { get; } = new();
 
-        public SessionTemplateDetailViewModel(IGroupRepository repository, IExerciseRepository exerciseRepository)
+        // Injection mise à jour
+        public SessionTemplateDetailViewModel(ITemplateRepository templateRepository, IExerciseRepository exerciseRepository)
         {
-            _repository = repository;
+            _templateRepository = templateRepository;
             _exerciseRepository = exerciseRepository;
         }
 
@@ -38,13 +34,11 @@ namespace Coach_app.ViewModels.Templates
         {
             if (value > 0)
             {
-                // Si on ouvre un modèle existant -> Mode Lecture
                 IsEditMode = false;
                 await LoadData(value);
             }
             else
             {
-                // Création -> Mode Édition direct
                 IsEditMode = true;
                 Title = "Nouveau Modèle";
                 Exercises.Clear();
@@ -56,17 +50,17 @@ namespace Coach_app.ViewModels.Templates
             IsBusy = true;
             try
             {
-                var all = await _repository.GetAllTemplatesAsync();
-                var t = all.FirstOrDefault(x => x.Id == id);
+                // Appels via TemplateRepository
+                var t = await _templateRepository.GetTemplateByIdAsync(id);
                 if (t != null)
                 {
                     Name = t.Name;
                     Category = t.Category;
                     Description = t.Description;
-                    Title = t.Name; // Le titre de la page devient le nom de la séance
+                    Title = t.Name;
                 }
 
-                var exos = await _repository.GetTemplateExercisesAsync(id);
+                var exos = await _templateRepository.GetTemplateExercisesAsync(id);
                 var allExos = await _exerciseRepository.GetAllExercisesAsync();
 
                 Exercises.Clear();
@@ -86,8 +80,6 @@ namespace Coach_app.ViewModels.Templates
             finally { IsBusy = false; }
         }
 
-        // --- ACTIONS ---
-
         [RelayCommand]
         private void EnableEditMode()
         {
@@ -98,14 +90,11 @@ namespace Coach_app.ViewModels.Templates
         [RelayCommand]
         private async Task CancelEdit()
         {
-            if (TemplateId == 0)
-            {
-                await Shell.Current.GoToAsync("..");
-            }
+            if (TemplateId == 0) await Shell.Current.GoToAsync("..");
             else
             {
                 IsEditMode = false;
-                await LoadData(TemplateId); // On recharge les données d'origine (annulation)
+                await LoadData(TemplateId);
             }
         }
 
@@ -119,21 +108,11 @@ namespace Coach_app.ViewModels.Templates
             if (!string.IsNullOrEmpty(choice) && choice != "Annuler")
             {
                 var sel = all.First(e => e.Name == choice);
-                Exercises.Add(new TemplateExerciseItem
-                {
-                    ExerciseId = sel.Id,
-                    Name = sel.Name,
-                    Sets = "4",
-                    Reps = "10"
-                });
+                Exercises.Add(new TemplateExerciseItem { ExerciseId = sel.Id, Name = sel.Name, Sets = "4", Reps = "10" });
             }
         }
 
-        [RelayCommand]
-        private void RemoveExercise(TemplateExerciseItem item)
-        {
-            Exercises.Remove(item);
-        }
+        [RelayCommand] private void RemoveExercise(TemplateExerciseItem item) => Exercises.Remove(item);
 
         [RelayCommand]
         private async Task Save()
@@ -167,14 +146,12 @@ namespace Coach_app.ViewModels.Templates
                 });
             }
 
-            await _repository.SaveTemplateAsync(template, listToSave);
+            // Sauvegarde via TemplateRepository
+            await _templateRepository.SaveTemplateAsync(template, listToSave);
 
-            // Si c'était une création, on récupère l'ID (optionnel, mais propre)
-            // Pour l'instant on repasse juste en mode lecture
             IsEditMode = false;
             Title = Name;
 
-            // Si ID était 0, il faut recharger la liste ou revenir en arrière pour voir le nouvel ID
             if (TemplateId == 0)
             {
                 await Shell.Current.DisplayAlert("Succès", "Séance type créée !", "OK");

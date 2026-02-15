@@ -1,4 +1,4 @@
-﻿using Coach_app.Data.Repositories;
+﻿using Coach_app.Data.Repositories.Interfaces; // Important : Utiliser le namespace Interfaces
 using Coach_app.Models.Domains.Groups;
 using Coach_app.ViewModels.Base;
 using Coach_app.Views.Groups;
@@ -12,32 +12,34 @@ namespace Coach_app.ViewModels.Groups
     [QueryProperty(nameof(GroupId), "Id")]
     public partial class GroupSessionsViewModel : ViewModelBase
     {
-        private readonly IGroupRepository _repository;
+        private readonly IGroupRepository _groupRepository;
+        private readonly ISessionRepository _sessionRepository; // AJOUT
 
         [ObservableProperty] private int _groupId;
         [ObservableProperty] private string _groupName;
 
-        // --- CHAMPS POUR AJOUTER UNE SÉANCE ---
         [ObservableProperty] private DateTime _newDate = DateTime.Today;
         [ObservableProperty] private TimeSpan _newStartTime = new TimeSpan(18, 0, 0);
         [ObservableProperty] private TimeSpan _newEndTime = new TimeSpan(20, 0, 0);
 
         public ObservableCollection<GroupSession> Sessions { get; } = new();
 
-        public GroupSessionsViewModel(IGroupRepository repository)
+        // On injecte les deux repositories
+        public GroupSessionsViewModel(IGroupRepository groupRepository, ISessionRepository sessionRepository)
         {
-            _repository = repository;
+            _groupRepository = groupRepository;
+            _sessionRepository = sessionRepository;
         }
 
         async partial void OnGroupIdChanged(int value)
         {
             if (value > 0)
             {
-                var group = await _repository.GetGroupByIdAsync(value);
+                // Info groupe -> GroupRepository
+                var group = await _groupRepository.GetGroupByIdAsync(value);
                 if (group != null)
                 {
                     GroupName = group.Name;
-                    // Pré-remplir les horaires avec ceux du groupe par défaut
                     NewStartTime = group.StartTime;
                     NewEndTime = group.EndTime;
                 }
@@ -52,10 +54,9 @@ namespace Coach_app.ViewModels.Groups
             try
             {
                 Sessions.Clear();
-                var list = await _repository.GetSessionsByGroupIdAsync(GroupId);
+                // Séances -> SessionRepository
+                var list = await _sessionRepository.GetSessionsByGroupIdAsync(GroupId);
 
-                // On filtre pour ne montrer que les séances futures ou récentes (optionnel)
-                // Ici je montre tout, trié par date
                 foreach (var s in list.OrderBy(x => x.Date))
                 {
                     Sessions.Add(s);
@@ -83,10 +84,10 @@ namespace Coach_app.ViewModels.Groups
                     Note = "Séance ajoutée manuellement"
                 };
 
-                await _repository.AddSessionAsync(newSession);
-                await LoadSessions(); // Recharger la liste
+                // Ajout -> SessionRepository
+                await _sessionRepository.AddSessionAsync(newSession);
+                await LoadSessions();
 
-                // Petit feedback visuel
                 await Shell.Current.DisplayAlert("Succès", "Séance ajoutée !", "OK");
             }
             finally
@@ -105,7 +106,8 @@ namespace Coach_app.ViewModels.Groups
 
             if (confirm)
             {
-                await _repository.DeleteSessionAsync(session.Id);
+                // Suppression -> SessionRepository
+                await _sessionRepository.DeleteSessionAsync(session.Id);
                 Sessions.Remove(session);
             }
         }
@@ -118,10 +120,7 @@ namespace Coach_app.ViewModels.Groups
         private async Task GoToSession(GroupSession session)
         {
             if (session == null) return;
-
-            // On navigue vers la page d'appel qu'on a créée avant
             await Shell.Current.GoToAsync($"{nameof(SessionDetailView)}?Id={session.Id}");
         }
     }
-
 }

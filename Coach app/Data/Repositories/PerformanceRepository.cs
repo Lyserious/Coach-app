@@ -1,35 +1,41 @@
-﻿using SQLite;
-using Coach_app.Data.Context;
-using Coach_app.Models.Domains.Groups;
+﻿using Coach_app.Models.Domains.Groups;
+using Coach_app.Services.Data;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Coach_app.Data.Repositories
 {
-    public class PerformanceRepository : Interfaces.IPerformanceRepository
+    // On force explicitement l'interface du dossier Interfaces
+    public class PerformanceRepository : Coach_app.Data.Repositories.Interfaces.IPerformanceRepository
     {
-        private readonly CoachDbContext _context;
-        private SQLiteAsyncConnection Connection => _context.Connection;
+        private readonly ICoachDatabaseService _dbService;
 
-        public PerformanceRepository(CoachDbContext context) { _context = context; }
+        public PerformanceRepository(ICoachDatabaseService dbService)
+        {
+            _dbService = dbService;
+        }
 
         public async Task<List<Performance>> GetPerformancesBySessionExerciseAsync(int sessionExerciseId)
         {
-            await _context.InitAsync();
-            return await Connection.Table<Performance>()
-                                  .Where(p => p.SessionExerciseId == sessionExerciseId)
-                                  .ToListAsync();
+            var db = await _dbService.GetConnectionAsync();
+            return await db.Table<Performance>()
+                           .Where(p => p.SessionExerciseId == sessionExerciseId)
+                           .ToListAsync();
         }
 
         public async Task SavePerformanceAsync(Performance perf)
         {
-            await _context.InitAsync();
-            if (perf.Id != 0) await Connection.UpdateAsync(perf);
-            else await Connection.InsertAsync(perf);
+            var db = await _dbService.GetConnectionAsync();
+            if (perf.Id != 0)
+                await db.UpdateAsync(perf);
+            else
+                await db.InsertAsync(perf);
         }
 
         public async Task DeletePerformanceAsync(Performance perf)
         {
-            await _context.InitAsync();
-            await Connection.DeleteAsync(perf);
+            var db = await _dbService.GetConnectionAsync();
+            await db.DeleteAsync(perf);
         }
     }
 }
