@@ -1,4 +1,4 @@
-﻿using Coach_app.Data.Repositories;
+﻿using Coach_app.Data.Repositories.Interfaces;
 using Coach_app.Models;
 using Coach_app.Services.Auth;
 using Coach_app.ViewModels.Base;
@@ -13,30 +13,24 @@ namespace Coach_app.ViewModels.Home
     public partial class DashboardViewModel : ViewModelBase
     {
         private readonly ISessionService _sessionService;
-        private readonly IGroupRepository _groupRepository; // Nécessaire pour charger les cours
+        private readonly IGroupRepository _groupRepository;
+        private readonly ISessionRepository _sessionRepository; // AJOUT
 
-        [ObservableProperty]
-        private string _welcomeMessage;
-
-        // --- AJOUT CALENDRIER : Propriétés ---
-        [ObservableProperty]
-        private DateTime _selectedDate;
-
-        [ObservableProperty]
-        private string _dateDisplay;
+        [ObservableProperty] private string _welcomeMessage;
+        [ObservableProperty] private DateTime _selectedDate;
+        [ObservableProperty] private string _dateDisplay;
 
         public ObservableCollection<SessionItem> TodaysSessions { get; } = new();
-        // -------------------------------------
 
-        public DashboardViewModel(ISessionService sessionService, IGroupRepository groupRepository)
+        // Injection mise à jour
+        public DashboardViewModel(ISessionService sessionService, IGroupRepository groupRepository, ISessionRepository sessionRepository)
         {
             _sessionService = sessionService;
-            _groupRepository = groupRepository; // Injection du repo
+            _groupRepository = groupRepository;
+            _sessionRepository = sessionRepository;
 
             Title = "Tableau de bord";
             UpdateWelcomeMessage();
-
-            // Initialiser le calendrier à aujourd'hui
             SelectedDate = DateTime.Today;
         }
 
@@ -46,9 +40,6 @@ namespace Coach_app.ViewModels.Home
             WelcomeMessage = $"Bonjour, {coachName} !";
         }
 
-        // --- AJOUT CALENDRIER : Méthodes ---
-
-        // Se déclenche automatiquement quand SelectedDate change
         async partial void OnSelectedDateChanged(DateTime value)
         {
             if (value.Date == DateTime.Today) DateDisplay = "Aujourd'hui";
@@ -58,7 +49,6 @@ namespace Coach_app.ViewModels.Home
             await LoadSessions();
         }
 
-        
         [RelayCommand]
         public async Task LoadSessions()
         {
@@ -67,18 +57,17 @@ namespace Coach_app.ViewModels.Home
             {
                 TodaysSessions.Clear();
 
-                // 1. On récupère tout (y compris les doublons)
-                var rawSessions = await _groupRepository.GetSessionsByDateAsync(SelectedDate);
+                // Appel via SessionRepository
+                var rawSessions = await _sessionRepository.GetSessionsByDateAsync(SelectedDate);
 
-                // 2. FILTRE ANTI-DOUBLON : On groupe par (ID du Groupe + Heure de début) et on prend le premier
                 var uniqueSessions = rawSessions
                     .GroupBy(s => new { s.GroupId, s.StartTime })
                     .Select(g => g.First())
                     .ToList();
 
-                // 3. On affiche la liste propre
                 foreach (var session in uniqueSessions)
                 {
+                    // GroupRepository est toujours utilisé pour les infos du groupe, c'est correct
                     var group = await _groupRepository.GetGroupByIdAsync(session.GroupId);
                     if (group != null)
                     {
@@ -99,29 +88,21 @@ namespace Coach_app.ViewModels.Home
                 IsBusy = false;
             }
         }
-        [RelayCommand]
-        private void PreviousDay() => SelectedDate = SelectedDate.AddDays(-1);
 
-        [RelayCommand]
-        private void NextDay() => SelectedDate = SelectedDate.AddDays(1);
+        [RelayCommand] private void PreviousDay() => SelectedDate = SelectedDate.AddDays(-1);
+        [RelayCommand] private void NextDay() => SelectedDate = SelectedDate.AddDays(1);
 
         [RelayCommand]
         private async Task GoToSession(SessionItem item)
         {
-            // Redirige vers le groupe pour l'instant
             if (item != null)
                 await Shell.Current.GoToAsync($"{nameof(SessionDetailView)}?Id={item.SessionId}");
         }
-        // -------------------------------------
-
 
         [RelayCommand]
         private async Task GoToPage(string route)
         {
-            if (!string.IsNullOrEmpty(route))
-            {
-                await Shell.Current.GoToAsync(route);
-            }
+            if (!string.IsNullOrEmpty(route)) await Shell.Current.GoToAsync(route);
         }
 
         [RelayCommand]
@@ -132,7 +113,6 @@ namespace Coach_app.ViewModels.Home
         }
     }
 
-    // Petite classe pour l'affichage dans la liste
     public class SessionItem
     {
         public int SessionId { get; set; }

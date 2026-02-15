@@ -1,20 +1,28 @@
-﻿using Coach_app.Data.Repositories;
+﻿using Coach_app.Data.Context;
+using Coach_app.Data.Repositories; // Pour les classes concrètes (SessionRepository...)
 using Coach_app.Services.Auth;
+using Coach_app.Services.Data;
+using Coach_app.Services.Files;
+using Coach_app.Services.Training;
 using Coach_app.ViewModels.Auth;
 using Coach_app.ViewModels.Exercises;
 using Coach_app.ViewModels.Groups;
 using Coach_app.ViewModels.Home;
+using Coach_app.ViewModels.Settings;
 using Coach_app.ViewModels.Students;
+using Coach_app.ViewModels.Templates;
 using Coach_app.Views.Auth;
 using Coach_app.Views.Exercises;
 using Coach_app.Views.Groups;
 using Coach_app.Views.Home;
+using Coach_app.Views.Settings;
 using Coach_app.Views.Students;
+using Coach_app.Views.Templates;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
-
-
+// NOTE : Je ne mets PAS 'using Coach_app.Data.Repositories.Interfaces' ici pour éviter l'ambiguïté.
+// On utilisera le nom complet plus bas.
 
 namespace Coach_app
 {
@@ -25,7 +33,7 @@ namespace Coach_app
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseMauiCommunityToolkit() 
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -36,72 +44,80 @@ namespace Coach_app
             builder.Logging.AddDebug();
 #endif
 
-
-
-            // Services
-            builder.Services.AddSingleton<ICoachRepository, CoachRepository>();
+            // --- SERVICES ---
+            builder.Services.AddSingleton<CoachDbContext>();
+            builder.Services.AddSingleton<ICoachDatabaseService, CoachDatabaseService>();
+            builder.Services.AddSingleton<IFileService, FileService>();
             builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
             builder.Services.AddSingleton<IAuthService, AuthService>();
             builder.Services.AddSingleton<ISessionService, SessionService>();
+            builder.Services.AddTransient<ISessionComposer, SessionComposer>();
+
+            // --- REPOSITORIES (Correction "Chemin Complet") ---
+
+            // On force le type de l'interface avec son chemin complet pour éviter toute erreur
+            builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.ISessionRepository, SessionRepository>();
+            builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.ITemplateRepository, TemplateRepository>();
+            builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.IAttendanceRepository, AttendanceRepository>();
+            builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.IPerformanceRepository, PerformanceRepository>();
+            builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.IStudentContactRepository, StudentContactRepository>();
+
+            // Les autres repositories (pas d'ambiguïté connue mais on sécurise)
+            builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.IGroupRepository, GroupRepository>();
+            builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.IStudentRepository, StudentRepository>();
+            builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.IExerciseRepository, ExerciseRepository>();
+            builder.Services.AddSingleton<Coach_app.Data.Repositories.Interfaces.ICoachRepository, CoachRepository>();
+            builder.Services.AddSingleton<Coach_app.Data.Repositories.Interfaces.INoteRepository, NoteRepository>();
+            builder.Services.AddSingleton<Coach_app.Data.Repositories.Interfaces.IPhotoRepository, PhotoRepository>();
 
 
-
-            // Repositories
-            builder.Services.AddTransient<IGroupRepository, GroupRepository>();
+            // --- VUES & VIEWMODELS ---
             builder.Services.AddTransient<LoginPage>();
-            builder.Services.AddTransient<IExerciseRepository, ExerciseRepository>();
-            builder.Services.AddTransient<IStudentRepository, StudentRepository>();
-            builder.Services.AddSingleton<INoteRepository, NoteRepository>();
-            builder.Services.AddSingleton<IPhotoRepository, PhotoRepository>();
-
-
-
-            // Views
-            builder.Services.AddTransient<Coach_app.Views.Groups.GroupsView>();
-            builder.Services.AddTransient<Coach_app.Views.Home.DashboardView>();
-            builder.Services.AddTransient<Coach_app.Views.Groups.GroupDetailView>();
-            builder.Services.AddTransient<GroupDashboardViewModel>();
-            builder.Services.AddTransient<GroupDashboardView>();
-            builder.Services.AddTransient<ExerciseLibraryView>();
-            builder.Services.AddTransient<ExerciseDetailView>();
-            builder.Services.AddTransient<StudentDetailView>();
-            builder.Services.AddTransient<AddExistingStudentView>();
-            builder.Services.AddTransient<StudentLibraryView>();
-            builder.Services.AddTransient<StudentProfileView>();
-            builder.Services.AddTransient<SessionDetailView>();
-            builder.Services.AddTransient<GroupSessionsView>();
-            builder.Services.AddTransient<GroupGalleryView>();
-            builder.Services.AddTransient<PhotoDetailView>();
-            builder.Services.AddTransient<Views.Templates.SessionTemplatesView>();
-            builder.Services.AddTransient<Views.Templates.SessionTemplateDetailView>();
-            builder.Services.AddTransient<Views.Settings.SettingsView>();
-            builder.Services.AddTransient<StudentPhotoDetailView>();
-
-
-            // ViewModels
-
-            builder.Services.AddTransient<Coach_app.ViewModels.Home.DashboardViewModel>();
-            builder.Services.AddTransient<Coach_app.ViewModels.Groups.GroupsViewModel>();
-            builder.Services.AddTransient<Coach_app.ViewModels.Groups.GroupDetailViewModel>();
-            builder.Services.AddTransient<ExerciseLibraryViewModel>();
-            builder.Services.AddTransient<ExerciseDetailViewModel>();
-            builder.Services.AddTransient<StudentDetailViewModel>();
-            builder.Services.AddTransient<AddExistingStudentViewModel>();
-            builder.Services.AddTransient<StudentLibraryViewModel>();
-            builder.Services.AddTransient<ViewModels.Settings.SettingsViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
-            builder.Services.AddTransient<StudentProfileViewModel>();
-            builder.Services.AddTransient<SessionDetailViewModel>();
+
+            builder.Services.AddTransient<DashboardView>();
+            builder.Services.AddTransient<DashboardViewModel>();
+
+            builder.Services.AddTransient<SettingsView>();
+            builder.Services.AddTransient<SettingsViewModel>();
+
+            builder.Services.AddTransient<GroupsView>();
+            builder.Services.AddTransient<GroupsViewModel>();
+            builder.Services.AddTransient<GroupDetailView>();
+            builder.Services.AddTransient<GroupDetailViewModel>();
+            builder.Services.AddTransient<GroupDashboardView>();
+            builder.Services.AddTransient<GroupDashboardViewModel>();
+            builder.Services.AddTransient<GroupSessionsView>();
             builder.Services.AddTransient<GroupSessionsViewModel>();
+            builder.Services.AddTransient<GroupGalleryView>();
             builder.Services.AddTransient<GroupGalleryViewModel>();
-            builder.Services.AddTransient<PhotoDetailViewModel>();
-            builder.Services.AddTransient<ViewModels.Templates.SessionTemplatesViewModel>();
-            builder.Services.AddTransient<ViewModels.Templates.SessionTemplateDetailViewModel>();
+
+            builder.Services.AddTransient<SessionDetailView>();
+            builder.Services.AddTransient<SessionDetailViewModel>();
+            builder.Services.AddTransient<SessionTemplatesView>();
+            builder.Services.AddTransient<SessionTemplatesViewModel>();
+            builder.Services.AddTransient<SessionTemplateDetailView>();
+            builder.Services.AddTransient<SessionTemplateDetailViewModel>();
+
+            builder.Services.AddTransient<StudentLibraryView>();
+            builder.Services.AddTransient<StudentLibraryViewModel>();
+            builder.Services.AddTransient<StudentDetailView>();
+            builder.Services.AddTransient<StudentDetailViewModel>();
+            builder.Services.AddTransient<StudentProfileView>();
+            builder.Services.AddTransient<StudentProfileViewModel>();
+            builder.Services.AddTransient<AddExistingStudentView>();
+            builder.Services.AddTransient<AddExistingStudentViewModel>();
+            builder.Services.AddTransient<StudentPhotoDetailView>();
             builder.Services.AddTransient<StudentPhotoDetailViewModel>();
 
+            builder.Services.AddTransient<ExerciseLibraryView>();
+            builder.Services.AddTransient<ExerciseLibraryViewModel>();
+            builder.Services.AddTransient<ExerciseDetailView>();
+            builder.Services.AddTransient<ExerciseDetailViewModel>();
 
-            builder.Services.AddSingleton<Coach_app.Data.Context.CoachDbContext>();
-            //return builder.Build();
+            builder.Services.AddTransient<PhotoDetailView>();
+            builder.Services.AddTransient<PhotoDetailViewModel>();
+
             return builder.Build();
         }
     }

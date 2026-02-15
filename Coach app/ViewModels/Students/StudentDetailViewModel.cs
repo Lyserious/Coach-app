@@ -1,5 +1,6 @@
 ﻿using Coach_app.Core.Helpers;
 using Coach_app.Data.Repositories;
+using Coach_app.Data.Repositories.Interfaces;
 using Coach_app.Models;
 using Coach_app.Models.Domains.Students;
 using Coach_app.ViewModels.Base;
@@ -13,7 +14,9 @@ namespace Coach_app.ViewModels.Students
     public partial class StudentDetailViewModel : ViewModelBase, IQueryAttributable
     {
         private readonly IStudentRepository _repository;
-        private readonly INoteRepository _noteRepository; // AJOUT : Repository des notes
+        private readonly INoteRepository _noteRepository; 
+        private readonly Services.Files.IFileService _fileService;
+
 
         [ObservableProperty] private int _groupId;
         [ObservableProperty] private int _studentId;
@@ -47,10 +50,11 @@ namespace Coach_app.ViewModels.Students
         };
 
         // Constructeur mis à jour avec INoteRepository
-        public StudentDetailViewModel(IStudentRepository repository, INoteRepository noteRepository)
+        public StudentDetailViewModel(IStudentRepository repository, INoteRepository noteRepository, Services.Files.IFileService fileService)
         {
             _repository = repository;
             _noteRepository = noteRepository;
+            _fileService = fileService;
             Title = "Nouvel Élève";
         }
 
@@ -183,14 +187,20 @@ namespace Coach_app.ViewModels.Students
         [RelayCommand]
         private async Task PickPhoto()
         {
-            try
+            // La logique système est maintenant encapsulée dans le service
+            string path = await _fileService.PickPhotoAsync();
+            if (!string.IsNullOrEmpty(path))
             {
-                var result = await MediaPicker.Default.PickPhotoAsync();
-                if (result != null) ProfilePhotoPath = result.FullPath;
+                ProfilePhotoPath = path;
             }
-            catch (Exception ex)
+            else
             {
-                await Shell.Current.DisplayAlert("Erreur", "Impossible d'accéder aux photos.", "OK");
+                // Gestion silencieuse ou log si l'utilisateur annule ou erreur
+                // Le service gère déjà le try/catch de base
+                if (path == null)
+                {
+                    await Shell.Current.DisplayAlert("Erreur", "Impossible d'accéder aux photos.", "OK");
+                }
             }
         }
 

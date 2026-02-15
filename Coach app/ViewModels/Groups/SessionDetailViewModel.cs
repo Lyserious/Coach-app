@@ -1,6 +1,15 @@
-﻿using Coach_app.Data.Repositories;
+﻿// --- ALIAS DE FORCE (Placez ces lignes tout en haut) ---
+using ISessionRepository = Coach_app.Data.Repositories.Interfaces.ISessionRepository;
+using ITemplateRepository = Coach_app.Data.Repositories.Interfaces.ITemplateRepository;
+using IPerformanceRepository = Coach_app.Data.Repositories.Interfaces.IPerformanceRepository;
+using IAttendanceRepository = Coach_app.Data.Repositories.Interfaces.IAttendanceRepository;
+using IGroupRepository = Coach_app.Data.Repositories.Interfaces.IGroupRepository;
+using IExerciseRepository = Coach_app.Data.Repositories.Interfaces.IExerciseRepository;
+
 using Coach_app.Models;
 using Coach_app.Models.Domains.Groups;
+using Coach_app.Models.Ui;
+using Coach_app.Services.Training;
 using Coach_app.ViewModels.Base;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,9 +21,13 @@ namespace Coach_app.ViewModels.Groups
     [QueryProperty(nameof(SessionId), "Id")]
     public partial class SessionDetailViewModel : ViewModelBase
     {
+        private readonly ISessionRepository _sessionRepository;
         private readonly IGroupRepository _groupRepository;
-        private readonly IStudentRepository _studentRepository;
         private readonly IExerciseRepository _exerciseRepository;
+        private readonly ISessionComposer _sessionComposer;
+        private readonly IAttendanceRepository _attendanceRepository;
+        private readonly IPerformanceRepository _performanceRepository;
+        private readonly ITemplateRepository _templateRepository;
 
         [ObservableProperty] private int _sessionId;
         [ObservableProperty] private string _groupName;
@@ -29,7 +42,7 @@ namespace Coach_app.ViewModels.Groups
         [NotifyPropertyChangedFor(nameof(TabProgramColor))]
         [NotifyPropertyChangedFor(nameof(TabPerfColor))]
         [NotifyPropertyChangedFor(nameof(TabAttendanceColor))]
-        private int _currentTab = 0; // 0=Programme, 1=Perfs, 2=Appel
+        private int _currentTab = 0;
 
         public bool IsProgramVisible => CurrentTab == 0;
         public bool IsPerformanceVisible => CurrentTab == 1;
@@ -46,9 +59,22 @@ namespace Coach_app.ViewModels.Groups
 
         [ObservableProperty] private SessionExercise _selectedExerciseForPerf;
 
-        public SessionDetailViewModel(IGroupRepository repo, IStudentRepository studentRepo, IExerciseRepository exoRepo)
+        public SessionDetailViewModel(
+            ISessionRepository sessionRepo,
+            IGroupRepository groupRepo,
+            IExerciseRepository exoRepo,
+            ISessionComposer sessionComposer,
+            IAttendanceRepository attendanceRepo,
+            IPerformanceRepository perfRepo,
+            ITemplateRepository templateRepo)
         {
-            _groupRepository = repo; _studentRepository = studentRepo; _exerciseRepository = exoRepo;
+            _sessionRepository = sessionRepo;
+            _groupRepository = groupRepo;
+            _exerciseRepository = exoRepo;
+            _sessionComposer = sessionComposer;
+            _attendanceRepository = attendanceRepo;
+            _performanceRepository = perfRepo;
+            _templateRepository = templateRepo;
         }
 
         async partial void OnSessionIdChanged(int value)
@@ -62,63 +88,44 @@ namespace Coach_app.ViewModels.Groups
             IsBusy = true;
             try
             {
-                var session = await _groupRepository.GetSessionByIdAsync(SessionId);
+                var session = await _sessionRepository.GetSessionByIdAsync(SessionId);
                 if (session != null)
                 {
                     DateDisplay = session.Date.ToString("D", new CultureInfo("fr-FR"));
                     var group = await _groupRepository.GetGroupByIdAsync(session.GroupId);
                     GroupName = group?.Name;
                     SessionDescription = session.Description;
+
                     SessionExercises.Clear();
-                    var exos = await _groupRepository.GetExercisesForSessionAsync(SessionId);
+                    var exos = await _sessionRepository.GetExercisesForSessionAsync(SessionId);
                     foreach (var ex in exos) SessionExercises.Add(ex);
 
-                    await LoadAttendanceData();
+                    await LoadAttendanceData(session.GroupId);
                 }
             }
             finally { IsBusy = false; }
         }
+
         [RelayCommand]
         private async Task SaveDescription()
         {
-            var session = await _groupRepository.GetSessionByIdAsync(SessionId);
+            var session = await _sessionRepository.GetSessionByIdAsync(SessionId);
             if (session != null)
             {
                 session.Description = SessionDescription;
-                await _groupRepository.UpdateSessionAsync(session);
+                await _sessionRepository.UpdateSessionAsync(session);
                 await Shell.Current.DisplayAlert("Succès", "Description mise à jour", "OK");
             }
         }
-        private async Task LoadAttendanceData()
+
+        private async Task LoadAttendanceData(int groupId)
         {
-            var session = await _groupRepository.GetSessionByIdAsync(SessionId);
-            if (session == null) return;
-
-            var students = await _studentRepository.GetStudentsByGroupIdAsync(session.GroupId);
-            var existingAttendance = await _groupRepository.GetAttendanceForSessionAsync(SessionId);
-
+            var list = await _sessionComposer.GetAttendanceListAsync(SessionId, groupId);
             AttendanceList.Clear();
-            foreach (var student in students)
-            {
-                var record = existingAttendance.FirstOrDefault(a => a.StudentId == student.Id);
-                string status = record?.Status ?? "Absent";
-
-                AttendanceList.Add(new StudentAttendanceItem
-                {
-                    StudentId = student.Id,
-                    DisplayName = student.DisplayName,
-                    PhotoPath = student.ProfilePhotoPath,
-                    AttendanceId = record?.Id ?? 0,
-                    Status = status,
-                    Note = record?.Note
-                });
-            }
+            foreach (var item in list) AttendanceList.Add(item);
         }
 
-        // --- COMMANDES NAVIGATION ---
         [RelayCommand] private void SetTab(string index) { if (int.TryParse(index, out int i)) CurrentTab = i; }
-
-        // --- LOGIQUE PERFORMANCES ---
 
         async partial void OnSelectedExerciseForPerfChanged(SessionExercise value)
         {
@@ -131,37 +138,9 @@ namespace Coach_app.ViewModels.Groups
             IsBusy = true;
             try
             {
-                var existingPerfs = await _groupRepository.GetPerformancesBySessionExerciseAsync(exo.Id);
-
+                var list = await _sessionComposer.GetPerformanceListAsync(exo, AttendanceList.ToList());
                 StudentPerformances.Clear();
-
-                // (Le reste du filtrage des présents ne change pas)
-                var presentStudents = AttendanceList
-                    .Where(a => !string.Equals(a.Status, "Absent", StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
-                var scoringType = exo.Exercise.ScoringType;
-
-                foreach (var s in presentStudents)
-                {
-                    var p = existingPerfs.FirstOrDefault(x => x.StudentId == s.StudentId && x.SetNumber == 1);
-
-                    var item = new StudentPerformanceItem
-                    {
-                        StudentId = s.StudentId,
-                        Name = s.DisplayName,
-                        PhotoPath = s.PhotoPath,
-                        PerfId = p?.Id ?? 0,
-                        IsNumeric = scoringType == PerformanceType.Numeric,
-                        IsCompletion = scoringType == PerformanceType.Completion,
-                        IsLevel = scoringType == PerformanceType.Level
-                    };
-
-                    if (item.IsCompletion) item.IsCompleted = p?.Value == "true";
-                    else item.ValueDisplay = p?.Value ?? "";
-
-                    StudentPerformances.Add(item);
-                }
+                foreach (var item in list) StudentPerformances.Add(item);
             }
             finally { IsBusy = false; }
         }
@@ -171,6 +150,7 @@ namespace Coach_app.ViewModels.Groups
         {
             if (SelectedExerciseForPerf == null) return;
             IsBusy = true;
+
             var type = SelectedExerciseForPerf.Exercise.ScoringType;
 
             foreach (var item in StudentPerformances)
@@ -181,18 +161,16 @@ namespace Coach_app.ViewModels.Groups
                 {
                     Id = item.PerfId,
                     GroupSessionId = SessionId,
-                    ExerciseId = SelectedExerciseForPerf.ExerciseId, // On garde ça pour l'historique global si besoin
-
-                    // IMPORTANT : On sauvegarde l'ID unique de la ligne
+                    ExerciseId = SelectedExerciseForPerf.ExerciseId,
                     SessionExerciseId = SelectedExerciseForPerf.Id,
-
                     StudentId = item.StudentId,
                     Value = val,
                     SetNumber = 1,
                     Type = type
                 };
 
-                await _groupRepository.SavePerformanceAsync(perf);
+                await _performanceRepository.SavePerformanceAsync(perf);
+
                 if (item.PerfId == 0) item.PerfId = perf.Id;
             }
             IsBusy = false;
@@ -213,29 +191,25 @@ namespace Coach_app.ViewModels.Groups
             else item.ValueDisplay = "0";
         }
 
-        // --- APPEL & PROGRAMME ---
-
         [RelayCommand]
         private void CycleStatus(StudentAttendanceItem item)
         {
             if (item == null) return;
-            // Cycle : Absent -> Présent -> Retard -> Absent
-            item.Status = item.Status switch
-            {
-                "Absent" => "Présent",
-                "Présent" => "Retard",
-                "Retard" => "Absent",
-                _ => "Présent" // Si le statut est inconnu (ex: "Present" anglais), on le corrige en "Présent"
-            };
+            item.Status = _sessionComposer.CycleAttendanceStatus(item.Status);
         }
 
         [RelayCommand]
         private async Task SaveAttendance()
         {
             var list = new List<SessionAttendance>();
-            foreach (var item in AttendanceList) list.Add(new SessionAttendance { Id = item.AttendanceId, GroupSessionId = SessionId, StudentId = item.StudentId, Status = item.Status, Note = item.Note });
-            await _groupRepository.SaveAttendanceListAsync(list);
-            await LoadAttendanceData();
+            foreach (var item in AttendanceList)
+                list.Add(new SessionAttendance { Id = item.AttendanceId, GroupSessionId = SessionId, StudentId = item.StudentId, Status = item.Status, Note = item.Note });
+
+            await _attendanceRepository.SaveAttendanceListAsync(list);
+
+            var session = await _sessionRepository.GetSessionByIdAsync(SessionId);
+            if (session != null) await LoadAttendanceData(session.GroupId);
+
             await Shell.Current.DisplayAlert("Succès", "Appel noté", "OK");
         }
 
@@ -249,18 +223,29 @@ namespace Coach_app.ViewModels.Groups
             {
                 var sel = all.First(e => e.Name == choice);
                 var newLink = new SessionExercise { GroupSessionId = SessionId, ExerciseId = sel.Id, OrderIndex = SessionExercises.Count + 1, Sets = "4", Reps = "10" };
-                await _groupRepository.SaveSessionExerciseAsync(newLink); await LoadData();
+                await _sessionRepository.SaveSessionExerciseAsync(newLink);
+                await LoadData();
             }
         }
-        [RelayCommand] private async Task DeleteExercise(SessionExercise ex) { if (ex != null) { await _groupRepository.DeleteSessionExerciseAsync(ex); SessionExercises.Remove(ex); } }
-        [RelayCommand] private async Task UpdateExercise(SessionExercise ex) { if (ex != null) await _groupRepository.SaveSessionExerciseAsync(ex); }
+
+        [RelayCommand]
+        private async Task DeleteExercise(SessionExercise ex)
+        {
+            if (ex != null) { await _sessionRepository.DeleteSessionExerciseAsync(ex); SessionExercises.Remove(ex); }
+        }
+
+        [RelayCommand]
+        private async Task UpdateExercise(SessionExercise ex)
+        {
+            if (ex != null) await _sessionRepository.SaveSessionExerciseAsync(ex);
+        }
+
         [RelayCommand]
         private async Task ImportTemplate()
         {
             try
             {
-                // 1. Récupérer les templates
-                var templates = await _groupRepository.GetAllTemplatesAsync();
+                var templates = await _templateRepository.GetAllTemplatesAsync();
 
                 if (templates == null || !templates.Any())
                 {
@@ -268,27 +253,19 @@ namespace Coach_app.ViewModels.Groups
                     return;
                 }
 
-                // 2. Afficher la liste
                 var names = templates.Select(t => t.Name).ToArray();
                 string choice = await Shell.Current.DisplayActionSheet("Choisir un modèle à importer", "Annuler", null, names);
 
                 if (!string.IsNullOrEmpty(choice) && choice != "Annuler")
                 {
                     var tmpl = templates.First(t => t.Name == choice);
-
                     bool confirm = await Shell.Current.DisplayAlert("Confirmation", $"Voulez-vous copier les exercices de '{tmpl.Name}' dans cette séance ?", "Oui", "Non");
 
                     if (confirm)
                     {
                         IsBusy = true;
-
-                        // 3. Exécuter l'importation (Copie en base de données)
-                        // Note: Les exos sont copiés, donc modifier la séance après ne touche PAS au modèle.
-                        await _groupRepository.ImportTemplateToSessionAsync(tmpl.Id, SessionId);
-
-                        // 4. Recharger l'interface pour voir les nouveaux exos
+                        await _sessionRepository.ImportTemplateToSessionAsync(tmpl.Id, SessionId, _templateRepository);
                         await LoadData();
-
                         await Shell.Current.DisplayAlert("Succès", "Exercices importés !", "OK");
                     }
                 }
@@ -302,25 +279,5 @@ namespace Coach_app.ViewModels.Groups
                 IsBusy = false;
             }
         }
-    }
-
-    public partial class StudentPerformanceItem : ObservableObject
-    {
-        public int StudentId { get; set; }
-        public int PerfId { get; set; }
-        public string Name { get; set; }
-        public string PhotoPath { get; set; }
-        public bool IsNumeric { get; set; }
-        public bool IsCompletion { get; set; }
-        public bool IsLevel { get; set; }
-        [ObservableProperty] private string _valueDisplay; [ObservableProperty] private bool _isCompleted;
-    }
-    public partial class StudentAttendanceItem : ObservableObject
-    {
-        public int StudentId { get; set; }
-        public int AttendanceId { get; set; }
-        public string DisplayName { get; set; }
-        public string PhotoPath { get; set; }
-        [ObservableProperty] private string _status; [ObservableProperty] private string _note;
     }
 }

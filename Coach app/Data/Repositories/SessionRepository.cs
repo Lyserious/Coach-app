@@ -1,32 +1,31 @@
-﻿using Coach_app.Data.Context;
-using Coach_app.Models;
+﻿using Coach_app.Models;
 using Coach_app.Models.Domains.Groups;
 using Coach_app.Models.Domains.Training;
-using SQLite;
+using Coach_app.Services.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Coach_app.Data.Repositories
 {
-    public class SessionRepository : Interfaces.ISessionRepository
+    // On force explicitement l'interface du dossier Interfaces
+    public class SessionRepository : Coach_app.Data.Repositories.Interfaces.ISessionRepository
     {
-        private readonly CoachDbContext _context;
-        // Raccourci pour accéder à la connexion thread-safe
-        private SQLiteAsyncConnection Connection => _context.Connection;
+        private readonly ICoachDatabaseService _dbService;
+        private readonly Coach_app.Data.Repositories.Interfaces.IAttendanceRepository _attendanceRepo;
 
-        public SessionRepository(CoachDbContext context)
+        public SessionRepository(ICoachDatabaseService dbService, Coach_app.Data.Repositories.Interfaces.IAttendanceRepository attendanceRepo)
         {
-            _context = context;
-        }
-
-        public async Task<GroupSession> GetSessionByIdAsync(int id)
-        {
-            await _context.InitAsync();
-            return await Connection.Table<GroupSession>().FirstOrDefaultAsync(s => s.Id == id);
+            _dbService = dbService;
+            _attendanceRepo = attendanceRepo;
         }
 
         public async Task<List<GroupSession>> GetSessionsByGroupIdAsync(int groupId)
         {
-            await _context.InitAsync();
-            return await Connection.Table<GroupSession>()
+            var db = await _dbService.GetConnectionAsync();
+            if (db == null) return new List<GroupSession>();
+            return await db.Table<GroupSession>()
                                   .Where(s => s.GroupId == groupId)
                                   .OrderBy(s => s.Date)
                                   .ToListAsync();
@@ -34,110 +33,69 @@ namespace Coach_app.Data.Repositories
 
         public async Task<List<GroupSession>> GetSessionsByDateAsync(DateTime date)
         {
-            await _context.InitAsync();
-            var start = date.Date;
-            var end = date.Date.AddDays(1).AddTicks(-1);
-            return await Connection.Table<GroupSession>()
-                                  .Where(s => s.Date >= start && s.Date <= end)
+            var db = await _dbService.GetConnectionAsync();
+            if (db == null) return new List<GroupSession>();
+
+            var startOfDay = date.Date;
+            var endOfDay = date.Date.AddDays(1).AddTicks(-1);
+
+            return await db.Table<GroupSession>()
+                                  .Where(s => s.Date >= startOfDay && s.Date <= endOfDay)
                                   .OrderBy(s => s.StartTime)
                                   .ToListAsync();
         }
 
+        public async Task<GroupSession> GetSessionByIdAsync(int id)
+        {
+            var db = await _dbService.GetConnectionAsync();
+            if (db == null) return null;
+            return await db.Table<GroupSession>().Where(s => s.Id == id).FirstOrDefaultAsync();
+        }
+
         public async Task AddSessionAsync(GroupSession session)
         {
-            await _context.InitAsync();
-            await Connection.InsertAsync(session);
+            var db = await _dbService.GetConnectionAsync();
+            if (db == null) return;
+            await db.InsertAsync(session);
         }
 
         public async Task UpdateSessionAsync(GroupSession session)
         {
-            await _context.InitAsync();
-            await Connection.UpdateAsync(session);
+            var db = await _dbService.GetConnectionAsync();
+            if (db != null) await db.UpdateAsync(session);
         }
 
         public async Task DeleteSessionAsync(int sessionId)
         {
-            await _context.InitAsync();
-            // Nettoyage en cascade (Appel + Exos + Perfs devraient être gérés ici idéalement)
-            var attendances = await Connection.Table<SessionAttendance>().Where(a => a.GroupSessionId == sessionId).ToListAsync();
-            foreach (var att in attendances) await Connection.DeleteAsync(att);
+            var db = await _dbService.GetConnectionAsync();
+            if (db == null) return;
 
-            await Connection.DeleteAsync<GroupSession>(sessionId);
+            await _attendanceRepo.DeleteAttendanceForSessionAsync(sessionId);
+            await db.DeleteAsync<GroupSession>(sessionId);
         }
 
-        // --- Contenu Séance ---
-
-        public async Task<List<SessionExercise>> GetExercisesForSessionAsync(int sessionId)
-        {
-            await _context.InitAsync();
-            var links = await Connection.Table<SessionExercise>()
-                                       .Where(x => x.GroupSessionId == sessionId)
-                                       .OrderBy(x => x.OrderIndex)
-                                       .ToListAsync();
-
-            foreach (var link in links)
-            {
-                // Note : Idéalement on ferait un JOIN, mais SQLite-net-pcl est limité.
-                link.Exercise = await Connection.Table<Exercise>().FirstOrDefaultAsync(e => e.Id == link.ExerciseId);
-            }
-            return links;
-        }
-
-        public async Task SaveSessionExerciseAsync(SessionExercise sessionExercise)
-        {
-            await _context.InitAsync();
-            if (sessionExercise.Id != 0) await Connection.UpdateAsync(sessionExercise);
-            else await Connection.InsertAsync(sessionExercise);
-        }
-
-        public async Task DeleteSessionExerciseAsync(SessionExercise sessionExercise)
-        {
-            await _context.InitAsync();
-            await Connection.DeleteAsync(sessionExercise);
-        }
-
-        // --- Appel ---
-
-        public async Task<List<SessionAttendance>> GetAttendanceForSessionAsync(int sessionId)
-        {
-            await _context.InitAsync();
-            return await Connection.Table<SessionAttendance>().Where(a => a.GroupSessionId == sessionId).ToListAsync();
-        }
-
-        public async Task SaveAttendanceListAsync(List<SessionAttendance> attendanceList)
-        {
-            await _context.InitAsync();
-            foreach (var item in attendanceList)
-            {
-                if (item.Id > 0) await Connection.UpdateAsync(item);
-                else await Connection.InsertAsync(item);
-            }
-        }
-
-        // --- Génération (Migration telle quelle pour l'instant) ---
         public async Task GenerateSessionsForGroupAsync(Group group)
         {
-            await _context.InitAsync();
+            var db = await _dbService.GetConnectionAsync();
+            if (db == null) return;
+
             var today = DateTime.Today;
 
-            // Suppression des futures séances non réalisées pour régénération
-            var futureSessions = await Connection.Table<GroupSession>()
+            var futureSessions = await db.Table<GroupSession>()
                                              .Where(s => s.GroupId == group.Id && s.Date >= today && s.Status == "Scheduled")
                                              .ToListAsync();
-            foreach (var s in futureSessions) await Connection.DeleteAsync(s);
+            foreach (var s in futureSessions) await db.DeleteAsync(s);
 
-            // Récupération des dates passées pour éviter doublons
-            var existingPastSessions = await Connection.Table<GroupSession>()
+            var existingPastSessions = await db.Table<GroupSession>()
                                                       .Where(s => s.GroupId == group.Id && s.Date < today)
                                                       .ToListAsync();
-            var existingDates = existingPastSessions.Select(s => s.Date.Date).ToHashSet(); // HashSet pour perf
+            var existingDates = existingPastSessions.Select(s => s.Date.Date).ToList();
 
             var sessionsToAdd = new List<GroupSession>();
 
             if (group.RecurrenceDay.HasValue)
             {
                 var currentDate = group.StartDate;
-                // Caler sur le bon jour
                 while (currentDate.DayOfWeek != group.RecurrenceDay.Value)
                     currentDate = currentDate.AddDays(1);
 
@@ -167,7 +125,75 @@ namespace Coach_app.Data.Repositories
                 }
             }
 
-            if (sessionsToAdd.Count > 0) await Connection.InsertAllAsync(sessionsToAdd);
+            if (sessionsToAdd.Count > 0) await db.InsertAllAsync(sessionsToAdd);
+        }
+
+        // --- CONTENU SÉANCES ---
+
+        public async Task<List<SessionExercise>> GetExercisesForSessionAsync(int sessionId)
+        {
+            var db = await _dbService.GetConnectionAsync();
+            var links = await db.Table<SessionExercise>()
+                                       .Where(x => x.GroupSessionId == sessionId)
+                                       .OrderBy(x => x.OrderIndex)
+                                       .ToListAsync();
+
+            foreach (var link in links)
+            {
+                link.Exercise = await db.Table<Exercise>().Where(e => e.Id == link.ExerciseId).FirstOrDefaultAsync();
+            }
+            return links;
+        }
+
+        public async Task SaveSessionExerciseAsync(SessionExercise sessionExercise)
+        {
+            var db = await _dbService.GetConnectionAsync();
+            if (sessionExercise.Id != 0)
+                await db.UpdateAsync(sessionExercise);
+            else
+                await db.InsertAsync(sessionExercise);
+        }
+
+        public async Task DeleteSessionExerciseAsync(SessionExercise sessionExercise)
+        {
+            var db = await _dbService.GetConnectionAsync();
+            await db.DeleteAsync(sessionExercise);
+        }
+
+        // Signature mise à jour avec le namespace complet
+        public async Task ImportTemplateToSessionAsync(int templateId, int targetSessionId, Coach_app.Data.Repositories.Interfaces.ITemplateRepository templateRepo)
+        {
+            var db = await _dbService.GetConnectionAsync();
+
+            var template = await templateRepo.GetTemplateByIdAsync(templateId);
+            var templateExercises = await templateRepo.GetTemplateExercisesAsync(templateId);
+
+            var targetSession = await GetSessionByIdAsync(targetSessionId);
+            if (targetSession != null && template != null)
+            {
+                targetSession.Description = template.Description;
+                await UpdateSessionAsync(targetSession);
+            }
+
+            var newSessionExercises = new List<SessionExercise>();
+            var existing = await db.Table<SessionExercise>().Where(x => x.GroupSessionId == targetSessionId).ToListAsync();
+            int startIndex = existing.Count + 1;
+
+            foreach (var tExo in templateExercises)
+            {
+                newSessionExercises.Add(new SessionExercise
+                {
+                    GroupSessionId = targetSessionId,
+                    ExerciseId = tExo.ExerciseId,
+                    OrderIndex = startIndex++,
+                    Sets = tExo.Sets,
+                    Reps = tExo.Reps,
+                    Weight = tExo.Weight,
+                    Rest = tExo.Rest,
+                    Note = tExo.Note
+                });
+            }
+            if (newSessionExercises.Any()) await db.InsertAllAsync(newSessionExercises);
         }
     }
 }
