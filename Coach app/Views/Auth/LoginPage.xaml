@@ -5,56 +5,91 @@
              x:Class="Coach_app.Views.Auth.LoginPage"
              Shell.NavBarIsVisible="False"
              Shell.FlyoutBehavior="Disabled"
-             Title="Connexion">
+             BackgroundColor="{StaticResource BrandDarkBlue}">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+    <Grid>
+        <Ellipse Fill="{StaticResource BrandNavyBlue}"
+                 WidthRequest="500"
+                 HeightRequest="500"
+                 Opacity="0.3"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"
+                 TranslationX="150"
+                 TranslationY="-150" />
 
-            <Image Source="dotnet_bot.png" 
-                   HeightRequest="150" 
-                   HorizontalOptions="Center" />
+        <ScrollView VerticalOptions="Center">
+            <VerticalStackLayout Spacing="30" 
+                                 Padding="30" 
+                                 MaximumWidthRequest="400" 
+                                 HorizontalOptions="Center">
 
-            <Label Text="{Binding Title}"
-                   FontSize="24"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center" />
+                <VerticalStackLayout Spacing="20">
+                    <Image Source="dotnet_bot.png" 
+                           HeightRequest="120" 
+                           HorizontalOptions="Center" />
 
-            <VerticalStackLayout Spacing="15">
-                <Entry Placeholder="Nom du Coach"
-                       Text="{Binding Username}"
-                       Keyboard="Text" />
+                    <Label Text="COACH TRACKER" 
+                           Style="{StaticResource HeaderLabelStyle}"
+                           TextColor="{StaticResource BrandCoral}"
+                           CharacterSpacing="2"/>
 
-                <Entry Placeholder="Mot de passe"
-                       Text="{Binding Password}"
-                       IsPassword="True" />
+                    <Label Text="{Binding Title}" 
+                           Style="{StaticResource HeaderLabelStyle}"
+                           FontSize="18"
+                           Opacity="0.8"/>
+                </VerticalStackLayout>
 
-                <Entry Placeholder="Confirmer le mot de passe"
-                       Text="{Binding ConfirmPassword}"
-                       IsPassword="True"
-                       IsVisible="{Binding IsRegistering}" />
+                <VerticalStackLayout Spacing="15">
+
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <Entry Placeholder="Identifiant Coach"
+                               Text="{Binding Username}"
+                               Keyboard="Text"
+                               Style="{StaticResource CleanEntryStyle}" />
+                    </Border>
+
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <Entry Placeholder="Mot de passe"
+                               Text="{Binding Password}"
+                               IsPassword="True"
+                               Style="{StaticResource CleanEntryStyle}" />
+                    </Border>
+
+                    <Border Style="{StaticResource InputBorderStyle}"
+                            IsVisible="{Binding IsRegistering}">
+                        <Entry Placeholder="Confirmer le mot de passe"
+                               Text="{Binding ConfirmPassword}"
+                               IsPassword="True"
+                               Style="{StaticResource CleanEntryStyle}" />
+                    </Border>
+
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{StaticResource ErrorRed}"
+                           HorizontalTextAlignment="Center"
+                           FontSize="13"
+                           IsVisible="{Binding ErrorMessage, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" />
+
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="15" Margin="0,10,0,0">
+
+                    <Button Text="{Binding ButtonText}"
+                            Command="{Binding SubmitCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            Style="{StaticResource PrimaryButtonStyle}" />
+
+                    <Button Text="{Binding SwitchModeText}"
+                            Command="{Binding ToggleModeCommand}"
+                            Style="{StaticResource TextButtonStyle}"
+                            BackgroundColor="Transparent" />
+
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       Color="{StaticResource BrandCoral}"
+                                       HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
             </VerticalStackLayout>
-
-            <Label Text="{Binding ErrorMessage}"
-                   TextColor="Red"
-                   HorizontalOptions="Center"
-                   IsVisible="{Binding ErrorMessage, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" />
-            <Button Text="{Binding ButtonText}"
-                    Command="{Binding SubmitCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    HeightRequest="50"
-                    CornerRadius="25" />
-
-            <Button Text="{Binding SwitchModeText}"
-                    Command="{Binding ToggleModeCommand}"
-                    BackgroundColor="Transparent"
-                    TextColor="{StaticResource Primary}"
-                    FontSize="Small" />
-
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                               IsVisible="{Binding IsBusy}"
-                               Color="{StaticResource Primary}"
-                               HorizontalOptions="Center" />
-
-        </VerticalStackLayout>
-    </ScrollView>
+        </ScrollView>
+    </Grid>
 </ContentPage>

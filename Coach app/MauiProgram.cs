@@ -1,5 +1,6 @@
 ﻿using Coach_app.Data.Context;
-using Coach_app.Data.Repositories; // Pour les classes concrètes (SessionRepository...)
+using Coach_app.Data.Repositories;
+using Coach_app.Data.Repositories.Interfaces;
 using Coach_app.Services.Auth;
 using Coach_app.Services.Data;
 using Coach_app.Services.Files;
@@ -20,9 +21,8 @@ using Coach_app.Views.Students;
 using Coach_app.Views.Templates;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.LifecycleEvents;
 
-// NOTE : Je ne mets PAS 'using Coach_app.Data.Repositories.Interfaces' ici pour éviter l'ambiguïté.
-// On utilisera le nom complet plus bas.
 
 namespace Coach_app
 {
@@ -33,16 +33,23 @@ namespace Coach_app
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseMauiCommunityToolkit()
+                .UseMauiCommunityToolkit() 
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-#if DEBUG
-            builder.Logging.AddDebug();
+
+            Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoBorder", (handler, view) =>
+            {
+#if WINDOWS
+                handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+                handler.PlatformView.Style = null; 
+#elif ANDROID
+                handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
 #endif
+            });
 
             // --- SERVICES ---
             builder.Services.AddSingleton<CoachDbContext>();
@@ -53,7 +60,7 @@ namespace Coach_app
             builder.Services.AddSingleton<ISessionService, SessionService>();
             builder.Services.AddTransient<ISessionComposer, SessionComposer>();
 
-            // --- REPOSITORIES (Correction "Chemin Complet") ---
+            // --- REPOSITORIES ---
 
             // On force le type de l'interface avec son chemin complet pour éviter toute erreur
             builder.Services.AddTransient<Coach_app.Data.Repositories.Interfaces.ISessionRepository, SessionRepository>();
@@ -117,6 +124,10 @@ namespace Coach_app
 
             builder.Services.AddTransient<PhotoDetailView>();
             builder.Services.AddTransient<PhotoDetailViewModel>();
+
+#if DEBUG
+            builder.Logging.AddDebug();
+#endif
 
             return builder.Build();
         }
