@@ -4,136 +4,151 @@
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Home"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Coach_app.Views.Home.DashboardView"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource BrandDarkBlue}">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadSessionsCommand}" />
     </ContentPage.Behaviors>
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="25">
-
-            <Grid ColumnDefinitions="*, Auto">
-                <VerticalStackLayout Grid.Column="0" Spacing="5">
-                    <Label Text="{Binding WelcomeMessage}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
-                    <Label Text="Prêt pour une nouvelle séance ?" TextColor="Gray" />
+        <VerticalStackLayout Padding="20" Spacing="30">
+            <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center">
+                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                    <Label Text="{Binding WelcomeMessage}" 
+                           FontSize="26" 
+                           FontFamily="OpenSansSemibold" 
+                           TextColor="{StaticResource BrandCoral}"/>
+                    <Label Text="C'est parti pour une nouvelle journée!" 
+                           TextColor="{StaticResource NeutralLightGray}" 
+                           FontSize="14"/>
                 </VerticalStackLayout>
+
+                <Border Grid.Column="1"
+                        Stroke="{StaticResource BrandCoral}"
+                        StrokeThickness="2"
+                        StrokeShape="RoundRectangle 30" 
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="SettingsView"/>
+                    </Border.GestureRecognizers>
+                    <Image Source="dotnet_bot.png" Aspect="AspectFill"/>
+                </Border>
             </Grid>
 
+            <Border Stroke="Transparent"
+                    BackgroundColor="{StaticResource BrandNavyBlue}"
+                    StrokeShape="RoundRectangle 25" 
+                    Padding="15">
 
-            <Frame Padding="15" CornerRadius="15" BackgroundColor="#F9F9F9" BorderColor="Transparent">
                 <VerticalStackLayout Spacing="15">
-
                     <Grid ColumnDefinitions="Auto, *, Auto">
                         <Button Grid.Column="0" Text="◀" Command="{Binding PreviousDayCommand}" 
-                                BackgroundColor="Transparent" TextColor="{StaticResource Primary}" FontSize="18"/>
+                                BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" 
+                                FontSize="22" HeightRequest="40" WidthRequest="40" Padding="0" BorderColor="Transparent"/>
 
                         <Label Grid.Column="1" Text="{Binding DateDisplay}" 
-                               TextColor="Black" FontAttributes="Bold" FontSize="16" 
-                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                               TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold" 
+                               FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
 
                         <Button Grid.Column="2" Text="▶" Command="{Binding NextDayCommand}" 
-                                BackgroundColor="Transparent" TextColor="{StaticResource Primary}" FontSize="18"/>
+                                BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" 
+                                FontSize="22" HeightRequest="40" WidthRequest="40" Padding="0" BorderColor="Transparent"/>
                     </Grid>
 
-                    <CollectionView ItemsSource="{Binding TodaysSessions}" HeightRequest="160">
+                    <BoxView HeightRequest="1" Color="{StaticResource BrandDarkBlue}" Opacity="0.3"/>
+
+                    <CollectionView ItemsSource="{Binding TodaysSessions}" HeightRequest="120">
                         <CollectionView.EmptyView>
-                            <Label Text="Aucune séance ce jour 🏖️" TextColor="Gray" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,20"/>
+                            <VerticalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,15">
+                                <Label Text="🏖️" FontSize="28" HorizontalOptions="Center" Opacity="0.7"/>
+                                <Label Text="Aucune séance prévue" TextColor="{StaticResource NeutralLightGray}" FontSize="14"/>
+                            </VerticalStackLayout>
                         </CollectionView.EmptyView>
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Frame Margin="0,0,0,10" Padding="10" CornerRadius="10" BackgroundColor="White" HasShadow="True" BorderColor="Transparent">
-                                    <Frame.GestureRecognizers>
+                                <Border Margin="0,0,0,10" Padding="12" StrokeShape="RoundRectangle 15" 
+                                        BackgroundColor="{StaticResource BrandDarkBlue}">
+                                    <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=GoToSessionCommand}" CommandParameter="{Binding .}"/>
-                                    </Frame.GestureRecognizers>
-                                    <Grid ColumnDefinitions="60, *">
-                                        <Label Grid.Column="0" Text="{Binding TimeDisplay}" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" TextColor="{StaticResource Primary}"/>
-                                        <Label Grid.Column="1" Text="{Binding GroupName}" FontSize="14" VerticalOptions="Center" TextColor="Black"/>
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="65, *, Auto">
+                                        <Label Grid.Column="0" Text="{Binding TimeDisplay}" FontSize="13" FontFamily="OpenSansSemibold" VerticalOptions="Center" TextColor="{StaticResource BrandOrange}"/>
+                                        <Label Grid.Column="1" Text="{Binding GroupName}" FontSize="15" VerticalOptions="Center" TextColor="{StaticResource NeutralWhite}" LineBreakMode="TailTruncation"/>
+                                        <Label Grid.Column="2" Text="›" TextColor="{StaticResource NeutralGray}" FontSize="20" VerticalOptions="Center" Margin="0,-3,0,0"/>
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
+            <VerticalStackLayout Spacing="15">
+                <Label Text="ACCÈS RAPIDE" FontFamily="OpenSansSemibold" FontSize="14" TextColor="{StaticResource NeutralLightGray}" CharacterSpacing="1" Margin="5,0,0,0"/>
 
-            <Label Text="Accès Rapide" FontAttributes="Bold" FontSize="18" TextColor="Black"/>
+                <Grid ColumnDefinitions="*,*" RowDefinitions="120, 120, 120" ColumnSpacing="15" RowSpacing="15">
 
-            <Grid ColumnDefinitions="*,*" RowDefinitions="140, 140, 140,140" ColumnSpacing="15" RowSpacing="15">
+                    <Border Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeShape="RoundRectangle 40">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//StudentLibraryView"/>
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                            <Label Text="🎓" FontSize="36" HorizontalOptions="Center"/>
+                            <Label Text="Élèves" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold" FontSize="15"/>
+                        </VerticalStackLayout>
+                    </Border>
 
-                <Frame Grid.Row="0" Grid.Column="0" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//StudentLibraryView"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Label Text="🎓" FontSize="35" HorizontalOptions="Center"/>
-                        <Label Text="Élèves" FontAttributes="Bold" TextColor="Black"/>
-                    </VerticalStackLayout>
-                </Frame>
+                    <Border Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeShape="RoundRectangle 40">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//Groups"/>
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                            <Label Text="👥" FontSize="36" HorizontalOptions="Center"/>
+                            <Label Text="Groupes" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold" FontSize="15"/>
+                        </VerticalStackLayout>
+                    </Border>
 
-                <Frame Grid.Row="0" Grid.Column="1" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//Groups"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Label Text="👥" FontSize="35" HorizontalOptions="Center" TextColor="White"/>
-                        <Label Text="Groupes" FontAttributes="Bold" TextColor="Black"/>
-                    </VerticalStackLayout>
-                </Frame>
-                
-                <Frame Grid.Row="1" Grid.Column="0" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//Exercises"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Label Text="📚" FontSize="35" HorizontalOptions="Center"/>
-                        <Label Text="Tous les exercices" FontAttributes="Bold" TextColor="Black"/>
-                    </VerticalStackLayout>
-                </Frame>
-                
-                <Frame Grid.Row="1" Grid.Column="1" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//SessionTemplates"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Label Text="📋" FontSize="35" HorizontalOptions="Center"/>
-                        <Label Text="Séances prédéfinies" FontAttributes="Bold" TextColor="Black"/>
-                    </VerticalStackLayout>
-                </Frame>
+                    <Border Grid.Row="1" Grid.Column="0" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeShape="RoundRectangle 40">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//Exercises"/>
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                            <Label Text="📚" FontSize="36" HorizontalOptions="Center"/>
+                            <Label Text="Exercices" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold" FontSize="15"/>
+                        </VerticalStackLayout>
+                    </Border>
 
-                <Frame Grid.Row="2" Grid.Column="0" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//SessionTemplates"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Label Text="📷" FontSize="35" HorizontalOptions="Center"/>
-                        <Label Text="Gallerie photo" FontAttributes="Bold" TextColor="Black"/>
-                    </VerticalStackLayout>
-                </Frame>
-                
-                <Frame Grid.Row="2" Grid.Column="1" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//SessionTemplates"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Label Text="⏲️" FontSize="35" HorizontalOptions="Center"/>
-                        <Label Text="Autres outils" FontAttributes="Bold" TextColor="Black"/>
-                    </VerticalStackLayout>
-                </Frame>
+                    <Border Grid.Row="1" Grid.Column="1" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeShape="RoundRectangle 40">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="//SessionTemplates"/>
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                            <Label Text="📋" FontSize="36" HorizontalOptions="Center"/>
+                            <Label Text="Modèles" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold" FontSize="15"/>
+                        </VerticalStackLayout>
+                    </Border>
 
-                <Frame Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" CornerRadius="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="SettingsView"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                        <Label Text="⚙️" FontSize="35" HorizontalOptions="Center"/>
-                        <Label Text="Paramètres" FontAttributes="Bold" TextColor="Black"/>
-                    </VerticalStackLayout>
-                </Frame>
+                    <Border Grid.Row="2" Grid.Column="0" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeShape="RoundRectangle 40" Opacity="0.5">
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                            <Label Text="📷" FontSize="36" HorizontalOptions="Center" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Label Text="Photos" TextColor="{StaticResource NeutralLightGray}" FontSize="15"/>
+                        </VerticalStackLayout>
+                    </Border>
 
-            </Grid>
+                    <Border Grid.Row="2" Grid.Column="1" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeShape="RoundRectangle 40" Opacity="0.5">
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                            <Label Text="🛠️" FontSize="36" HorizontalOptions="Center" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Label Text="Autres outils" TextColor="{StaticResource NeutralLightGray}" FontSize="15"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </Grid>
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>
