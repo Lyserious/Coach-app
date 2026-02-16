@@ -2,84 +2,100 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Coach_app.Views.Shared.SidebarView"
-             BackgroundColor="{StaticResource Gray100}">
-    <Grid RowDefinitions="Auto, *" Padding="10,20">
+             BackgroundColor="{StaticResource BrandNavyBlue}">
+    <ContentView.Resources>
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="TextColor" Value="{StaticResource NeutralWhite}" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="HeightRequest" Value="50" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="ContentLayout" Value="Left,15" />
+            <Setter Property="HorizontalOptions" Value="Fill" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="OpenSansSemibold" />
+            <Setter Property="Padding" Value="15,0" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="PointerOver">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource BrandDarkBlue}" />
+                                <Setter Property="TextColor" Value="{StaticResource BrandCoral}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </ContentView.Resources>
 
-        <VerticalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,30">
-            <Image Source="dotnet_bot.png" HeightRequest="60" HorizontalOptions="Center"/>
+    <Grid RowDefinitions="Auto, *, Auto" Padding="15,30">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,40">
+            <Image Source="dotnet_bot.png" HeightRequest="50" HorizontalOptions="Center"/>
             <Label Text="COACH TRACKER" 
-                   FontSize="12" 
-                   FontAttributes="Bold" 
+                   FontSize="14" 
+                   FontFamily="OpenSansSemibold"
                    HorizontalOptions="Center"
-                   TextColor="{StaticResource Gray900}"/>
+                   TextColor="{StaticResource BrandCoral}"
+                   CharacterSpacing="1"/>
         </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Row="1" Spacing="15" Margin="0,20,0,0">
+        <VerticalStackLayout Grid.Row="1" Spacing="5">
 
             <Button Text="Accueil" 
                     ImageSource="dotnet_bot.png" 
-                    ContentLayout="Left,15"
-                    HeightRequest="45"
-                    CornerRadius="10"
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    HorizontalOptions="Start"
+                    Style="{StaticResource NavButtonStyle}"
                     Command="{Binding NavigateCommand}"
-                    CommandParameter="//Dashboard"/>
+                    CommandParameter="//Dashboard"
+                    HorizontalOptions="Start"
+                    BorderColor="Transparent"
+                    />
 
             <Button Text="Mes Groupes" 
                     ImageSource="dotnet_bot.png"
-                    ContentLayout="Left,15"
-                    HeightRequest="45"
-                    CornerRadius="10"
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    HorizontalOptions="Start"            
+                    Style="{StaticResource NavButtonStyle}"     
                     Command="{Binding NavigateCommand}"
-                    CommandParameter="//Groups"/>
+                    CommandParameter="//Groups"
+                    HorizontalOptions="Start"
+                    BorderColor="Transparent"/>
 
             <Button Text="Exercices" 
                     ImageSource="dotnet_bot.png"
-                    ContentLayout="Left,15"
-                    HeightRequest="45"
-                    CornerRadius="10"
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    HorizontalOptions="Start"                   
+                    Style="{StaticResource NavButtonStyle}"                 
                     Command="{Binding NavigateCommand}"
-                    CommandParameter="//Exercises"/>
+                    CommandParameter="//Exercises"
+                    HorizontalOptions="Start"
+                    BorderColor="Transparent"/>
 
             <Button Text="Elèves" 
                     ImageSource="dotnet_bot.png"
-                    ContentLayout="Left,15"
-                    HeightRequest="45"
-                    CornerRadius="10"
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    HorizontalOptions="Start"                   
+                    Style="{StaticResource NavButtonStyle}"                  
                     Command="{Binding NavigateCommand}"
-                    CommandParameter="//StudentLibraryView"/>
+                    CommandParameter="//StudentLibraryView"
+                    HorizontalOptions="Start"
+                    BorderColor="Transparent"/>
 
             <Button Text="Séances Types" 
-        ImageSource="dotnet_bot.png"
-        ContentLayout="Left,15"
-        HeightRequest="45"
-        CornerRadius="10"
-        BackgroundColor="Transparent" 
-        TextColor="Black"
-        HorizontalOptions="Start"                   
-        Command="{Binding NavigateCommand}"
-        CommandParameter="//SessionTemplates"/>
-
+                    ImageSource="dotnet_bot.png"
+                    Style="{StaticResource NavButtonStyle}"                  
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="//SessionTemplates"
+                    HorizontalOptions="Start"
+                    BorderColor="Transparent"/>
 
         </VerticalStackLayout>
 
-        <Button Grid.Row="1" 
+        <Button Grid.Row="2" 
                 Text="Paramètres" 
-                VerticalOptions="End"
-                BackgroundColor="{StaticResource Primary}" 
-                TextColor="White"
-                HeightRequest="40"
+                BackgroundColor="{StaticResource BrandCoral}" 
+                TextColor="{StaticResource NeutralWhite}"
+                FontFamily="OpenSansSemibold"
+                CornerRadius="12"
+                HeightRequest="50"
+                Margin="0,20,0,0"
+                Shadow="{Shadow Radius=5, Opacity=0.3}"
                 Command="{Binding NavigateCommand}"
                 CommandParameter="SettingsView"/>
     </Grid>

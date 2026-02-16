@@ -111,6 +111,12 @@ namespace Coach_app.ViewModels.Home
             _sessionService.ClearSession();
             await Shell.Current.GoToAsync("//Login");
         }
+        [RelayCommand]
+        private void OpenMenu()
+        {
+            // C'est la commande pour ouvrir le menu latéral manuellement
+            Shell.Current.FlyoutIsPresented = true;
+        }
     }
 
     public class SessionItem

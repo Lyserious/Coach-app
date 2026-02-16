@@ -11,8 +11,10 @@
     xmlns:students="clr-namespace:Coach_app.Views.Students"
     xmlns:templates="clr-namespace:Coach_app.Views.Templates" 
     Title="Coach Tracker"
-    FlyoutBackgroundColor="{StaticResource Primary}"
+    FlyoutBackgroundColor="{StaticResource BrandDarkBlue}"
+    Shell.BackgroundColor="{StaticResource BrandDarkBlue}"
     Shell.NavBarIsVisible="False">
+
     <Shell.FlyoutBehavior>
         <OnPlatform x:TypeArguments="FlyoutBehavior">
             <On Platform="Android,iOS" Value="Flyout" />
@@ -20,19 +22,63 @@
         </OnPlatform>
     </Shell.FlyoutBehavior>
 
+    <Shell.Resources>
+        <Style x:Key="FlyoutItemStyle" TargetType="Grid">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="Transparent" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource BrandDarkBlue}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </Shell.Resources>
+
     <Shell.FlyoutHeader>
-        <Grid HeightRequest="150" BackgroundColor="{StaticResource Primary}">
-            <Image Source="dotnet_bot.png" 
-                   HeightRequest="80" 
-                   VerticalOptions="Center" />
-            <Label Text="Coach Tracker"
-                   TextColor="White"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   VerticalOptions="End"
-                   Margin="0,0,0,10"/>
+        <Grid HeightRequest="140" BackgroundColor="{StaticResource BrandDarkBlue}">
+            <VerticalStackLayout VerticalOptions="Center" Spacing="5">
+                <Image Source="dotnet_bot.png" 
+                       HeightRequest="60" 
+                       HorizontalOptions="Center" />
+                <Label Text="COACH TRACKER"
+                       TextColor="{StaticResource BrandCoral}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="16"
+                       HorizontalOptions="Center"
+                       CharacterSpacing="1"/>
+                <BoxView HeightRequest="1" Color="{StaticResource BrandCoral}" WidthRequest="50" Margin="0,5,0,0"/>
+            </VerticalStackLayout>
         </Grid>
     </Shell.FlyoutHeader>
+
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid ColumnDefinitions="50, *" Padding="20,15" Style="{StaticResource FlyoutItemStyle}">
+                <Image Grid.Column="0"
+                       Source="{Binding Icon}"
+                       HeightRequest="24"
+                       WidthRequest="24"
+                       VerticalOptions="Center"
+                       Aspect="AspectFit"/>
+
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       TextColor="{StaticResource NeutralWhite}"
+                       FontSize="15"
+                       FontFamily="OpenSansRegular"
+                       VerticalOptions="Center"/>
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
 
     <ShellContent Route="Login"
                   ContentTemplate="{DataTemplate auth:LoginPage}"
@@ -57,5 +103,34 @@
     <FlyoutItem Title="Séances Types" Icon="dotnet_bot.png">
         <ShellContent ContentTemplate="{DataTemplate templates:SessionTemplatesView}" Route="SessionTemplates" />
     </FlyoutItem>
+
+    <Shell.FlyoutFooter>
+        <Grid Padding="0" BackgroundColor="{StaticResource BrandDarkBlue}">
+            <VerticalStackLayout>
+                <BoxView HeightRequest="1" Color="{StaticResource BrandNavyBlue}" />
+
+                <Grid ColumnDefinitions="50, *" Padding="20,20">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type Shell}}, Path=GoToAsync}" 
+                                              CommandParameter="SettingsView"/>
+                    </Grid.GestureRecognizers>
+
+                    <Image Grid.Column="0"
+                           Source="dotnet_bot.png"
+                           HeightRequest="24"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+
+                    <Label Grid.Column="1"
+                           Text="Paramètres"
+                           TextColor="{StaticResource BrandOrange}"
+                           FontFamily="OpenSansSemibold"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <BoxView HeightRequest="20" Color="Transparent"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutFooter>
 
 </Shell>

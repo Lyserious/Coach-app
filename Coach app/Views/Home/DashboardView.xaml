@@ -13,25 +13,47 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="30">
-            <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center">
-                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+
+            <Grid ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" ColumnSpacing="15">
+
+                <Border Grid.Column="0"
+                        Stroke="{StaticResource BrandCoral}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10"
+                        HeightRequest="40"
+                        WidthRequest="40"
+                        BackgroundColor="{StaticResource BrandNavyBlue}"
+                        IsVisible="{OnPlatform Android=True, iOS=True, WinUI=False, MacCatalyst=False}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenMenuCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="☰" 
+                           TextColor="{StaticResource BrandCoral}" 
+                           FontSize="20" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"/>
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                     <Label Text="{Binding WelcomeMessage}" 
-                           FontSize="26" 
+                           FontSize="24" 
                            FontFamily="OpenSansSemibold" 
-                           TextColor="{StaticResource BrandCoral}"/>
+                           TextColor="{StaticResource BrandCoral}"
+                           LineBreakMode="TailTruncation"/>
                     <Label Text="C'est parti pour une nouvelle journée!" 
                            TextColor="{StaticResource NeutralLightGray}" 
-                           FontSize="14"/>
+                           FontSize="12"/>
                 </VerticalStackLayout>
 
-                <Border Grid.Column="1"
+                <Border Grid.Column="2"
                         Stroke="{StaticResource BrandCoral}"
                         StrokeThickness="2"
                         StrokeShape="RoundRectangle 30" 
                         HeightRequest="50"
                         WidthRequest="50"
                         HorizontalOptions="End"
-                        VerticalOptions="Center">
+                        VerticalOptions="Center"
+                        BackgroundColor="{StaticResource BrandNavyBlue}">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToPageCommand}" CommandParameter="SettingsView"/>
                     </Border.GestureRecognizers>
@@ -72,7 +94,8 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Border Margin="0,0,0,10" Padding="12" StrokeShape="RoundRectangle 15" 
-                                        BackgroundColor="{StaticResource BrandDarkBlue}">
+                                        BackgroundColor="{StaticResource BrandDarkBlue}"
+                                        StrokeThickness="0">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=GoToSessionCommand}" CommandParameter="{Binding .}"/>
                                     </Border.GestureRecognizers>
