@@ -14,7 +14,6 @@
     FlyoutBackgroundColor="{StaticResource BrandDarkBlue}"
     Shell.BackgroundColor="{StaticResource BrandDarkBlue}"
     Shell.NavBarIsVisible="False">
-
     <Shell.FlyoutBehavior>
         <OnPlatform x:TypeArguments="FlyoutBehavior">
             <On Platform="Android,iOS" Value="Flyout" />
@@ -34,7 +33,7 @@
                         </VisualState>
                         <VisualState x:Name="Selected">
                             <VisualState.Setters>
-                                <Setter Property="BackgroundColor" Value="{StaticResource BrandDarkBlue}" />
+                                <Setter Property="BackgroundColor" Value="{StaticResource BrandNavyBlue}" />
                             </VisualState.Setters>
                         </VisualState>
                     </VisualStateGroup>

@@ -13,6 +13,7 @@
     </ContentPage.Behaviors>
 
     <Grid>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="{OnPlatform WinUI='250', MacCatalyst='250', Default='0'}" />
             <ColumnDefinition Width="*" />

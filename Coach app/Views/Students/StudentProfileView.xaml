@@ -4,113 +4,246 @@
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Students"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Coach_app.Views.Students.StudentProfileView"
-             Title="{Binding Student.DisplayName}">
+             Title="{Binding Student.DisplayName}"
+             BackgroundColor="{StaticResource BrandDarkBlue}"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadDataCommand}" />
     </ContentPage.Behaviors>
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Modifier" Command="{Binding EditStudentCommand}" />
-    </ContentPage.ToolbarItems>
+    <Grid RowDefinitions="Auto, Auto, Auto, *" Padding="20">
 
-    <Grid RowDefinitions="Auto, Auto, *" Padding="0" BackgroundColor="White">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" Margin="0,0,0,20">
 
-        <Grid Grid.Row="0" ColumnDefinitions="120, *" Padding="20" ColumnSpacing="15">
-            <Frame Grid.Column="0" HeightRequest="120" WidthRequest="120" CornerRadius="60" 
-                   Padding="0" IsClippedToBounds="True" BorderColor="LightGray" HorizontalOptions="Center">
-                <Image Source="{Binding Student.ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
-                       Aspect="AspectFill"/>
-            </Frame>
-            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
-                <Grid ColumnDefinitions="*, Auto">
-                    <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
-                        <Label Text="{Binding Student.DisplayName}" FontSize="20" FontAttributes="Bold" TextColor="Black" LineBreakMode="TailTruncation"/>
-                        <Label Text="{Binding Student.Age, StringFormat='({0} ans)'}" FontSize="16" TextColor="Gray" VerticalOptions="End" Margin="0,0,0,2"/>
-                    </HorizontalStackLayout>
-                    <Button Grid.Column="1" Text="✎" Command="{Binding EditStudentCommand}" FontSize="22" TextColor="{StaticResource Primary}" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40" Padding="0" Margin="0,-5,0,0"/>
-                </Grid>
-                <Label Text="{Binding Student.MaxLevel, StringFormat='Niveau Max : {0}'}" FontSize="14" TextColor="{StaticResource Primary}" FontAttributes="Bold"/>
-                <BoxView HeightRequest="1" Color="LightGray" Margin="0,5"/>
-                <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Center">
-                    <HorizontalStackLayout Spacing="3" Margin="0,0,15,0">
-                        <Label Text="📞" FontSize="14"/>
-                        <Label Text="{Binding Student.PhoneNumber, TargetNullValue='-'}" FontSize="13" TextColor="Gray"/>
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Spacing="3">
-                        <Label Text="📧" FontSize="14"/>
-                        <Label Text="{Binding Student.Email, TargetNullValue='-'}" FontSize="13" TextColor="Gray" LineBreakMode="TailTruncation"/>
-                    </HorizontalStackLayout>
-                </FlexLayout>
-                <HorizontalStackLayout Spacing="5">
-                    <Label Text="📷" FontSize="14"/>
-                    <Label Text="{Binding Student.PhotoConsent, TargetNullValue='Non défini'}" FontSize="13" TextColor="{StaticResource Primary}" FontAttributes="Bold"/>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
+
+            <Label Grid.Column="1" 
+                   Text="Fiche Élève" 
+                   FontSize="28" 
+                   FontFamily="OpenSansSemibold" 
+                   TextColor="{StaticResource NeutralWhite}" 
+                   VerticalOptions="Center"/>
+
+            <Button Grid.Column="2" 
+                    Text="✎" 
+                    Command="{Binding EditStudentCommand}" 
+                    FontSize="22" 
+                    TextColor="{StaticResource BrandCoral}" 
+                    BackgroundColor="Transparent" 
+                    HeightRequest="40" 
+                    WidthRequest="40" 
+                    Padding="0"/>
         </Grid>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" Padding="0,10">
-            <Button Grid.Column="0" Text="Inscriptions" Command="{Binding SwitchTabCommand}" CommandParameter="0" BackgroundColor="Transparent" TextColor="{Binding Tab0Color}" FontAttributes="Bold" FontSize="12"/>
-            <Button Grid.Column="1" Text="Photos" Command="{Binding SwitchTabCommand}" CommandParameter="1" BackgroundColor="Transparent" TextColor="{Binding Tab1Color}" FontAttributes="Bold" FontSize="12"/>
-            <Button Grid.Column="2" Text="Notes" Command="{Binding SwitchTabCommand}" CommandParameter="2" BackgroundColor="Transparent" TextColor="{Binding Tab2Color}" FontAttributes="Bold" FontSize="12"/>
-            <Button Grid.Column="3" Text="Stats" Command="{Binding SwitchTabCommand}" CommandParameter="3" BackgroundColor="Transparent" TextColor="{Binding Tab3Color}" FontAttributes="Bold" FontSize="12"/>
-            <BoxView Grid.ColumnSpan="4" HeightRequest="1" Color="LightGray" VerticalOptions="End"/>
+        <Border Grid.Row="1" 
+                BackgroundColor="{StaticResource BrandNavyBlue}" 
+                StrokeShape="RoundRectangle 20" 
+                Padding="15" 
+                Margin="0,0,0,15" 
+                StrokeThickness="0">
+            <Grid ColumnDefinitions="110, *" ColumnSpacing="15">
+
+                <Border Grid.Column="0" 
+                        HeightRequest="100" 
+                        WidthRequest="100" 
+                        StrokeShape="RoundRectangle 50" 
+                        Stroke="{StaticResource BrandCoral}" 
+                        StrokeThickness="2" 
+                        BackgroundColor="{StaticResource BrandDarkBlue}" 
+                        HorizontalOptions="Center" 
+                        VerticalOptions="Center">
+                    <Image Source="{Binding Student.ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
+                           Aspect="AspectFill"/>
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
+                    <Label Text="{Binding Student.DisplayName}" 
+                           FontSize="22" 
+                           FontFamily="OpenSansSemibold" 
+                           TextColor="{StaticResource NeutralWhite}" 
+                           LineBreakMode="TailTruncation"/>
+
+                    <Label Text="{Binding Student.Age, StringFormat='{0} ans'}" 
+                           FontSize="14" 
+                           TextColor="{StaticResource NeutralLightGray}"/>
+
+                    <Label Text="{Binding Student.MaxLevel, StringFormat='Niveau : {0}'}" 
+                           FontSize="14" 
+                           TextColor="{StaticResource BrandOrange}" 
+                           FontFamily="OpenSansSemibold"/>
+
+                    <BoxView HeightRequest="1" 
+                             Color="{StaticResource BrandDarkBlue}" 
+                             Margin="0,5" 
+                             Opacity="0.5"/>
+
+                    <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Center">
+                        <HorizontalStackLayout Spacing="5" Margin="0,0,15,5">
+                            <Label Text="📞" FontSize="12" VerticalOptions="Center"/>
+                            <Label Text="{Binding Student.PhoneNumber, TargetNullValue='-'}" 
+                                   FontSize="13" 
+                                   TextColor="{StaticResource NeutralLightGray}" 
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout Spacing="5" Margin="0,0,15,5">
+                            <Label Text="📧" FontSize="12" VerticalOptions="Center"/>
+                            <Label Text="{Binding Student.Email, TargetNullValue='-'}" 
+                                   FontSize="13" 
+                                   TextColor="{StaticResource NeutralLightGray}" 
+                                   LineBreakMode="TailTruncation" 
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </FlexLayout>
+
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="📷" FontSize="12" VerticalOptions="Center"/>
+                        <Label Text="{Binding Student.PhotoConsent, TargetNullValue='Non défini'}" 
+                               FontSize="12" 
+                               TextColor="{StaticResource BrandCoral}" 
+                               FontFamily="OpenSansSemibold" 
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*" Padding="0,5,0,15">
+            <Button Grid.Column="0" 
+                    Text="Groupes" 
+                    Command="{Binding SwitchTabCommand}" 
+                    CommandParameter="0" 
+                    BackgroundColor="Transparent" 
+                    TextColor="{Binding Tab0Color}" 
+                    FontFamily="OpenSansSemibold" 
+                    FontSize="12"/>
+
+            <Button Grid.Column="1" 
+                    Text="Photos" 
+                    Command="{Binding SwitchTabCommand}" 
+                    CommandParameter="1" 
+                    BackgroundColor="Transparent" 
+                    TextColor="{Binding Tab1Color}" 
+                    FontFamily="OpenSansSemibold" 
+                    FontSize="12"/>
+
+            <Button Grid.Column="2" 
+                    Text="Notes" 
+                    Command="{Binding SwitchTabCommand}" 
+                    CommandParameter="2" 
+                    BackgroundColor="Transparent" 
+                    TextColor="{Binding Tab2Color}" 
+                    FontFamily="OpenSansSemibold" 
+                    FontSize="12"/>
+
+            <Button Grid.Column="3" 
+                    Text="Stats" 
+                    Command="{Binding SwitchTabCommand}" 
+                    CommandParameter="3" 
+                    BackgroundColor="Transparent" 
+                    TextColor="{Binding Tab3Color}" 
+                    FontFamily="OpenSansSemibold" 
+                    FontSize="12"/>
+
+            <BoxView Grid.ColumnSpan="4" HeightRequest="2" Color="{StaticResource BrandNavyBlue}" VerticalOptions="End"/>
         </Grid>
 
-        <Grid Grid.Row="2" Padding="20">
+        <Grid Grid.Row="3">
 
             <VerticalStackLayout IsVisible="{Binding IsInscriptionsVisible}" Spacing="15">
                 <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
                     <HorizontalStackLayout Spacing="10">
-                        <Button Text="Tout" Command="{Binding FilterInscriptionsCommand}" CommandParameter="0" BackgroundColor="{Binding Filter0Color}" TextColor="{Binding Filter0Text}" CornerRadius="20" HeightRequest="40" Padding="20,0"/>
-                        <Button Text="Actuelles" Command="{Binding FilterInscriptionsCommand}" CommandParameter="1" BackgroundColor="{Binding Filter1Color}" TextColor="{Binding Filter1Text}" CornerRadius="20" HeightRequest="40" Padding="20,0"/>
-                        <Button Text="Futures" Command="{Binding FilterInscriptionsCommand}" CommandParameter="2" BackgroundColor="{Binding Filter2Color}" TextColor="{Binding Filter2Text}" CornerRadius="20" HeightRequest="40" Padding="20,0"/>
-                        <Button Text="Passées" Command="{Binding FilterInscriptionsCommand}" CommandParameter="3" BackgroundColor="{Binding Filter3Color}" TextColor="{Binding Filter3Text}" CornerRadius="20" HeightRequest="40" Padding="20,0"/>
+                        <Button Text="Tout" 
+                                Command="{Binding FilterInscriptionsCommand}" 
+                                CommandParameter="0" 
+                                BackgroundColor="{Binding Filter0Color}" 
+                                TextColor="Black" 
+                                BorderColor="{StaticResource BrandNavyBlue}" 
+                                BorderWidth="1" 
+                                CornerRadius="20" 
+                                HeightRequest="40" 
+                                Padding="20,0" 
+                                FontFamily="OpenSansSemibold"/>
+
+                        <Button Text="Actuelles" 
+                                Command="{Binding FilterInscriptionsCommand}" 
+                                CommandParameter="1" 
+                                BackgroundColor="{Binding Filter1Color}" 
+                                TextColor="Black" 
+                                BorderColor="{StaticResource BrandNavyBlue}" 
+                                BorderWidth="1" 
+                                CornerRadius="20" 
+                                HeightRequest="40" 
+                                Padding="20,0" 
+                                FontFamily="OpenSansSemibold"/>
+
+                        <Button Text="Futures" 
+                                Command="{Binding FilterInscriptionsCommand}" 
+                                CommandParameter="2" 
+                                BackgroundColor="{Binding Filter2Color}" 
+                                TextColor="Black" 
+                                BorderColor="{StaticResource BrandNavyBlue}" 
+                                BorderWidth="1" 
+                                CornerRadius="20" 
+                                HeightRequest="40" 
+                                Padding="20,0" 
+                                FontFamily="OpenSansSemibold"/>
+
+                        <Button Text="Passées" 
+                                Command="{Binding FilterInscriptionsCommand}" 
+                                CommandParameter="3" 
+                                BackgroundColor="{Binding Filter3Color}" 
+                                TextColor="Black" 
+                                BorderColor="{StaticResource BrandNavyBlue}" 
+                                BorderWidth="1" 
+                                CornerRadius="20" 
+                                HeightRequest="40" 
+                                Padding="20,0" 
+                                FontFamily="OpenSansSemibold"/>
                     </HorizontalStackLayout>
                 </ScrollView>
+
                 <CollectionView ItemsSource="{Binding FilteredGroups}">
                     <CollectionView.EmptyView>
-                        <Label Text="Aucune inscription trouvée." TextColor="Gray" HorizontalOptions="Center" Margin="0,30"/>
+                        <Label Text="Aucune inscription trouvée." 
+                               TextColor="{StaticResource NeutralLightGray}" 
+                               HorizontalOptions="Center" 
+                               Margin="0,30"/>
                     </CollectionView.EmptyView>
+
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Padding="15" Margin="0,0,0,10" CornerRadius="10" HasShadow="True" BorderColor="Transparent">
-                                <Frame.GestureRecognizers>
+                            <Border Margin="0,0,0,10" 
+                                    Padding="15" 
+                                    StrokeShape="RoundRectangle 12" 
+                                    BackgroundColor="{StaticResource BrandNavyBlue}" 
+                                    StrokeThickness="0">
+                                <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentProfileViewModel}}, Path=GoToGroupCommand}" CommandParameter="{Binding .}"/>
-                                </Frame.GestureRecognizers>
+                                </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="*, Auto">
-                                    <VerticalStackLayout>
-                                        <Label Text="{Binding Name}" FontAttributes="Bold"/>
-                                        <Label Text="{Binding ScheduleDisplay}" FontSize="12" TextColor="Gray"/>
+                                    <VerticalStackLayout VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" 
+                                               FontFamily="OpenSansSemibold" 
+                                               TextColor="{StaticResource NeutralWhite}" 
+                                               FontSize="15"/>
+                                        <Label Text="{Binding ScheduleDisplay}" 
+                                               FontSize="13" 
+                                               TextColor="{StaticResource NeutralLightGray}"/>
                                     </VerticalStackLayout>
-                                    <Label Grid.Column="1" Text="›" FontSize="20" TextColor="LightGray" VerticalOptions="Center"/>
+                                    <Label Grid.Column="1" 
+                                           Text="›" 
+                                           FontSize="24" 
+                                           TextColor="{StaticResource NeutralGray}" 
+                                           VerticalOptions="Center"/>
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </VerticalStackLayout>
 
-
             <Grid IsVisible="{Binding IsPhotosVisible}">
-
-                <Button Text="+" 
-                        Command="{Binding AddPhotoCommand}"
-                        FontSize="30"
-                        TextColor="White"
-                        BackgroundColor="{StaticResource Primary}"
-                        CornerRadius="30"
-                        HeightRequest="60"
-                        WidthRequest="60"
-                        HorizontalOptions="End"
-                        VerticalOptions="End"
-                        Margin="20"
-                        Shadow="{Shadow Brush=Black, Offset='2,4', Opacity=0.4}"/>
-            </Grid>
-
-
-            <Grid IsVisible="{Binding IsPhotosVisible}">
-
                 <ScrollView>
                     <FlexLayout BindableLayout.ItemsSource="{Binding Photos}" 
                                 Wrap="Wrap" 
@@ -120,30 +253,31 @@
                                 Padding="0,0,0,80">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Border StrokeShape="RoundRectangle 12"
-                                        StrokeThickness="1"
-                                        Stroke="LightGray"
-                                        BackgroundColor="#F0F0F0"
+                                <Border StrokeShape="RoundRectangle 10" 
+                                        Stroke="{StaticResource BrandDarkBlue}" 
+                                        StrokeThickness="2" 
+                                        BackgroundColor="{StaticResource BrandNavyBlue}" 
                                         Margin="0,0,10,10"
                                         HorizontalOptions="Start"
                                         VerticalOptions="Start">
-
                                     <Grid>
                                         <Image Source="{Binding FilePath}" 
-                                               Aspect="AspectFit"
+                                               Aspect="AspectFit" 
                                                HeightRequest="150"
                                                HorizontalOptions="Center"
                                                VerticalOptions="Center"/>
 
                                         <ImageButton Source="dotnet_bot.png" 
-                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentProfileViewModel}}, Path=DeletePhotoCommand}"
-                                                     CommandParameter="{Binding .}"
-                                                     HeightRequest="24" WidthRequest="24"
-                                                     HorizontalOptions="End" VerticalOptions="Start"
+                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentProfileViewModel}}, Path=DeletePhotoCommand}" 
+                                                     CommandParameter="{Binding .}" 
+                                                     HeightRequest="28" 
+                                                     WidthRequest="28" 
+                                                     HorizontalOptions="End" 
+                                                     VerticalOptions="Start" 
                                                      Margin="5" 
-                                                     BackgroundColor="Transparent" 
-                                                     CornerRadius="12"
-                                                     Padding="4"/>
+                                                     BackgroundColor="{StaticResource BrandDarkBlue}" 
+                                                     CornerRadius="14" 
+                                                     Padding="6"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -152,9 +286,9 @@
                 </ScrollView>
 
                 <Label Text="Aucune photo." 
-                       TextColor="Gray" 
+                       TextColor="{StaticResource NeutralLightGray}" 
                        HorizontalOptions="Center" 
-                       VerticalOptions="Center"
+                       VerticalOptions="Center" 
                        IsVisible="False">
                     <Label.Triggers>
                         <DataTrigger TargetType="Label" Binding="{Binding Photos.Count}" Value="0">
@@ -164,21 +298,71 @@
                 </Label>
 
                 <Button Text="+" 
-                        Command="{Binding AddPhotoCommand}"
-                        FontSize="30"
-                        TextColor="White"
-                        BackgroundColor="{StaticResource Primary}"
-                        CornerRadius="30"
-                        HeightRequest="60"
-                        WidthRequest="60"
-                        HorizontalOptions="End"
-                        VerticalOptions="End"
-                        Margin="20"
-                        Shadow="{Shadow Brush=Black, Offset='2,4', Opacity=0.4}"/>
+                        Command="{Binding AddPhotoCommand}" 
+                        FontSize="32" 
+                        TextColor="{StaticResource NeutralWhite}" 
+                        BackgroundColor="{StaticResource BrandCoral}" 
+                        CornerRadius="30" 
+                        HeightRequest="60" 
+                        WidthRequest="60" 
+                        HorizontalOptions="End" 
+                        VerticalOptions="End" 
+                        Margin="15"
+                        Shadow="{Shadow Brush=Black, Offset='0,4', Opacity=0.4}"/>
+            </Grid>
+
+            <Grid IsVisible="{Binding IsNotesVisible}">
+                <CollectionView ItemsSource="{Binding Notes}" Margin="0,0,0,80">
+                    <CollectionView.EmptyView>
+                        <Label Text="Aucune note pour le moment." 
+                               TextColor="{StaticResource NeutralLightGray}" 
+                               HorizontalOptions="Center" 
+                               Margin="0,30"/>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,10" 
+                                    Padding="15" 
+                                    StrokeShape="RoundRectangle 12" 
+                                    BackgroundColor="{StaticResource BrandNavyBlue}" 
+                                    StrokeThickness="0">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding Date, StringFormat='{0:dd/MM/yyyy}'}" 
+                                           FontSize="12" 
+                                           TextColor="{StaticResource BrandCoral}" 
+                                           FontFamily="OpenSansSemibold"/>
+
+                                    <Label Text="{Binding Content}" 
+                                           TextColor="{StaticResource NeutralWhite}" 
+                                           FontSize="14" 
+                                           LineBreakMode="WordWrap"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Button Text="+" 
+                        Command="{Binding AddNoteCommand}" 
+                        FontSize="32" 
+                        TextColor="{StaticResource NeutralWhite}" 
+                        BackgroundColor="{StaticResource BrandCoral}" 
+                        CornerRadius="30" 
+                        HeightRequest="60" 
+                        WidthRequest="60" 
+                        HorizontalOptions="End" 
+                        VerticalOptions="End" 
+                        Margin="15"
+                        Shadow="{Shadow Brush=Black, Offset='0,4', Opacity=0.4}"/>
             </Grid>
 
             <VerticalStackLayout IsVisible="{Binding IsStatsVisible}" VerticalOptions="Center">
-                <Label Text="🚧 Stats (A venir)" FontSize="20" TextColor="Gray" HorizontalOptions="Center"/>
+                <Label Text="🚧 Stats (A venir)" 
+                       FontSize="18" 
+                       FontFamily="OpenSansSemibold" 
+                       TextColor="{StaticResource NeutralLightGray}" 
+                       HorizontalOptions="Center"/>
             </VerticalStackLayout>
 
         </Grid>

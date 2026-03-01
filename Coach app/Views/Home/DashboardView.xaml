@@ -5,7 +5,8 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Coach_app.Views.Home.DashboardView"
              Title="{Binding Title}"
-             BackgroundColor="{StaticResource BrandDarkBlue}">
+             BackgroundColor="{StaticResource BrandDarkBlue}"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadSessionsCommand}" />
@@ -14,27 +15,9 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="30">
 
-            <Grid ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" ColumnSpacing="15">
+            <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" ColumnSpacing="15">
 
-                <Border Grid.Column="0"
-                        Stroke="{StaticResource BrandCoral}"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 10"
-                        HeightRequest="40"
-                        WidthRequest="40"
-                        BackgroundColor="{StaticResource BrandNavyBlue}"
-                        IsVisible="{OnPlatform Android=True, iOS=True, WinUI=False, MacCatalyst=False}">
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding OpenMenuCommand}"/>
-                    </Border.GestureRecognizers>
-                    <Label Text="☰" 
-                           TextColor="{StaticResource BrandCoral}" 
-                           FontSize="20" 
-                           HorizontalOptions="Center" 
-                           VerticalOptions="Center"/>
-                </Border>
-
-                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
                     <Label Text="{Binding WelcomeMessage}" 
                            FontSize="24" 
                            FontFamily="OpenSansSemibold" 
@@ -45,7 +28,7 @@
                            FontSize="12"/>
                 </VerticalStackLayout>
 
-                <Border Grid.Column="2"
+                <Border Grid.Column="1"
                         Stroke="{StaticResource BrandCoral}"
                         StrokeThickness="2"
                         StrokeShape="RoundRectangle 30" 
@@ -67,28 +50,43 @@
                     Padding="15">
 
                 <VerticalStackLayout Spacing="15">
-                    <Grid ColumnDefinitions="Auto, *, Auto">
-                        <Button Grid.Column="0" Text="◀" Command="{Binding PreviousDayCommand}" 
-                                BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" 
-                                FontSize="22" HeightRequest="40" WidthRequest="40" Padding="0" BorderColor="Transparent"/>
+
+                    <Grid ColumnDefinitions="40, *, 40">
+
+                        <Border Grid.Column="0" BackgroundColor="Transparent" Stroke="Transparent" HeightRequest="40" WidthRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PreviousDayCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="◀" TextColor="{StaticResource BrandCoral}" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
 
                         <Label Grid.Column="1" Text="{Binding DateDisplay}" 
                                TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold" 
                                FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
 
-                        <Button Grid.Column="2" Text="▶" Command="{Binding NextDayCommand}" 
-                                BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" 
-                                FontSize="22" HeightRequest="40" WidthRequest="40" Padding="0" BorderColor="Transparent"/>
+                        <Border Grid.Column="2" BackgroundColor="Transparent" Stroke="Transparent" HeightRequest="40" WidthRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding NextDayCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="▶" TextColor="{StaticResource BrandCoral}" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
                     </Grid>
 
                     <BoxView HeightRequest="1" Color="{StaticResource BrandDarkBlue}" Opacity="0.3"/>
 
                     <CollectionView ItemsSource="{Binding TodaysSessions}" HeightRequest="120">
+
                         <CollectionView.EmptyView>
-                            <VerticalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,15">
-                                <Label Text="🏖️" FontSize="28" HorizontalOptions="Center" Opacity="0.7"/>
-                                <Label Text="Aucune séance prévue" TextColor="{StaticResource NeutralLightGray}" FontSize="14"/>
-                            </VerticalStackLayout>
+                            <ContentView HorizontalOptions="Fill" VerticalOptions="Fill">
+                                <VerticalStackLayout Spacing="8" VerticalOptions="Center" HorizontalOptions="Center">
+                                    <Label Text="🏖️" FontSize="28" HorizontalOptions="Center" Opacity="0.8"/>
+                                    <Label Text="Pas de cours prévus aujourd'hui" 
+                                           TextColor="{StaticResource NeutralLightGray}" 
+                                           FontFamily="OpenSansSemibold" 
+                                           FontSize="14" 
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </ContentView>
                         </CollectionView.EmptyView>
 
                         <CollectionView.ItemTemplate>

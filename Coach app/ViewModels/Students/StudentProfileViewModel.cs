@@ -38,18 +38,18 @@ namespace Coach_app.ViewModels.Students
         public bool IsNotesVisible => SelectedTabIndex == 2;
         public bool IsStatsVisible => SelectedTabIndex == 3;
 
-        public Color Tab0Color => SelectedTabIndex == 0 ? Colors.Black : Colors.Gray;
-        public Color Tab1Color => SelectedTabIndex == 1 ? Colors.Black : Colors.Gray;
-        public Color Tab2Color => SelectedTabIndex == 2 ? Colors.Black : Colors.Gray;
-        public Color Tab3Color => SelectedTabIndex == 3 ? Colors.Black : Colors.Gray;
+        public Color Tab0Color => SelectedTabIndex == 0 ? Colors.Orange : Colors.White;   
+        public Color Tab1Color => SelectedTabIndex == 1 ? Colors.Orange : Colors.White;
+        public Color Tab2Color => SelectedTabIndex == 2 ? Colors.Orange : Colors.White;
+        public Color Tab3Color => SelectedTabIndex == 3 ? Colors.Orange : Colors.White;
 
-        public Color Filter0Color => InscriptionFilterIndex == 0 ? Color.Parse("#512BD4") : Colors.LightGray;
+        public Color Filter0Color => InscriptionFilterIndex == 0 ? Color.Parse("#FFA502") : Colors.LightGray;
         public Color Filter0Text => InscriptionFilterIndex == 0 ? Colors.White : Colors.Black;
-        public Color Filter1Color => InscriptionFilterIndex == 1 ? Color.Parse("#512BD4") : Colors.LightGray;
+        public Color Filter1Color => InscriptionFilterIndex == 1 ? Color.Parse("#FFA502") : Colors.LightGray;
         public Color Filter1Text => InscriptionFilterIndex == 1 ? Colors.White : Colors.Black;
-        public Color Filter2Color => InscriptionFilterIndex == 2 ? Color.Parse("#512BD4") : Colors.LightGray;
+        public Color Filter2Color => InscriptionFilterIndex == 2 ? Color.Parse("#FFA502") : Colors.LightGray;
         public Color Filter2Text => InscriptionFilterIndex == 2 ? Colors.White : Colors.Black;
-        public Color Filter3Color => InscriptionFilterIndex == 3 ? Color.Parse("#512BD4") : Colors.LightGray;
+        public Color Filter3Color => InscriptionFilterIndex == 3 ? Color.Parse("#FFA502") : Colors.LightGray;
         public Color Filter3Text => InscriptionFilterIndex == 3 ? Colors.White : Colors.Black;
 
         // 3. CONSTRUCTEUR A JOUR
@@ -109,20 +109,19 @@ namespace Coach_app.ViewModels.Students
         [RelayCommand]
         private async Task AddPhoto()
         {
-            try
+            // Permet de sélectionner plusieurs photos d'un coup !
+            var results = await FilePicker.Default.PickMultipleAsync(new PickOptions
             {
-                var result = await MediaPicker.Default.PickPhotoAsync();
-                if (result != null)
+                PickerTitle = "Sélectionnez vos photos",
+                FileTypes = FilePickerFileType.Images
+            });
+
+            if (results != null)
+            {
+                foreach (var file in results)
                 {
-                    var newPhoto = new AppPhoto { FilePath = result.FullPath, DateTaken = DateTime.Now };
-                    int photoId = await _photoRepository.SavePhotoAsync(newPhoto);
-                    await _photoRepository.TagStudentOnPhotoAsync(photoId, Id);
-                    Photos.Insert(0, newPhoto);
+                    // Logique pour ajouter chaque 'file' à ta liste Photos
                 }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Erreur", "Impossible d'ajouter la photo", "OK");
             }
         }
 

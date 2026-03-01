@@ -5,155 +5,139 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Coach_app.Views.Students.StudentDetailView"
              Shell.NavBarIsVisible="False"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource BrandDarkBlue}">
 
-    <Grid RowDefinitions="Auto, *" BackgroundColor="#F5F5F5">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadDataCommand}" />
+    </ContentPage.Behaviors>
 
-        <Frame Grid.Row="0" Padding="15,10" CornerRadius="0" HasShadow="True" BackgroundColor="White" BorderColor="Transparent" ZIndex="1">
-            <Grid ColumnDefinitions="Auto, *, Auto">
-                <ImageButton Grid.Column="0" Source="dotnet_bot.png" 
-                             Command="{Binding CancelCommand}"
-                             HeightRequest="30" WidthRequest="30" 
-                             HorizontalOptions="Start" VerticalOptions="Center">
-                </ImageButton>
+    <Grid RowDefinitions="Auto, *">
 
-                <Label Grid.Column="1" Text="{Binding Title}" 
-                       FontSize="18" FontAttributes="Bold" 
-                       HorizontalOptions="Center" VerticalOptions="Center" 
-                       TextColor="Black"/>
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" Padding="20,20,20,10">
+            <Border Grid.Column="0" Stroke="{StaticResource BrandCoral}" StrokeThickness="1" StrokeShape="RoundRectangle 10" HeightRequest="40" WidthRequest="40" BackgroundColor="{StaticResource BrandNavyBlue}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CancelCommand}" />
+                </Border.GestureRecognizers>
+                <Label Text="✕" TextColor="{StaticResource BrandCoral}" FontSize="20" FontFamily="OpenSansSemibold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
 
-                <Label Grid.Column="2" Text=" " WidthRequest="30"/>
-            </Grid>
-        </Frame>
+            <Label Grid.Column="1" Text="{Binding Title}" FontSize="22" FontFamily="OpenSansSemibold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{StaticResource NeutralWhite}"/>
+
+            <Label Grid.Column="2" Text=" " WidthRequest="40"/>
+        </Grid>
 
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Spacing="20" Padding="20">
+            <VerticalStackLayout Spacing="25" Padding="20">
 
                 <VerticalStackLayout HorizontalOptions="Center" Spacing="10" Margin="0,10,0,0">
-                    <Frame HeightRequest="120" WidthRequest="120" CornerRadius="60" Padding="0" IsClippedToBounds="True" BorderColor="White" HasShadow="False">
-                        <Frame.GestureRecognizers>
+                    <Border HeightRequest="120" WidthRequest="120" StrokeShape="RoundRectangle 60" Stroke="{StaticResource BrandCoral}" StrokeThickness="2" BackgroundColor="{StaticResource BrandNavyBlue}" Padding="0" >
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding PickPhotoCommand}"/>
-                        </Frame.GestureRecognizers>
+                        </Border.GestureRecognizers>
                         <Image Source="{Binding ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill"/>
-                    </Frame>
-                    <Label Text="Toucher pour modifier" FontSize="12" TextColor="{StaticResource Primary}" HorizontalOptions="Center"/>
+                    </Border>
+                    <Label Text="Toucher pour modifier" FontSize="13" TextColor="{StaticResource BrandCoral}" FontFamily="OpenSansSemibold" HorizontalOptions="Center"/>
                 </VerticalStackLayout>
 
-                <Frame Padding="15" CornerRadius="10" BorderColor="Transparent" BackgroundColor="White">
+                <Border Padding="20" StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                     <VerticalStackLayout Spacing="15">
-                        <Label Text="Identité" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Label Text="IDENTITÉ" FontSize="14" FontFamily="OpenSansSemibold" TextColor="{StaticResource BrandCoral}" CharacterSpacing="1"/>
 
-                        <Grid ColumnDefinitions="*,*">
-                            <VerticalStackLayout Grid.Column="0" Margin="0,0,5,0">
-                                <Label Text="Prénom" FontSize="12" TextColor="Black"/>
-                                <Entry Text="{Binding FirstName}" Placeholder="Prénom" FontAttributes="Bold"/>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Prénom" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                                <Entry Text="{Binding FirstName}" Placeholder="Prénom" TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}" FontFamily="OpenSansSemibold"/>
                             </VerticalStackLayout>
-                            <VerticalStackLayout Grid.Column="1" Margin="5,0,0,0">
-                                <Label Text="Nom" FontSize="12" TextColor="Gray"/>
-                                <Entry Text="{Binding LastName}" Placeholder="Nom" FontAttributes="Bold"/>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Nom" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                                <Entry Text="{Binding LastName}" Placeholder="Nom" TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}" FontFamily="OpenSansSemibold"/>
                             </VerticalStackLayout>
                         </Grid>
 
                         <VerticalStackLayout>
-                            <Label Text="Surnom" FontSize="12" TextColor="Gray"/>
-                            <Entry Text="{Binding Nickname}" Placeholder="Surnom (Optionnel)"/>
+                            <Label Text="Surnom" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Entry Text="{Binding Nickname}" Placeholder="Surnom (Optionnel)" TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}"/>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout>
-                            <Label Text="Date de naissance" FontSize="12" TextColor="Gray"/>
-                            <DatePicker Date="{Binding BirthDate}" 
-                                        Format="dd/MM/yyyy"
-                                        MinimumDate="01/01/1950"
-                                        MaximumDate="12/31/2030"
-                                        TextColor="Black"
-                                        FontAttributes="Bold"/>
+                            <Label Text="Date de naissance" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <DatePicker Date="{Binding BirthDate}" Format="dd/MM/yyyy" MinimumDate="01/01/1950" MaximumDate="12/31/2030" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold"/>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout>
-                            <Label Text="Droit à l'image" FontSize="12" TextColor="Gray"/>
-                            <Border Stroke="LightGray" StrokeThickness="1" Padding="5" StrokeShape="RoundRectangle 5">
-                                <Picker ItemsSource="{Binding ConsentOptions}" 
-                                        SelectedItem="{Binding PhotoConsent}"
-                                        Title="Choisir l'autorisation"/>
+                            <Label Text="Droit à l'image" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Border Stroke="{StaticResource BrandDarkBlue}" StrokeThickness="1" Padding="5,0" StrokeShape="RoundRectangle 8" BackgroundColor="Transparent" Margin="0,5,0,0">
+                                <Picker ItemsSource="{Binding ConsentOptions}" SelectedItem="{Binding PhotoConsent}" Title="Choisir l'autorisation" TextColor="{StaticResource NeutralWhite}" TitleColor="{StaticResource NeutralGray}"/>
                             </Border>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout>
-                            <Label Text="Niveau" FontSize="12" TextColor="Gray"/>
-                            <Picker ItemsSource="{Binding Levels}" SelectedItem="{Binding SelectedLevel}" Title="Choisir un niveau"/>
+                            <Label Text="Niveau" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Border Stroke="{StaticResource BrandDarkBlue}" StrokeThickness="1" Padding="5,0" StrokeShape="RoundRectangle 8" BackgroundColor="Transparent" Margin="0,5,0,0">
+                                <Picker ItemsSource="{Binding Levels}" SelectedItem="{Binding SelectedLevel}" Title="Choisir un niveau" TextColor="{StaticResource NeutralWhite}" TitleColor="{StaticResource NeutralGray}"/>
+                            </Border>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <Frame Padding="15" CornerRadius="10" BorderColor="Transparent" BackgroundColor="White">
+                <Border Padding="20" StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                     <VerticalStackLayout Spacing="15">
-                        <Label Text="Contact Personnel" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Label Text="CONTACT PERSONNEL" FontSize="14" FontFamily="OpenSansSemibold" TextColor="{StaticResource BrandCoral}" CharacterSpacing="1"/>
 
                         <VerticalStackLayout>
-                            <Label Text="Mobile Élève" FontSize="12" TextColor="Gray"/>
-                            <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" Placeholder="06..." />
+                            <Label Text="Mobile Élève" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" Placeholder="06..." TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}"/>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout>
-                            <Label Text="Email" FontSize="12" TextColor="Gray"/>
-                            <Entry Text="{Binding Email}" Keyboard="Email" Placeholder="exemple@email.com" />
+                            <Label Text="Email" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Entry Text="{Binding Email}" Keyboard="Email" Placeholder="exemple@email.com" TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}"/>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <VerticalStackLayout Spacing="10">
-                    <Grid ColumnDefinitions="*, Auto">
-                        <Label Text="Contacts d'Urgence / Parents" FontSize="14" FontAttributes="Bold" TextColor="Red" VerticalOptions="Center"/>
-                        <Button Grid.Column="1" Text="+ Ajouter" Command="{Binding AddContactCommand}" 
-                                HeightRequest="35" FontSize="11" CornerRadius="17" 
-                                BackgroundColor="#FFEEEE" TextColor="Red" Padding="15,0"/>
+                <VerticalStackLayout Spacing="15">
+                    <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0" Text="CONTACTS D'URGENCE" FontSize="14" FontFamily="OpenSansSemibold" TextColor="{StaticResource BrandOrange}" VerticalOptions="Center" CharacterSpacing="1"/>
+                        <Button Grid.Column="1" Text="+ Ajouter" Command="{Binding AddContactCommand}" HeightRequest="35" FontSize="12" FontFamily="OpenSansSemibold" CornerRadius="8" BackgroundColor="{StaticResource BrandNavyBlue}" TextColor="{StaticResource BrandOrange}" Padding="15,0"/>
                     </Grid>
 
                     <StackLayout BindableLayout.ItemsSource="{Binding Contacts}" Spacing="10">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Frame Padding="15" CornerRadius="10" BorderColor="Transparent" BackgroundColor="White">
+                                <Border Padding="15" StrokeShape="RoundRectangle 12" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                                     <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, Auto" RowSpacing="10">
 
-                                        <Button Grid.Row="0" Grid.Column="1" Text="✕" 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentDetailViewModel}}, Path=RemoveContactCommand}"
-                                                CommandParameter="{Binding .}"
-                                                BackgroundColor="Transparent" TextColor="Gray" 
-                                                HeightRequest="30" WidthRequest="30" Padding="0"/>
+                                        <Button Grid.Row="0" Grid.Column="1" Text="✕" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentDetailViewModel}}, Path=RemoveContactCommand}" CommandParameter="{Binding .}" BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" HeightRequest="35" WidthRequest="35" Padding="0" VerticalOptions="Start"/>
 
                                         <VerticalStackLayout Grid.Row="0" Grid.Column="0">
-                                            <Label Text="Lien (Qui est-ce ?)" FontSize="11" TextColor="Gray"/>
-                                            <Entry Text="{Binding Relation}" Placeholder="Ex: Mère, Père, Voisin..." FontAttributes="Bold" TextColor="Red"/>
+                                            <Label Text="Lien (Qui est-ce ?)" FontSize="11" TextColor="{StaticResource NeutralLightGray}"/>
+                                            <Entry Text="{Binding Relation}" Placeholder="Ex: Mère, Père, Voisin..." FontFamily="OpenSansSemibold" TextColor="{StaticResource BrandOrange}" PlaceholderColor="{StaticResource NeutralGray}"/>
                                         </VerticalStackLayout>
 
-                                        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,*">
-                                            <VerticalStackLayout Grid.Column="0" Margin="0,0,5,0">
-                                                <Label Text="Prénom" FontSize="11" TextColor="Gray"/>
-                                                <Entry Text="{Binding FirstName}" Placeholder="Prénom"/>
+                                        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="15">
+                                            <VerticalStackLayout Grid.Column="0">
+                                                <Label Text="Prénom" FontSize="11" TextColor="{StaticResource NeutralLightGray}"/>
+                                                <Entry Text="{Binding FirstName}" Placeholder="Prénom" TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}"/>
                                             </VerticalStackLayout>
-                                            <VerticalStackLayout Grid.Column="1" Margin="5,0,0,0">
-                                                <Label Text="Nom" FontSize="11" TextColor="Gray"/>
-                                                <Entry Text="{Binding LastName}" Placeholder="Nom"/>
+                                            <VerticalStackLayout Grid.Column="1">
+                                                <Label Text="Nom" FontSize="11" TextColor="{StaticResource NeutralLightGray}"/>
+                                                <Entry Text="{Binding LastName}" Placeholder="Nom" TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}"/>
                                             </VerticalStackLayout>
                                         </Grid>
 
                                         <VerticalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-                                            <Label Text="Téléphone" FontSize="11" TextColor="Gray"/>
-                                            <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" Placeholder="Numéro d'urgence..."/>
+                                            <Label Text="Téléphone" FontSize="11" TextColor="{StaticResource NeutralLightGray}"/>
+                                            <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" Placeholder="Numéro d'urgence..." TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}"/>
                                         </VerticalStackLayout>
-
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </StackLayout>
 
-                    <Label Text="Aucun contact d'urgence."
-                           HorizontalOptions="Center" 
-                           TextColor="Gray" 
-                           FontSize="12" 
-                           Margin="0,10"
-                           IsVisible="False">
+                    <Label Text="Aucun contact d'urgence." HorizontalOptions="Center" TextColor="{StaticResource NeutralLightGray}" FontSize="13" Margin="0,5" IsVisible="False">
                         <Label.Triggers>
                             <DataTrigger TargetType="Label" Binding="{Binding Contacts.Count}" Value="0">
                                 <Setter Property="IsVisible" Value="True" />
@@ -162,43 +146,35 @@
                     </Label>
                 </VerticalStackLayout>
 
-                <VerticalStackLayout Spacing="10" IsVisible="{Binding IsEditMode}">
-                    <Label Text="Suivi &amp; Notes" FontSize="14" FontAttributes="Bold" TextColor="Black"/>
+                <VerticalStackLayout Spacing="15" IsVisible="{Binding IsEditMode}">
+                    <Label Text="SUIVI &amp; NOTES" FontSize="14" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}" CharacterSpacing="1"/>
 
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
-                        <Entry Grid.Column="0" Text="{Binding NewNoteText}" Placeholder="Ajouter une note..." BackgroundColor="White"/>
-                        <Button Grid.Column="1" Text="Envoyer" Command="{Binding AddNoteCommand}" BackgroundColor="Black" TextColor="White" CornerRadius="10"/>
+                        <Entry Grid.Column="0" Text="{Binding NewNoteText}" Placeholder="Ajouter une note..." TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}" BackgroundColor="{StaticResource BrandNavyBlue}"/>
+                        <Button Grid.Column="1" Text="Envoyer" Command="{Binding AddNoteCommand}" BackgroundColor="{StaticResource BrandCoral}" TextColor="{StaticResource NeutralWhite}" CornerRadius="10" FontFamily="OpenSansSemibold"/>
                     </Grid>
 
-                    <StackLayout BindableLayout.ItemsSource="{Binding Notes}" Spacing="5">
+                    <StackLayout BindableLayout.ItemsSource="{Binding Notes}" Spacing="10">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Frame Padding="10" BackgroundColor="#FFFBE6" BorderColor="Transparent" CornerRadius="5">
+                                <Border Padding="15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeShape="RoundRectangle 10" StrokeThickness="0">
                                     <Grid ColumnDefinitions="*, Auto">
-                                        <VerticalStackLayout Grid.Column="0">
-                                            <Label Text="{Binding Content}" TextColor="Black" FontSize="14"/>
-                                            <Label Text="{Binding Date, StringFormat='{0:dd/MM/yyyy}'}" TextColor="Gray" FontSize="10"/>
+                                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                            <Label Text="{Binding Date, StringFormat='{0:dd/MM/yyyy}'}" TextColor="{StaticResource BrandCoral}" FontSize="11" FontFamily="OpenSansSemibold"/>
+                                            <Label Text="{Binding Content}" TextColor="{StaticResource NeutralWhite}" FontSize="14" LineBreakMode="WordWrap"/>
                                         </VerticalStackLayout>
-                                        <Button Grid.Column="1" Text="🗑️" 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentDetailViewModel}}, Path=DeleteNoteCommand}"
-                                                CommandParameter="{Binding .}"
-                                                BackgroundColor="Transparent" TextColor="Red" HeightRequest="30"/>
+                                        <Button Grid.Column="1" Text="🗑️" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StudentDetailViewModel}}, Path=DeleteNoteCommand}" CommandParameter="{Binding .}" BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" HeightRequest="35" FontSize="16"/>
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </StackLayout>
                 </VerticalStackLayout>
 
-                <VerticalStackLayout Spacing="10" Margin="0,10,0,30">
-                    <Button Text="Enregistrer tout" Command="{Binding SaveCommand}" 
-                            BackgroundColor="{StaticResource Primary}" TextColor="White" 
-                            CornerRadius="25" HeightRequest="50" FontAttributes="Bold"/>
+                <VerticalStackLayout Spacing="15" Margin="0,20,0,40">
+                    <Button Text="Enregistrer tout" Command="{Binding SaveCommand}" BackgroundColor="{StaticResource BrandCoral}" TextColor="{StaticResource NeutralWhite}" CornerRadius="25" HeightRequest="55" FontFamily="OpenSansSemibold" FontSize="16"/>
 
-                    <Button Text="Supprimer l'élève" Command="{Binding DeleteCommand}" 
-                            IsVisible="{Binding IsEditMode}"
-                            BackgroundColor="#FFEEEE" TextColor="Red" 
-                            CornerRadius="25" HeightRequest="45"/>
+                    <Button Text="Supprimer l'élève" Command="{Binding DeleteCommand}" IsVisible="{Binding IsEditMode}" BackgroundColor="Transparent" BorderColor="{StaticResource BrandCoral}" BorderWidth="1" TextColor="{StaticResource BrandCoral}" CornerRadius="25" HeightRequest="50" FontFamily="OpenSansSemibold"/>
                 </VerticalStackLayout>
 
             </VerticalStackLayout>
