@@ -92,6 +92,21 @@ namespace Coach_app.ViewModels.Groups
         }
 
         [RelayCommand]
+        private async Task GoToStudentProfile(Student student)
+        {
+            if (student == null) return;
+
+            // On crée un colis appelé "Student" qui contient notre élève
+            var navigationParameter = new Dictionary<string, object>
+    {
+        { "Student", student }
+    };
+
+            // On l'envoie vers la page profil
+            await Shell.Current.GoToAsync(nameof(StudentProfileView), navigationParameter);
+        }
+
+        [RelayCommand]
         private async Task EditGroup()
         {
             if (CurrentGroup != null)

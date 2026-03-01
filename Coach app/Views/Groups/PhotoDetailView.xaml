@@ -4,57 +4,41 @@
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Groups"
              x:Class="Coach_app.Views.Groups.PhotoDetailView"
              Title="Détail Photo"
-             BackgroundColor="Black">
+             BackgroundColor="Black"
+             Shell.NavBarIsVisible="False">
 
     <Grid>
-        <Image Source="{Binding ImagePath}" 
-               Aspect="AspectFit" 
-               HorizontalOptions="Fill" 
-               VerticalOptions="Fill"/>
+        <Image Source="{Binding ImagePath}" Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill" ZIndex="1"/>
 
-        <Button Text="..." 
-                Command="{Binding ShowOptionsCommand}"
-                FontSize="24"
-                FontAttributes="Bold"
-                BackgroundColor="#80000000" 
-                TextColor="White"
-                CornerRadius="25"
-                HeightRequest="50"
-                WidthRequest="50"
-                Padding="0"
-                Margin="0,10,10,0"
-                HorizontalOptions="End"
-                VerticalOptions="Start"/>
-        <Grid IsVisible="{Binding IsTaggingVisible}" BackgroundColor="#AA000000" VerticalOptions="Fill" HorizontalOptions="Fill">
+        <Button Text="⋮" Command="{Binding ShowOptionsCommand}" FontSize="24" FontFamily="OpenSansSemibold" BackgroundColor="#80000000" TextColor="{StaticResource NeutralWhite}" CornerRadius="25" HeightRequest="50" WidthRequest="50" Padding="0" Margin="0,15,15,0" HorizontalOptions="End" VerticalOptions="Start" ZIndex="2"/>
 
+        <Grid IsVisible="{Binding IsTaggingVisible}" BackgroundColor="#CC000000" VerticalOptions="Fill" HorizontalOptions="Fill" ZIndex="3">
             <Grid.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding HideTaggingCommand}"/>
             </Grid.GestureRecognizers>
 
-            <Frame VerticalOptions="End" CornerRadius="20" BackgroundColor="White" Padding="20" Margin="10,10,10,20" HasShadow="True">
+            <Border VerticalOptions="End" StrokeShape="RoundRectangle 20,20,0,0" BackgroundColor="{StaticResource BrandNavyBlue}" Padding="20,25,20,40" StrokeThickness="0">
                 <VerticalStackLayout Spacing="15">
 
                     <Grid ColumnDefinitions="*, Auto">
-                        <Label Text="Qui est sur cette photo ?" FontAttributes="Bold" FontSize="16" TextColor="Black" VerticalOptions="Center"/>
-                        <Button Text="✕" Command="{Binding HideTaggingCommand}" BackgroundColor="Transparent" TextColor="Gray" Grid.Column="1"/>
+                        <Label Text="Qui est sur cette photo ?" FontFamily="OpenSansSemibold" FontSize="16" TextColor="{StaticResource NeutralWhite}" VerticalOptions="Center"/>
+                        <Button Text="✕" Command="{Binding HideTaggingCommand}" BackgroundColor="Transparent" TextColor="{StaticResource NeutralLightGray}" Grid.Column="1" FontSize="18" Padding="0"/>
                     </Grid>
 
-                    <CollectionView ItemsSource="{Binding Students}" HeightRequest="200">
+                    <CollectionView ItemsSource="{Binding Students}" HeightRequest="250" Margin="0,10">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Grid ColumnDefinitions="Auto, *" Padding="5">
-                                    <CheckBox IsChecked="{Binding IsTagged}" Grid.Column="0" Color="{StaticResource Primary}"/>
-                                    <Label Text="{Binding Name}" VerticalOptions="Center" Grid.Column="1" TextColor="Black"/>
+                                <Grid ColumnDefinitions="Auto, *" Padding="5,10">
+                                    <CheckBox IsChecked="{Binding IsTagged}" Grid.Column="0" Color="{StaticResource BrandCoral}"/>
+                                    <Label Text="{Binding Name}" VerticalOptions="Center" Grid.Column="1" TextColor="{StaticResource NeutralWhite}" FontSize="15" Margin="10,0,0,0"/>
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
-                    <Button Text="Enregistrer" Command="{Binding SaveTagsCommand}" 
-                            BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="10"/>
+                    <Button Text="Enregistrer" Command="{Binding SaveTagsCommand}" BackgroundColor="{StaticResource BrandCoral}" TextColor="{StaticResource NeutralWhite}" CornerRadius="12" HeightRequest="50" FontFamily="OpenSansSemibold"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
         </Grid>
-
     </Grid>
 </ContentPage>

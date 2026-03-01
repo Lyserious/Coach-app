@@ -5,157 +5,120 @@
              x:Class="Coach_app.Views.Groups.SessionDetailView"
              x:Name="SessionPage"
              Title="{Binding GroupName}"
-             BackgroundColor="#F5F5F5">
+             BackgroundColor="{StaticResource BrandDarkBlue}"
+             Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto, *">
 
-        <VerticalStackLayout Grid.Row="0" BackgroundColor="White" Shadow="{Shadow Brush=Black, Offset='0,2', Opacity=0.1}">
-            <Grid ColumnDefinitions="*, Auto" Padding="20,10">
-                <VerticalStackLayout>
-                    <Label Text="{Binding DateDisplay}" FontSize="18" FontAttributes="Bold" TextColor="Black"/>
-                    <Label Text="{Binding GroupName}" FontSize="12" TextColor="Gray"/>
+        <VerticalStackLayout Grid.Row="0" BackgroundColor="{StaticResource BrandNavyBlue}">
+            <Grid ColumnDefinitions="*, Auto" Padding="20,20,20,10">
+                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                    <Label Text="{Binding DateDisplay}" FontSize="18" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}"/>
+                    <Label Text="{Binding GroupName}" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
                 </VerticalStackLayout>
-                <Button Grid.Column="1" Text="💾" Command="{Binding SavePerformancesCommand}" 
-                        IsVisible="{Binding IsPerformanceVisible}" BackgroundColor="Transparent" TextColor="Black"/>
+                <Button Grid.Column="1" Text="💾" Command="{Binding SavePerformancesCommand}" IsVisible="{Binding IsPerformanceVisible}" BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" FontSize="20" Padding="0"/>
             </Grid>
 
-            <Grid ColumnDefinitions="*,*,*">
-                <Button Grid.Column="0" Text="Programme" Command="{Binding SetTabCommand}" CommandParameter="0" 
-                        BackgroundColor="Transparent" TextColor="{Binding TabProgramColor}" FontAttributes="Bold"/>
-                <Button Grid.Column="1" Text="Performances" Command="{Binding SetTabCommand}" CommandParameter="1" 
-                        BackgroundColor="Transparent" TextColor="{Binding TabPerfColor}" FontAttributes="Bold"/>
-                <Button Grid.Column="2" Text="Appel" Command="{Binding SetTabCommand}" CommandParameter="2" 
-                        BackgroundColor="Transparent" TextColor="{Binding TabAttendanceColor}" FontAttributes="Bold"/>
-
-                <BoxView Grid.Column="{Binding CurrentTab}" VerticalOptions="End" HeightRequest="3" Color="Black"/>
+            <Grid ColumnDefinitions="*,*,*" Margin="0,10,0,0">
+                <Button Grid.Column="0" Text="Programme" Command="{Binding SetTabCommand}" CommandParameter="0" BackgroundColor="Transparent" TextColor="{Binding TabProgramColor}" FontFamily="OpenSansSemibold" FontSize="12"/>
+                <Button Grid.Column="1" Text="Performances" Command="{Binding SetTabCommand}" CommandParameter="1" BackgroundColor="Transparent" TextColor="{Binding TabPerfColor}" FontFamily="OpenSansSemibold" FontSize="12"/>
+                <Button Grid.Column="2" Text="Appel" Command="{Binding SetTabCommand}" CommandParameter="2" BackgroundColor="Transparent" TextColor="{Binding TabAttendanceColor}" FontFamily="OpenSansSemibold" FontSize="12"/>
+                <BoxView Grid.Column="{Binding CurrentTab}" VerticalOptions="End" HeightRequest="3" Color="{StaticResource BrandCoral}"/>
             </Grid>
         </VerticalStackLayout>
 
         <Grid Grid.Row="1" IsVisible="{Binding IsProgramVisible}">
             <Grid RowDefinitions="Auto, *, Auto">
-
-                <Frame Grid.Row="0" Margin="10,10,10,0" Padding="10" BackgroundColor="White" CornerRadius="10" BorderColor="Transparent">
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Objectifs / Description" FontSize="10" TextColor="Gray" FontAttributes="Bold"/>
-                        <Editor Text="{Binding SessionDescription}" 
-                                Placeholder="Description de la séance..." 
-                                AutoSize="TextChanges" 
-                                MaximumHeightRequest="100"
-                                FontSize="14"/>
-                        <Button Text="Enregistrer le texte" 
-                                Command="{Binding SaveDescriptionCommand}" 
-                                FontSize="10" 
-                                HeightRequest="30" 
-                                Padding="0"
-                                BackgroundColor="#EEE" 
-                                TextColor="Black" 
-                                HorizontalOptions="End"
-                                CornerRadius="5"/>
+                <Border Grid.Row="0" Margin="15,15,15,0" Padding="15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeShape="RoundRectangle 12" StrokeThickness="0">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="OBJECTIFS / DESCRIPTION" FontSize="11" TextColor="{StaticResource BrandOrange}" FontFamily="OpenSansSemibold"/>
+                        <Editor Text="{Binding SessionDescription}" Placeholder="Description de la séance..." AutoSize="TextChanges" MaximumHeightRequest="100" FontSize="14" TextColor="{StaticResource NeutralWhite}" PlaceholderColor="{StaticResource NeutralGray}" BackgroundColor="Transparent"/>
+                        <Button Text="Enregistrer le texte" Command="{Binding SaveDescriptionCommand}" FontSize="11" HeightRequest="30" Padding="15,0" BackgroundColor="{StaticResource BrandDarkBlue}" TextColor="{StaticResource NeutralLightGray}" HorizontalOptions="End" CornerRadius="8"/>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <CollectionView Grid.Row="1" ItemsSource="{Binding SessionExercises}" Margin="10">
+                <CollectionView Grid.Row="1" ItemsSource="{Binding SessionExercises}" Margin="15,10">
                     <CollectionView.EmptyView>
-                        <Label Text="Aucun exercice" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Gray"/>
+                        <Label Text="Aucun exercice ajouté." HorizontalOptions="Center" VerticalOptions="Center" TextColor="{StaticResource NeutralLightGray}"/>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Margin="0,5" Padding="15" CornerRadius="10" BackgroundColor="White" BorderColor="Transparent">
+                            <Border Margin="0,5" Padding="15" StrokeShape="RoundRectangle 12" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                                 <Grid ColumnDefinitions="*, Auto">
-                                    <VerticalStackLayout Spacing="2">
-                                        <Label Text="{Binding Exercise.Name}" FontAttributes="Bold" TextColor="Black"/>
-                                        <Label Text="{Binding Exercise.ScoringType}" FontSize="10" TextColor="Black"/>
-                                        <HorizontalStackLayout Spacing="5">
-                                            <Entry Text="{Binding Sets}" Placeholder="Sets" WidthRequest="40" FontSize="14" HorizontalTextAlignment="Center"/>
-                                            <Label Text="x" VerticalOptions="Center"/>
-                                            <Entry Text="{Binding Reps}" Placeholder="Reps" WidthRequest="40" FontSize="14" HorizontalTextAlignment="Center"/>
-                                            <Entry Text="{Binding Weight}" Placeholder="Kg" WidthRequest="40" FontSize="14" HorizontalTextAlignment="Center"/>
+                                    <VerticalStackLayout Spacing="5">
+                                        <Label Text="{Binding Exercise.Name}" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}" FontSize="15"/>
+                                        <Label Text="{Binding Exercise.ScoringType}" FontSize="11" TextColor="{StaticResource NeutralLightGray}"/>
+                                        <HorizontalStackLayout Spacing="8" Margin="0,5,0,0">
+                                            <Entry Text="{Binding Sets}" Placeholder="Sets" WidthRequest="45" FontSize="14" HorizontalTextAlignment="Center" TextColor="{StaticResource NeutralWhite}" BackgroundColor="{StaticResource BrandDarkBlue}"/>
+                                            <Label Text="x" VerticalOptions="Center" TextColor="{StaticResource NeutralGray}"/>
+                                            <Entry Text="{Binding Reps}" Placeholder="Reps" WidthRequest="45" FontSize="14" HorizontalTextAlignment="Center" TextColor="{StaticResource NeutralWhite}" BackgroundColor="{StaticResource BrandDarkBlue}"/>
+                                            <Entry Text="{Binding Weight}" Placeholder="Kg" WidthRequest="45" FontSize="14" HorizontalTextAlignment="Center" TextColor="{StaticResource NeutralWhite}" BackgroundColor="{StaticResource BrandDarkBlue}"/>
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
-
-                                    <VerticalStackLayout Grid.Column="1" Spacing="5">
-                                        <Button Text="✕" Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.DeleteExerciseCommand}" CommandParameter="{Binding .}" 
-                                                BackgroundColor="#FFEBEE" TextColor="Red" HeightRequest="30" WidthRequest="30" Padding="0" CornerRadius="15"/>
-                                        <ImageButton Source="dotnet_bot.png" Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.UpdateExerciseCommand}" CommandParameter="{Binding .}" HeightRequest="25" WidthRequest="25"/>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center">
+                                        <Button Text="✕" Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.DeleteExerciseCommand}" CommandParameter="{Binding .}" BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" HeightRequest="35" WidthRequest="35" Padding="0"/>
                                     </VerticalStackLayout>
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Grid Grid.Row="2" ColumnDefinitions="*, Auto" Padding="20" ColumnSpacing="10">
-                    <Button Grid.Column="0" Text="+ Ajouter Exercice" Command="{Binding AddExerciseCommand}" BackgroundColor="Black" TextColor="White" CornerRadius="10"/>
-                    <Button Grid.Column="1" Text="📥" Command="{Binding ImportTemplateCommand}" BackgroundColor="White" TextColor="Black" BorderColor="Black" BorderWidth="1" WidthRequest="50" CornerRadius="10"/>
+                <Grid Grid.Row="2" ColumnDefinitions="*, Auto" Padding="15" ColumnSpacing="15">
+                    <Button Grid.Column="0" Text="+ Ajouter Exercice" Command="{Binding AddExerciseCommand}" BackgroundColor="{StaticResource BrandCoral}" TextColor="{StaticResource NeutralWhite}" CornerRadius="12" FontFamily="OpenSansSemibold"/>
+                    <Button Grid.Column="1" Text="📥" Command="{Binding ImportTemplateCommand}" BackgroundColor="{StaticResource BrandNavyBlue}" TextColor="{StaticResource NeutralWhite}" WidthRequest="50" CornerRadius="12"/>
                 </Grid>
             </Grid>
         </Grid>
 
         <Grid Grid.Row="1" IsVisible="{Binding IsPerformanceVisible}" RowDefinitions="Auto, *">
-
-            <CollectionView Grid.Row="0" ItemsSource="{Binding SessionExercises}" 
-                            HeightRequest="60" 
-                            SelectionMode="Single"
-                            SelectedItem="{Binding SelectedExerciseForPerf, Mode=TwoWay}"
-                            HorizontalScrollBarVisibility="Never">
+            <CollectionView Grid.Row="0" ItemsSource="{Binding SessionExercises}" HeightRequest="65" SelectionMode="Single" SelectedItem="{Binding SelectedExerciseForPerf, Mode=TwoWay}" HorizontalScrollBarVisibility="Never" Margin="0,5">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border StrokeShape="RoundRectangle 20" Stroke="Black" StrokeThickness="1" 
-                                BackgroundColor="White" Padding="15,5" Margin="5,10">
+                        <Border StrokeShape="RoundRectangle 20" StrokeThickness="0" BackgroundColor="{StaticResource BrandNavyBlue}" Padding="20,0" Margin="10,5">
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal" />
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="Black" />
-                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="BackgroundColor" Value="{StaticResource BrandCoral}" />
                                         </VisualState.Setters>
                                     </VisualState>
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
-                            <Label Text="{Binding Exercise.Name}" VerticalOptions="Center" FontAttributes="Bold" 
-                                   TextColor="{Binding Source={RelativeSource AncestorType={x:Type Border}}, Path=BackgroundColor, Converter={StaticResource ColorToInverseConverter}}"/>
+                            <Label Text="{Binding Exercise.Name}" VerticalOptions="Center" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}"/>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding StudentPerformances}" Margin="10,0">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding StudentPerformances}" Margin="15,0">
                 <CollectionView.EmptyView>
-                    <Label Text="Sélectionnez un exercice ci-dessus" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Gray"/>
+                    <Label Text="Sélectionnez un exercice ci-dessus" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{StaticResource NeutralLightGray}"/>
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Margin="0,5" Padding="10" CornerRadius="12" BackgroundColor="White" HasShadow="True">
+                        <Border Margin="0,5" Padding="15" StrokeShape="RoundRectangle 12" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                             <Grid ColumnDefinitions="Auto, *, Auto">
-                                <Image Grid.Column="0" Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
-                                       Aspect="AspectFill" HeightRequest="45" WidthRequest="45" Margin="0,0,10,0">
-                                    <Image.Clip>
-                                        <EllipseGeometry Center="22.5,22.5" RadiusX="22.5" RadiusY="22.5"/>
-                                    </Image.Clip>
-                                </Image>
+                                <Border Grid.Column="0" HeightRequest="45" WidthRequest="45" StrokeShape="RoundRectangle 22" StrokeThickness="0" Margin="0,0,15,0" VerticalOptions="Center">
+                                    <Image Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill"/>
+                                </Border>
+                                <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}"/>
 
-                                <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center" FontAttributes="Bold" TextColor="#333"/>
-
-                                <Grid Grid.Column="2" WidthRequest="120">
-
+                                <Grid Grid.Column="2" WidthRequest="130">
                                     <Grid IsVisible="{Binding IsNumeric}" ColumnDefinitions="Auto, *, Auto">
-                                        <Button Grid.Column="0" Text="-" Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.DecrementScoreCommand}" CommandParameter="{Binding .}" 
-                                                HeightRequest="35" WidthRequest="35" Padding="0" BackgroundColor="#EEE" TextColor="Black" CornerRadius="5"/>
-                                        <Entry Grid.Column="1" Text="{Binding ValueDisplay}" HorizontalTextAlignment="Center" Keyboard="Numeric" BackgroundColor="Transparent"/>
-                                        <Button Grid.Column="2" Text="+" Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.IncrementScoreCommand}" CommandParameter="{Binding .}" 
-                                                HeightRequest="35" WidthRequest="35" Padding="0" BackgroundColor="#EEE" TextColor="Black" CornerRadius="5"/>
+                                        <Button Grid.Column="0" Text="-" Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.DecrementScoreCommand}" CommandParameter="{Binding .}" HeightRequest="35" WidthRequest="35" Padding="0" BackgroundColor="{StaticResource BrandDarkBlue}" TextColor="{StaticResource NeutralWhite}" CornerRadius="8"/>
+                                        <Entry Grid.Column="1" Text="{Binding ValueDisplay}" HorizontalTextAlignment="Center" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="{StaticResource NeutralWhite}"/>
+                                        <Button Grid.Column="2" Text="+" Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.IncrementScoreCommand}" CommandParameter="{Binding .}" HeightRequest="35" WidthRequest="35" Padding="0" BackgroundColor="{StaticResource BrandDarkBlue}" TextColor="{StaticResource NeutralWhite}" CornerRadius="8"/>
                                     </Grid>
-
-                                    <Switch IsToggled="{Binding IsCompleted}" IsVisible="{Binding IsCompletion}" HorizontalOptions="End" OnColor="{StaticResource Primary}"/>
-
-                                    <Entry Text="{Binding ValueDisplay}" Placeholder="Niveau" IsVisible="{Binding IsLevel}" HorizontalOptions="Fill"/>
+                                    <Switch IsToggled="{Binding IsCompleted}" IsVisible="{Binding IsCompletion}" HorizontalOptions="End" OnColor="{StaticResource BrandCoral}"/>
+                                    <Entry Text="{Binding ValueDisplay}" Placeholder="Niveau" IsVisible="{Binding IsLevel}" HorizontalOptions="Fill" TextColor="{StaticResource NeutralWhite}"/>
                                 </Grid>
                             </Grid>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
@@ -163,28 +126,26 @@
 
         <Grid Grid.Row="1" IsVisible="{Binding IsAttendanceVisible}">
             <Grid RowDefinitions="*, Auto">
-                <CollectionView Grid.Row="0" ItemsSource="{Binding AttendanceList}" Margin="10">
+                <CollectionView Grid.Row="0" ItemsSource="{Binding AttendanceList}" Margin="15,10">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Padding="10" Margin="0,5" CornerRadius="10" BackgroundColor="White">
+                            <Border Padding="15" Margin="0,5" StrokeShape="RoundRectangle 12" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                                 <Grid ColumnDefinitions="Auto, *, Auto">
-                                    <Image Grid.Column="0" Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill" HeightRequest="50" WidthRequest="50" Margin="0,0,10,0"/>
+                                    <Border Grid.Column="0" HeightRequest="45" WidthRequest="45" StrokeShape="RoundRectangle 22" StrokeThickness="0" Margin="0,0,15,0">
+                                        <Image Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill"/>
+                                    </Border>
                                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                        <Label Text="{Binding DisplayName}" FontAttributes="Bold" TextColor="Black"/>
+                                        <Label Text="{Binding DisplayName}" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}" FontSize="15"/>
                                     </VerticalStackLayout>
-                                    <Button Grid.Column="2" Text="{Binding Status}" 
-                                            Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.CycleStatusCommand}" 
-                                            CommandParameter="{Binding .}" 
-                                            HeightRequest="40" FontSize="12" CornerRadius="10" 
-                                            BackgroundColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}" TextColor="Black"/>
+
+                                    <Button Grid.Column="2" Text="{Binding Status}" Command="{Binding Source={x:Reference SessionPage}, Path=BindingContext.CycleStatusCommand}" CommandParameter="{Binding .}" HeightRequest="35" FontSize="11" CornerRadius="8" BackgroundColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold" Padding="15,0"/>
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                <Button Grid.Row="1" Text="Enregistrer Appel" Command="{Binding SaveAttendanceCommand}" BackgroundColor="Black" TextColor="White" Margin="20" CornerRadius="25"/>
+                <Button Grid.Row="1" Text="Enregistrer Appel" Command="{Binding SaveAttendanceCommand}" BackgroundColor="{StaticResource BrandCoral}" TextColor="{StaticResource NeutralWhite}" Margin="20" CornerRadius="25" HeightRequest="50" FontFamily="OpenSansSemibold"/>
             </Grid>
         </Grid>
-
     </Grid>
 </ContentPage>

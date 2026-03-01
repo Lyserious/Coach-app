@@ -3,94 +3,153 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Coach_app.ViewModels.Groups"
              x:Class="Coach_app.Views.Groups.GroupDetailView"
-             Title="{Binding TitleText}">
+             Title="{Binding TitleText}"
+             BackgroundColor="{StaticResource BrandDarkBlue}"
+             Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="*, Auto">
 
-        <ScrollView Grid.Row="0" Padding="20">
-            <VerticalStackLayout Spacing="20">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="20" Padding="20">
+
+                <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" Margin="0,0,0,10">
+                    <Label Grid.Column="0" 
+                           Text="{Binding TitleText}" 
+                           FontSize="24" 
+                           FontFamily="OpenSansSemibold" 
+                           TextColor="{StaticResource NeutralWhite}" 
+                           VerticalOptions="Center"
+                           LineBreakMode="TailTruncation"/>
+
+                    <Button Grid.Column="1" 
+                            Text="✎" 
+                            Command="{Binding EditStudentCommand}" 
+                            FontSize="22" 
+                            TextColor="{StaticResource BrandCoral}" 
+                            BackgroundColor="Transparent" 
+                            HeightRequest="40" 
+                            WidthRequest="40" 
+                            Padding="0"/>
+                </Grid>
 
                 <VerticalStackLayout HorizontalOptions="Center" Spacing="10" Margin="0,0,0,10">
-                    <Frame HeightRequest="120" WidthRequest="120" CornerRadius="60" 
-                           Padding="0" IsClippedToBounds="True" BorderColor="LightGray">
-                        <Frame.GestureRecognizers>
+                    <Border HeightRequest="120" WidthRequest="120" StrokeShape="RoundRectangle 60" 
+                            Stroke="{StaticResource BrandCoral}" StrokeThickness="2" BackgroundColor="{StaticResource BrandNavyBlue}" Padding="0">
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding PickPhotoCommand}"/>
-                        </Frame.GestureRecognizers>
-                        <Image Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
-                               Aspect="AspectFill"/>
-                    </Frame>
-                    <Label Text="Toucher pour changer la photo" FontSize="11" TextColor="{StaticResource Primary}" HorizontalOptions="Center"/>
+                        </Border.GestureRecognizers>
+                        <Image Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill"/>
+                    </Border>
+                    <Label Text="Toucher pour changer la photo" FontSize="13" TextColor="{StaticResource BrandCoral}" FontFamily="OpenSansSemibold" HorizontalOptions="Center"/>
                 </VerticalStackLayout>
 
-
-                <Frame Padding="15" CornerRadius="10">
+                <Border Padding="20" StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                     <VerticalStackLayout Spacing="15">
-                        <Label Text="Général" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Label Text="GÉNÉRAL" FontSize="14" FontFamily="OpenSansSemibold" TextColor="{StaticResource BrandCoral}" CharacterSpacing="1"/>
 
-                        <Entry Placeholder="Nom (ex: Grpe Compétition)" 
-                               Text="{Binding Name}" 
-                               FontSize="18"/>
+                        <VerticalStackLayout>
+                            <Label Text="Nom du groupe" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Entry Placeholder="ex: Grpe Compétition" 
+                                   Text="{Binding Name}" 
+                                   TextColor="{StaticResource NeutralWhite}" 
+                                   PlaceholderColor="{StaticResource NeutralGray}" 
+                                   FontFamily="OpenSansSemibold" 
+                                   FontSize="16"/>
+                        </VerticalStackLayout>
 
-                        <Picker ItemsSource="{Binding GroupTypeNames}" 
-                                SelectedIndex="{Binding SelectedTypeIndex}"
-                                Title="Type d'activité" />
+                        <VerticalStackLayout>
+                            <Label Text="Type d'activité" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Border Stroke="{StaticResource BrandDarkBlue}" StrokeThickness="1" Padding="5,0" StrokeShape="RoundRectangle 8" BackgroundColor="Transparent" Margin="0,5,0,0">
+                                <Picker ItemsSource="{Binding GroupTypeNames}" 
+                                        SelectedIndex="{Binding SelectedTypeIndex}" 
+                                        Title="Sélectionner un type" 
+                                        TextColor="{StaticResource NeutralWhite}" 
+                                        TitleColor="{StaticResource NeutralGray}"/>
+                            </Border>
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <Frame IsVisible="{Binding IsWeekly}" Padding="15" CornerRadius="10">
+                <Border IsVisible="{Binding IsWeekly}" Padding="20" StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                     <VerticalStackLayout Spacing="15">
-                        <Label Text="Configuration de la Saison" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Label Text="CONFIGURATION DE LA SAISON" FontSize="14" FontFamily="OpenSansSemibold" TextColor="{StaticResource BrandOrange}" CharacterSpacing="1"/>
 
-                        <Label Text="Quel jour de la semaine ?" FontSize="12" TextColor="Gray"/>
-                        <Picker ItemsSource="{Binding DayNames}" SelectedIndex="{Binding SelectedDayIndex}"/>
+                        <VerticalStackLayout>
+                            <Label Text="Quel jour de la semaine ?" FontSize="12" TextColor="{StaticResource NeutralLightGray}"/>
+                            <Border Stroke="{StaticResource BrandDarkBlue}" StrokeThickness="1" Padding="5,0" StrokeShape="RoundRectangle 8" BackgroundColor="Transparent" Margin="0,5,0,0">
+                                <Picker ItemsSource="{Binding DayNames}" 
+                                        SelectedIndex="{Binding SelectedDayIndex}" 
+                                        TextColor="{StaticResource NeutralWhite}" 
+                                        TitleColor="{StaticResource NeutralGray}"/>
+                            </Border>
+                        </VerticalStackLayout>
 
-                        <Label Text="Horaires" FontSize="12" TextColor="Gray"/>
+                        <Label Text="Horaires" FontSize="12" TextColor="{StaticResource NeutralLightGray}" Margin="0,10,0,-5"/>
                         <Grid ColumnDefinitions="*, Auto, *">
-                            <TimePicker Time="{Binding StartTime}" Format="HH:mm"/>
-                            <Label Grid.Column="1" Text="à" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <TimePicker Grid.Column="2" Time="{Binding EndTime}" Format="HH:mm"/>
+                            <TimePicker Grid.Column="0" Time="{Binding StartTime}" Format="HH:mm" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold"/>
+                            <Label Grid.Column="1" Text="à" TextColor="{StaticResource NeutralLightGray}" VerticalOptions="Center" HorizontalOptions="Center" Margin="10,0"/>
+                            <TimePicker Grid.Column="2" Time="{Binding EndTime}" Format="HH:mm" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold"/>
                         </Grid>
 
-                        <Label Text="Durée de la saison" FontSize="12" TextColor="Gray"/>
+                        <Label Text="Durée de la saison" FontSize="12" TextColor="{StaticResource NeutralLightGray}" Margin="0,10,0,-5"/>
                         <Grid ColumnDefinitions="*, Auto, *">
-                            <DatePicker Date="{Binding StartDate}" Format="dd/MM/yyyy"/>
-                            <Label Grid.Column="1" Text="au" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <DatePicker Grid.Column="2" Date="{Binding EndDate}" Format="dd/MM/yyyy"/>
+                            <DatePicker Grid.Column="0" Date="{Binding StartDate}" Format="dd/MM/yyyy" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold"/>
+                            <Label Grid.Column="1" Text="au" TextColor="{StaticResource NeutralLightGray}" VerticalOptions="Center" HorizontalOptions="Center" Margin="10,0"/>
+                            <DatePicker Grid.Column="2" Date="{Binding EndDate}" Format="dd/MM/yyyy" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold"/>
                         </Grid>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <Frame IsVisible="{Binding IsEvent}" Padding="15" CornerRadius="10">
+                <Border IsVisible="{Binding IsEvent}" Padding="20" StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
                     <VerticalStackLayout Spacing="15">
-                        <Label Text="Dates du Stage" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+                        <Label Text="DATES DU STAGE" FontSize="14" FontFamily="OpenSansSemibold" TextColor="{StaticResource BrandOrange}" CharacterSpacing="1"/>
                         <Grid ColumnDefinitions="*, Auto, *">
-                            <DatePicker Date="{Binding StartDate}" Format="dd MMM"/>
-                            <Label Grid.Column="1" Text="au" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <DatePicker Grid.Column="2" Date="{Binding EndDate}" Format="dd MMM"/>
+                            <DatePicker Grid.Column="0" Date="{Binding StartDate}" Format="dd MMM" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold"/>
+                            <Label Grid.Column="1" Text="au" TextColor="{StaticResource NeutralLightGray}" VerticalOptions="Center" HorizontalOptions="Center" Margin="10,0"/>
+                            <DatePicker Grid.Column="2" Date="{Binding EndDate}" Format="dd MMM" TextColor="{StaticResource NeutralWhite}" FontFamily="OpenSansSemibold"/>
                         </Grid>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <Frame IsVisible="{Binding IsPrivate}" Padding="15" CornerRadius="10" BackgroundColor="#E3F2FD">
-                    <Label Text="Pour les cours particuliers, créez le groupe ici. Vous gérerez les séances dans le calendrier ensuite." 
-                           TextColor="Black" FontSize="12"/>
-                </Frame>
+                <Border IsVisible="{Binding IsPrivate}" Padding="20" StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="1" Stroke="{StaticResource BrandCoral}">
+                    <HorizontalStackLayout Spacing="15" VerticalOptions="Center">
+                        <Label Text="💡" FontSize="24" VerticalOptions="Center"/>
+                        <Label Text="Pour les cours particuliers, créez le groupe ici. Vous gérerez les séances dans le calendrier ensuite." 
+                               TextColor="{StaticResource NeutralLightGray}" FontSize="13" LineBreakMode="WordWrap" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </Border>
 
-                <BoxView HeightRequest="20" />
+                <BoxView HeightRequest="20" Color="Transparent"/>
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, *, *" ColumnSpacing="10" Padding="20" BackgroundColor="{AppThemeBinding Light=White, Dark=Black}">
+        <Grid Grid.Row="1" ColumnDefinitions="*, *, *" ColumnSpacing="15" Padding="20" BackgroundColor="{StaticResource BrandDarkBlue}">
 
             <Button Grid.Column="0" Text="Archiver" Command="{Binding DeleteCommand}"
-                    BackgroundColor="DarkRed" TextColor="White"
-                    IsVisible="{Binding IsEditMode}"/>
+                    IsVisible="{Binding IsEditMode}"
+                    BackgroundColor="Transparent" 
+                    TextColor="{StaticResource BrandCoral}" 
+                    BorderColor="{StaticResource BrandCoral}" 
+                    BorderWidth="1" 
+                    CornerRadius="12" 
+                    FontFamily="OpenSansSemibold"
+                    Padding="0"/>
 
             <Button Grid.Column="1" Text="Annuler" Command="{Binding CancelCommand}"
-                    BackgroundColor="Transparent" TextColor="Gray" BorderColor="Gray" BorderWidth="1"/>
+                    BackgroundColor="Transparent" 
+                    TextColor="{StaticResource NeutralLightGray}" 
+                    BorderColor="{StaticResource NeutralLightGray}" 
+                    BorderWidth="1" 
+                    CornerRadius="12" 
+                    FontFamily="OpenSansSemibold"
+                    Padding="0"/>
 
             <Button Grid.Column="2" Text="{Binding SubmitButtonText}" Command="{Binding SaveCommand}"
-                    BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+                    BackgroundColor="{StaticResource BrandCoral}" 
+                    TextColor="{StaticResource NeutralWhite}" 
+                    CornerRadius="12" 
+                    FontFamily="OpenSansSemibold"
+                    Padding="0"/>
         </Grid>
 
     </Grid>

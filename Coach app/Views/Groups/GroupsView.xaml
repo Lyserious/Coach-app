@@ -6,14 +6,15 @@
              xmlns:shared="clr-namespace:Coach_app.Views.Shared"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit" 
              x:Class="Coach_app.Views.Groups.GroupsView"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource BrandDarkBlue}"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding LoadGroupsCommand}" />
     </ContentPage.Behaviors>
 
     <Grid>
-        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="{OnPlatform WinUI='250', MacCatalyst='250', Default='0'}" />
             <ColumnDefinition Width="*" />
@@ -21,15 +22,52 @@
 
         <shared:SidebarView Grid.Column="0" IsVisible="{OnPlatform WinUI='True', MacCatalyst='True', Default='False'}" />
 
-        <Grid Grid.Column="1" RowDefinitions="Auto, *" Padding="20" BackgroundColor="#F5F5F5">
+        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" Padding="20">
 
-            <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,20">
-                <Label Text="Groupes récurrents &amp; Stages" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" TextColor="Black"/>
-                <Button Grid.Column="1" Text="+ Créer" Command="{Binding AddGroupCommand}"
-                        BackgroundColor="{StaticResource Primary}" TextColor="White" HeightRequest="40" CornerRadius="20"/>
+            <Grid Grid.Row="0" ColumnDefinitions="Auto, *" VerticalOptions="Center" Margin="0,0,0,10">
+
+                <Border Grid.Column="0"
+                        Stroke="{StaticResource BrandCoral}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10"
+                        HeightRequest="40"
+                        WidthRequest="40"
+                        Margin="0,0,15,0"
+                        BackgroundColor="{StaticResource BrandNavyBlue}"
+                        IsVisible="{OnPlatform Android=True, iOS=True, WinUI=False, MacCatalyst=False}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type Shell}}, Path=FlyoutIsPresented}" CommandParameter="True" />
+                    </Border.GestureRecognizers>
+                    <Label Text="☰" TextColor="{StaticResource BrandCoral}" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+
+                <Label Grid.Column="1"
+                       Text="{Binding Title}" 
+                       FontSize="28" 
+                       FontFamily="OpenSansSemibold" 
+                       TextColor="{StaticResource NeutralWhite}"
+                       VerticalOptions="Center"/>
             </Grid>
 
-            <CollectionView Grid.Row="1" 
+            <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Margin="0,0,0,20" VerticalOptions="End">
+                <Label Grid.Column="0" 
+                       Text="Groupes récurrents &amp; Stages" 
+                       FontSize="15" 
+                       TextColor="{StaticResource NeutralLightGray}" 
+                       VerticalOptions="Center"/>
+
+                <Button Grid.Column="1" 
+                        Text="+ CRÉER" 
+                        Command="{Binding AddGroupCommand}"
+                        BackgroundColor="{StaticResource BrandCoral}" 
+                        TextColor="{StaticResource NeutralWhite}" 
+                        FontFamily="OpenSansSemibold"
+                        HeightRequest="40" 
+                        Padding="20,0"
+                        CornerRadius="20"/>
+            </Grid>
+
+            <CollectionView Grid.Row="2" 
                             ItemsSource="{Binding Groups}"
                             SelectionMode="Single"
                             SelectedItem="{Binding SelectedGroup}">
@@ -39,39 +77,48 @@
                 </CollectionView.ItemsLayout>
 
                 <CollectionView.EmptyView>
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
-                        <Label Text="📭" FontSize="40" HorizontalOptions="Center"/>
-                        <Label Text="Aucun groupe trouvé" TextColor="Gray" HorizontalOptions="Center"/>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10" Margin="0,40,0,0">
+                        <Label Text="📭" FontSize="40" HorizontalOptions="Center" Opacity="0.8"/>
+                        <Label Text="Aucun groupe trouvé" TextColor="{StaticResource NeutralLightGray}" FontFamily="OpenSansSemibold" HorizontalOptions="Center"/>
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
 
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Group">
-                        <Frame Padding="0" CornerRadius="15" HasShadow="True" BorderColor="Transparent" HeightRequest="200" IsClippedToBounds="True">
-                            <Frame.GestureRecognizers>
+                    <DataTemplate>
+                        <Border StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0">
+                            <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GroupLibraryViewModel}}, Path=GoToGroupDetailCommand}" CommandParameter="{Binding .}"/>
-                            </Frame.GestureRecognizers>
+                            </Border.GestureRecognizers>
 
-                            <Grid RowDefinitions="2*, 1*">
-                                <Image Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
+                            <Grid RowDefinitions="140, Auto">
+                                <Image Grid.Row="0" 
+                                       Source="{Binding PhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
                                        Aspect="AspectFill" 
-                                       Grid.RowSpan="2"
-                                       BackgroundColor="#333"/>
-                                <BoxView Color="Black" Opacity="0.1" Grid.RowSpan="2"/>
+                                       BackgroundColor="{StaticResource BrandDarkBlue}"/>
 
-                                <Border BackgroundColor="White" HorizontalOptions="End" VerticalOptions="Start" Margin="10" Padding="8,4" StrokeShape="RoundRectangle 10" StrokeThickness="0">
-                                    <Label Text="{Binding Type}" FontSize="10" FontAttributes="Bold" TextColor="Black"/>
+                                <BoxView Grid.Row="0" Color="Black" Opacity="0.2"/>
+
+                                <Border Grid.Row="0" 
+                                        BackgroundColor="{StaticResource BrandCoral}" 
+                                        HorizontalOptions="End" 
+                                        VerticalOptions="Start" 
+                                        Margin="10" 
+                                        Padding="10,5" 
+                                        StrokeShape="RoundRectangle 10" 
+                                        StrokeThickness="0">
+                                    <Label Text="{Binding Type}" FontSize="11" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}"/>
                                 </Border>
 
-                                <VerticalStackLayout Grid.Row="1" BackgroundColor="White" Padding="15,10" Spacing="2">
-                                    <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="Black"/>
-                                    <Label Text="{Binding Schedule}" FontSize="12" TextColor="Gray"/>
+                                <VerticalStackLayout Grid.Row="1" Padding="15" Spacing="4">
+                                    <Label Text="{Binding Name}" FontSize="16" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}"/>
+                                    <Label Text="{Binding Schedule}" FontSize="13" TextColor="{StaticResource NeutralLightGray}"/>
                                 </VerticalStackLayout>
                             </Grid>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+
         </Grid>
     </Grid>
 </ContentPage>

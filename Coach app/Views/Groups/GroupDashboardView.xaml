@@ -5,6 +5,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit" 
              x:Class="Coach_app.Views.Groups.GroupDashboardView"
              Title="{Binding GroupName}"
+             BackgroundColor="{StaticResource BrandDarkBlue}"
              Shell.NavBarIsVisible="False">
 
     <ContentPage.Behaviors>
@@ -13,103 +14,100 @@
 
     <Grid RowDefinitions="Auto, *">
 
-        <Grid Grid.Row="0" ColumnDefinitions="Auto, Auto, *, Auto" Padding="15,40,15,20" BackgroundColor="{StaticResource Primary}">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="20" BackgroundColor="{StaticResource BrandNavyBlue}">
 
-            <Button Grid.Column="0" Text="←" Command="{Binding GoBackCommand}"
-                    BackgroundColor="Transparent" TextColor="White" FontSize="24"
-                    VerticalOptions="Start" Margin="0,-10,10,0"/>
-
-            <Frame Grid.Column="1" HeightRequest="50" WidthRequest="50" CornerRadius="25" 
-                   Padding="0" IsClippedToBounds="True" BorderColor="White" Margin="0,0,10,0"
-                   IsVisible="{Binding PhotoPath, Converter={toolkit:IsStringNotNullOrEmptyConverter}}">
+            <Border Grid.Column="0" HeightRequest="60" WidthRequest="60" StrokeShape="RoundRectangle 30" 
+                    Stroke="{StaticResource BrandCoral}" StrokeThickness="2" BackgroundColor="{StaticResource BrandDarkBlue}" 
+                    Margin="0,0,15,0" IsVisible="{Binding PhotoPath, Converter={toolkit:IsStringNotNullOrEmptyConverter}}">
                 <Image Source="{Binding PhotoPath}" Aspect="AspectFill"/>
-            </Frame>
+            </Border>
 
-            <VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
-                <Label Text="{Binding GroupName}" TextColor="White" FontSize="22" FontAttributes="Bold"/>
-                <Label Text="Tableau de bord" TextColor="White" Opacity="0.8" FontSize="12"/>
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                <Label Text="{Binding GroupName}" TextColor="{StaticResource NeutralWhite}" FontSize="24" FontFamily="OpenSansSemibold" LineBreakMode="TailTruncation"/>
+                <Label Text="Tableau de bord" TextColor="{StaticResource BrandCoral}" FontFamily="OpenSansSemibold" FontSize="13"/>
             </VerticalStackLayout>
 
-            <Button Grid.Column="3" Text="⚙ Paramètres" Command="{Binding EditGroupCommand}"
-                    BackgroundColor="White" TextColor="{StaticResource Primary}"
-                    FontSize="12" HeightRequest="35" CornerRadius="15" VerticalOptions="Center"/>
+            <Button Grid.Column="2" Text="✎ PARAMÈTRES" Command="{Binding EditGroupCommand}"
+                    BackgroundColor="Transparent" TextColor="{StaticResource NeutralLightGray}"
+                    BorderColor="{StaticResource NeutralLightGray}" BorderWidth="1"
+                    FontSize="11" FontFamily="OpenSansSemibold" HeightRequest="35" CornerRadius="8" VerticalOptions="Center"/>
         </Grid>
 
         <ScrollView Grid.Row="1" Padding="20">
             <VerticalStackLayout Spacing="25">
 
-                <Frame CornerRadius="15" HasShadow="True" BorderColor="Transparent" Padding="15">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="📅  Calendrier / Séances" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}"/>
+                <Border StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0" Padding="20">
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="📅 CALENDRIER &amp; SÉANCES" FontFamily="OpenSansSemibold" FontSize="14" TextColor="{StaticResource NeutralWhite}" CharacterSpacing="1"/>
 
-                        <Grid ColumnDefinitions="Auto, *" BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#333}" Padding="10" 
-                              RowDefinitions="Auto, Auto">
-                            <Label Grid.Column="0" Text="PROCHAINE" FontSize="10" FontAttributes="Bold" TextColor="Gray" Margin="0,0,10,0"/>
-                            <Label Grid.Column="1" Text="Lundi 14 Octobre" FontAttributes="Bold"/>
+                        <Border BackgroundColor="{StaticResource BrandDarkBlue}" StrokeShape="RoundRectangle 10" Padding="15" StrokeThickness="0">
+                            <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
+                                <Label Grid.RowSpan="2" Grid.Column="0" Text="PROCHAINE" FontSize="11" FontFamily="OpenSansSemibold" TextColor="{StaticResource BrandCoral}" VerticalOptions="Center" Margin="0,0,15,0" Rotation="-90" />
+                                <Label Grid.Row="0" Grid.Column="1" Text="Lundi 14 Octobre" FontFamily="OpenSansSemibold" TextColor="{StaticResource NeutralWhite}" FontSize="15"/>
+                                <Label Grid.Row="1" Grid.Column="1" Text="18:00 - 20:00 (Endurance)" TextColor="{StaticResource NeutralLightGray}" FontSize="13" Margin="0,2,0,0"/>
+                            </Grid>
+                        </Border>
 
-                            <Label Grid.Row="1" Grid.Column="1" Text="18:00 - 20:00 (Endurance)" TextColor="Gray" FontSize="12"/>
-                        </Grid>
-
-                        <Button Text="📅 Voir tout le calendrier" 
-        Command="{Binding GoToCalendarCommand}"
-        BackgroundColor="White" TextColor="{StaticResource Primary}" 
-        BorderColor="{StaticResource Primary}" BorderWidth="1"
-        Margin="0,10,0,0"/>
-                        <Button Text="📷 Galerie Photos" 
-        Command="{Binding GoToGalleryCommand}"
-        BackgroundColor="{StaticResource Primary}" TextColor="White" 
-        Margin="0,10,0,0"/>
+                        <Button Text="Voir tout le calendrier" 
+                                Command="{Binding GoToCalendarCommand}"
+                                BackgroundColor="Transparent" TextColor="{StaticResource BrandCoral}" 
+                                BorderColor="{StaticResource BrandCoral}" BorderWidth="1"
+                                FontFamily="OpenSansSemibold" HeightRequest="45" CornerRadius="10" Margin="0,5,0,0"/>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <Frame CornerRadius="15" HasShadow="True" BorderColor="Transparent" Padding="15">
-                    <VerticalStackLayout Spacing="10">
-                        <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="10">
-                            <Label Text="👥  Élèves" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
+                <Border StrokeShape="RoundRectangle 15" BackgroundColor="{StaticResource BrandNavyBlue}" StrokeThickness="0" Padding="20">
+                    <VerticalStackLayout Spacing="15">
+                        <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="👥 ÉLÈVES" FontFamily="OpenSansSemibold" FontSize="14" TextColor="{StaticResource NeutralWhite}" CharacterSpacing="1" VerticalOptions="Center"/>
 
                             <Button Grid.Column="1" Text="🔍 Importer" Command="{Binding ImportStudentCommand}" 
-                                    FontSize="11" HeightRequest="30" Padding="10,0" CornerRadius="15"
-                                    BackgroundColor="LightGray" TextColor="Black"/>
+                                    FontSize="11" FontFamily="OpenSansSemibold" HeightRequest="35" Padding="15,0" CornerRadius="8"
+                                    BackgroundColor="{StaticResource BrandDarkBlue}" TextColor="{StaticResource NeutralLightGray}"/>
 
                             <Button Grid.Column="2" Text="+ Nouveau" Command="{Binding AddStudentCommand}" 
-                                    FontSize="11" HeightRequest="30" Padding="10,0" CornerRadius="15"
-                                    BackgroundColor="{StaticResource Primary}" TextColor="White"/>
+                                    FontSize="11" FontFamily="OpenSansSemibold" HeightRequest="35" Padding="15,0" CornerRadius="8"
+                                    BackgroundColor="{StaticResource BrandCoral}" TextColor="{StaticResource NeutralWhite}"/>
                         </Grid>
 
                         <CollectionView ItemsSource="{Binding Students}" HeightRequest="250">
                             <CollectionView.EmptyView>
-                                <Label Text="Aucun élève. Ajoutez-en un !" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Gray" Margin="0,30,0,0"/>
+                                <Label Text="Aucun élève. Ajoutez-en un !" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{StaticResource NeutralLightGray}" Margin="0,30,0,0"/>
                             </CollectionView.EmptyView>
 
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid ColumnDefinitions="40, *, Auto" Padding="0,5">
-                                        <Image Grid.Column="0" Source="{Binding ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" 
-                                               Aspect="AspectFill" HeightRequest="35" WidthRequest="35">
-                                            <Image.Clip>
-                                                <EllipseGeometry Center="17.5,17.5" RadiusX="17.5" RadiusY="17.5"/>
-                                            </Image.Clip>
-                                        </Image>
+                                    <Border BackgroundColor="{StaticResource BrandDarkBlue}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="10" Margin="0,0,0,10">
 
-                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="10,0,0,0">
-                                            <Label Text="{Binding DisplayName}" FontAttributes="Bold" FontSize="14"/>
-                                            <Label Text="{Binding MaxLevel, StringFormat='Niveau : {0}'}" TextColor="Gray" FontSize="10"/>
-                                        </VerticalStackLayout>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GroupDashboardViewModel}}, Path=GoToStudentProfileCommand}" CommandParameter="{Binding .}"/>
+                                        </Border.GestureRecognizers>
 
-                                        <Label Grid.Column="2" Text="🛈" FontSize="18" TextColor="LightGray" VerticalOptions="Center"/>
-                                    </Grid>
+                                        <Grid ColumnDefinitions="45, *, Auto">
+                                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" StrokeThickness="0" HorizontalOptions="Start" VerticalOptions="Center">
+                                                <Image Source="{Binding ProfilePhotoPath, Converter={StaticResource StringNullToImageConverter}}" Aspect="AspectFill"/>
+                                            </Border>
+
+                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="10,0,0,0">
+                                                <Label Text="{Binding DisplayName}" FontFamily="OpenSansSemibold" FontSize="15" TextColor="{StaticResource NeutralWhite}"/>
+                                                <Label Text="{Binding MaxLevel, StringFormat='Niveau : {0}'}" TextColor="{StaticResource NeutralLightGray}" FontSize="12"/>
+                                            </VerticalStackLayout>
+
+                                            <Label Grid.Column="2" Text="›" FontSize="24" TextColor="{StaticResource NeutralGray}" VerticalOptions="Center"/>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <Frame CornerRadius="15" HasShadow="True" BorderColor="Transparent" Padding="15">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="📷  Photos &amp; Vidéos" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}"/>
-                        <Label Text="Aucun média partagé pour ce groupe." TextColor="Gray" FontSize="12" FontAttributes="Italic"/>
-                    </VerticalStackLayout>
-                </Frame>
+                <Button Text="📷 GALERIE PHOTOS DU GROUPE" 
+                        Command="{Binding GoToGalleryCommand}"
+                        BackgroundColor="{StaticResource BrandCoral}" TextColor="{StaticResource NeutralWhite}" 
+                        FontFamily="OpenSansSemibold" HeightRequest="55" CornerRadius="12"
+                        Margin="0,10,0,40"
+                        Shadow="{Shadow Brush=Black, Offset='0,4', Opacity=0.2}"/>
 
             </VerticalStackLayout>
         </ScrollView>
